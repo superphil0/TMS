@@ -2,15 +2,13 @@ using ClosedXML.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-//using System.Windows.Forms;
+
 namespace TMS
 {
     internal class DocumentBuilder
     {
-
         private static List<XLColor> seasonColors = new List<XLColor>
 		{
-            
 			XLColor.LightGreen,
 			XLColor.Yellow,
 			XLColor.Orange,
