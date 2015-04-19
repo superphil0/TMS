@@ -106,7 +106,7 @@ namespace TMS
                 string ss = await response.Content.ReadAsStringAsync();
                 htmlDocument.LoadHtml(ss);
 
-                var nodes = htmlDocument.DocumentNode.SelectNodes("//div[@data-type='substitutions']");
+                var nodes = htmlDocument.DocumentNode.SelectNodes("//div[@data-id='substitutions']");
                 if (nodes != null)
                 {
                     var node = nodes.ElementAt(0);
