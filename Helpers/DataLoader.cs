@@ -339,17 +339,17 @@ namespace TMS
                             data = current.SelectNodes("td");
                             if (data != null)
                             {
-                                if (data.Count > 2)
+                                if (data.Count > 3)
                                 {
-                                    age = data.ElementAt(2).InnerText;
+                                    age = data.ElementAt(3).InnerText;
                                     if (age.IndexOf("(") != -1)
                                     {
                                         age = age.Substring(age.IndexOf("(") + 1);
                                         age = age.Replace(")", "").Trim();
                                     }
                                 }
-                                if (data.Count > 4)
-                                    marketValue = data.ElementAt(4).InnerText;
+                                if (data.Count > 5)
+                                    marketValue = data.ElementAt(5).InnerText;
 
                                 data = current.SelectNodes(".//td[@class='hauptlink']/span");
                                 if (data != null)
@@ -460,7 +460,7 @@ namespace TMS
                     HtmlNodeCollection htmlNodeCollection3 = htmlNode.SelectNodes("tr/td");
                     if (htmlNodeCollection3 != null)
                     {
-                        text = htmlNodeCollection3.ElementAt(4).InnerText;
+                        text = htmlNodeCollection3.ElementAt(5).InnerText;
                         text = text.Replace("\r\n", "").Replace("\t", "");
                     }
                     HtmlNode htmlNode2 = htmlDocument.DocumentNode.SelectNodes("//table[@class='profilheader']").ElementAt(1);
@@ -469,8 +469,15 @@ namespace TMS
                     {
                         text2 = htmlNodeCollection3.ElementAt(0).InnerText;
                         text2 = text2.Replace("\r\n", "").Replace("\t", "");
+                        if(htmlNodeCollection3.Count>4)
+                        {
+                            var np = htmlNodeCollection3.ElementAt(4).InnerText.Replace("&nbsp;","").Replace("\r\n","").Trim();
+                            var npurl = htmlNodeCollection3.ElementAt(4).SelectNodes("a").ElementAt(0).Attributes["href"].Value;
+                            statistics.NationalPlayer = np;
+                            statistics.NationalPlayerUrl = npurl;
+                        }
                     }
-                    contract = text + "-" + text2;
+                    contract = text2 + "-" + text;
                     List<Match> matches = new List<Match>();
                     htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes("//div[@class='responsive-table']/table/tbody/tr");
                     if (htmlNodeCollection != null)

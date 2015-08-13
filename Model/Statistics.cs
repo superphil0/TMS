@@ -56,5 +56,17 @@ namespace TMS
             get;
             set;
         }
+
+        public string NationalPlayer
+        {
+            get;
+            set;
+        }
+
+        public string NationalPlayerUrl
+        {
+            get;
+            set;
+        }
 	}
 }

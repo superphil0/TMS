@@ -108,6 +108,17 @@ namespace TMS
             set;
         }
 
+        public string NationalPlayer
+        {
+            get;
+            set;
+        }
+        public string NationalPlayerUrl
+        {
+            get;
+            set;
+        }
+
         public LineUpStatus Lineup
         {
             get;

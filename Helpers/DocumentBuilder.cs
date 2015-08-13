@@ -155,9 +155,19 @@ namespace TMS
                     iXLWorksheet.Cell("B" + (i * 5 + 4).ToString()).Value = player.Contract;
                     iXLWorksheet.Cell("B" + (i * 5 + 4).ToString()).Style.Alignment.Horizontal =
                       XLAlignmentHorizontalValues.Left;
-                    iXLWorksheet.Cell("B" + (i * 5 + 5).ToString()).Value = (player.MarketValue);
+
+                    var cv = (player.MarketValue);
+                    if (player.NationalPlayer != null)
+                        cv += " / " + player.NationalPlayer;
+
+                    iXLWorksheet.Cell("B" + (i * 5 + 5).ToString()).Value = cv;
                     iXLWorksheet.Cell("B" + (i * 5 + 5).ToString()).Style.Alignment.Horizontal =
                       XLAlignmentHorizontalValues.Left;
+                    if (player.NationalPlayerUrl != null)
+                        iXLWorksheet.Cell("B" + (i * 5 + 5).ToString()).Hyperlink =
+                            new XLHyperlink("http://www.transfermarkt.com/" + player.NationalPlayerUrl);
+
+
                     if (player.Matches != null)
                     {
                         for (int k = 0; k < player.Matches.Count; k++)

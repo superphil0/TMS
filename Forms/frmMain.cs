@@ -368,10 +368,10 @@ namespace TMS
                 LoadTeamsAsync();
         }
 
-        private  void lbCompetition_Click(object sender, EventArgs e)
+        private void lbCompetition_Click(object sender, EventArgs e)
         {
             if (lbCompetition.SelectedItem != null)
-                 LoadTeamsAsync();
+                LoadTeamsAsync();
         }
 
         #endregion Competitions
@@ -461,7 +461,7 @@ namespace TMS
             string text = this.cbTeams.Text;
             List<Team> dataSource = (
                 from ts in this._cachedTeams
-                where Helper.RemoveDiacritics(ts.TeamName,false).ToUpper().Contains(this.cbTeams.Text.ToUpper())
+                where Helper.RemoveDiacritics(ts.TeamName, false).ToUpper().Contains(this.cbTeams.Text.ToUpper())
                 select ts).ToList<Team>();
             this.lbTeams.ValueMember = "TeamId";
             this.lbTeams.DisplayMember = "TeamFullName";
@@ -480,7 +480,7 @@ namespace TMS
 
         private void lbTeams_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (_generatingInProgress == false && _playerLoadingInProgress==false)
+            if (_generatingInProgress == false && _playerLoadingInProgress == false)
                 this._selectedTeam = (Team)this.lbTeams.SelectedItem;
         }
 
@@ -517,7 +517,7 @@ namespace TMS
 
         private List<Team> FindTeamsByName(string teamName)
         {
-           // return _cachedTeams.Where(tt => tt.TeamName.Contains(teamName) || (tt.AlternativeName != null && tt.AlternativeName.Equals(teamName))).ToList();
+            // return _cachedTeams.Where(tt => tt.TeamName.Contains(teamName) || (tt.AlternativeName != null && tt.AlternativeName.Equals(teamName))).ToList();
             return _cachedTeams.Where(tt => Helper.RemoveDiacritics(tt.TeamName, false).Contains(teamName) || (tt.AlternativeName != null && tt.AlternativeName.Equals(teamName))).ToList();
         }
 
@@ -550,7 +550,7 @@ namespace TMS
         {
             try
             {
-                 _playerLoadingInProgress = true;
+                _playerLoadingInProgress = true;
                 lbTeams.Enabled = false;
                 cbTeams.Enabled = false;
                 lbMatches.Enabled = false;
@@ -712,74 +712,74 @@ namespace TMS
                 Logger.Exception(ex);
                 MessageBox.Show(ex.Message);
             }
-          _playerLoadingInProgress = false;
+            _playerLoadingInProgress = false;
         }
 
         private async Task GetPlayersData(Player p)
         {
-          StreamWriter streamWriter = null;
-          try
-          {
-            if (p.Lineup == Player.LineUpStatus.YES)
+            StreamWriter streamWriter = null;
+            try
             {
-              Statistics statistics = new Statistics();
+                if (p.Lineup == Player.LineUpStatus.YES)
+                {
+                    Statistics statistics = new Statistics();
 
-              p.Statistics = new List<Statistics>();
-              p.Matches = new List<Match>();
-              streamWriter =
-                new StreamWriter("cache\\" + this._selectedTeam.TeamId.ToString() + ".txt", true);
-              bool flag = true;
-              bool flag2 = false;
-              for (int i = 0; i < 4; i++)
-              {
-                string year;
-                if (DateTime.Now.Month < 7)
-                {
-                  year = (DateTime.Now.Year - i - 1).ToString();
-                }
-                else
-                {
-                  year = (DateTime.Now.Year - i).ToString();
-                }
-                bool flag3 = false;
-                Statistics statistics2 = new Statistics();
-                if (!flag)
-                {
-                  List<Player> list = (
-                    from cs in this._cachedStats
-                    where cs.PlayerId.Equals(p.PlayerId)
-                    select cs).ToList<Player>();
-                  if (list.Count > 0)
-                  {
-                    List<Statistics> list2 = (
-                      from ss in list.First<Player>().Statistics
-                      where ss.Year.Equals(year)
-                      select ss).ToList<Statistics>();
-                    if (list2.Count > 0)
+                    p.Statistics = new List<Statistics>();
+                    p.Matches = new List<Match>();
+                    streamWriter =
+                      new StreamWriter("cache\\" + this._selectedTeam.TeamId.ToString() + ".txt", true);
+                    bool flag = true;
+                    bool flag2 = false;
+                    for (int i = 0; i < 4; i++)
                     {
-                      flag3 = true;
-                      statistics2 = list2.ElementAt(0);
-                      p.Statistics.Add(statistics2);
-                      p.SecondaryPositions = list.First<Player>().SecondaryPositions.ToList<string>();
-                      p.PrefferedFoot = list.First<Player>().PrefferedFoot;
-                    }
-                  }
-                }
-                if (!flag3 || flag)
-                {
-                  DateTime arg_265_0 = DateTime.Now;
-                  if (DateTime.Now.Month < 8)
-                  {
-                    statistics2.Year = (DateTime.Now.Year - i - 1).ToString();
-                  }
-                  else
-                  {
-                    statistics2.Year = (DateTime.Now.Year - i).ToString();
-                  }
-                  DateTime arg_2C2_0 = DateTime.Now;
-                  string text = p.TmUrl.Substring(1);
-                  string text2 = text.Substring(0, text.IndexOf("/"));
-                  string playerStatsUrl = string.Concat(new object[]
+                        string year;
+                        if (DateTime.Now.Month < 7)
+                        {
+                            year = (DateTime.Now.Year - i - 1).ToString();
+                        }
+                        else
+                        {
+                            year = (DateTime.Now.Year - i).ToString();
+                        }
+                        bool flag3 = false;
+                        Statistics statistics2 = new Statistics();
+                        if (!flag)
+                        {
+                            List<Player> list = (
+                              from cs in this._cachedStats
+                              where cs.PlayerId.Equals(p.PlayerId)
+                              select cs).ToList<Player>();
+                            if (list.Count > 0)
+                            {
+                                List<Statistics> list2 = (
+                                  from ss in list.First<Player>().Statistics
+                                  where ss.Year.Equals(year)
+                                  select ss).ToList<Statistics>();
+                                if (list2.Count > 0)
+                                {
+                                    flag3 = true;
+                                    statistics2 = list2.ElementAt(0);
+                                    p.Statistics.Add(statistics2);
+                                    p.SecondaryPositions = list.First<Player>().SecondaryPositions.ToList<string>();
+                                    p.PrefferedFoot = list.First<Player>().PrefferedFoot;
+                                }
+                            }
+                        }
+                        if (!flag3 || flag)
+                        {
+                            DateTime arg_265_0 = DateTime.Now;
+                            if (DateTime.Now.Month < 8)
+                            {
+                                statistics2.Year = (DateTime.Now.Year - i - 1).ToString();
+                            }
+                            else
+                            {
+                                statistics2.Year = (DateTime.Now.Year - i).ToString();
+                            }
+                            DateTime arg_2C2_0 = DateTime.Now;
+                            string text = p.TmUrl.Substring(1);
+                            string text2 = text.Substring(0, text.IndexOf("/"));
+                            string playerStatsUrl = string.Concat(new object[]
                   {
                     text2,
                     "/leistungsdaten/spieler/",
@@ -788,25 +788,31 @@ namespace TMS
                     year,
                     "/plus/1"
                   });
-                  string text3 = null;
-                  statistics = await DataLoader.LoadPlayerStatisticsAsync(playerStatsUrl, flag, year,
-                    p.MainPosition);
-                  if (text3 != null)
-                  {
-                    p.Contract = statistics.Contract;
-                  }
-                  if (!flag && !flag2)
-                  {
-                    flag2 = true;
-                    List<string> secondaryPositions = new List<string>();
-                    AdditionalPlayerData additionalPlayerData =
-                      await DataLoader.LoadAdditionPlayerDataAsync(text2 + "/profil/spieler/" + p.PlayerId);
-                    p.PrefferedFoot = additionalPlayerData.PrefferedFoot;
-                    p.SecondaryPositions = additionalPlayerData.SecondaryPositions;
-                  }
-                  if (statistics != null && !flag && statistics.GamesPlayed != null)
-                  {
-                    streamWriter.Write(string.Concat(new object[]
+                            string text3 = null;
+                            statistics = await DataLoader.LoadPlayerStatisticsAsync(playerStatsUrl, flag, year,
+                              p.MainPosition);
+                            if (statistics.Contract != null)
+                            {
+                                p.Contract = statistics.Contract;
+                            }
+                            if (statistics.NationalPlayer != null)
+                                p.NationalPlayer = statistics.NationalPlayer;
+
+                            if (statistics.NationalPlayerUrl != null)
+                                p.NationalPlayerUrl = statistics.NationalPlayerUrl;
+
+                            if (!flag && !flag2)
+                            {
+                                flag2 = true;
+                                List<string> secondaryPositions = new List<string>();
+                                AdditionalPlayerData additionalPlayerData =
+                                  await DataLoader.LoadAdditionPlayerDataAsync(text2 + "/profil/spieler/" + p.PlayerId);
+                                p.PrefferedFoot = additionalPlayerData.PrefferedFoot;
+                                p.SecondaryPositions = additionalPlayerData.SecondaryPositions;
+                            }
+                            if (statistics != null && !flag && statistics.GamesPlayed != null)
+                            {
+                                streamWriter.Write(string.Concat(new object[]
                     {
                       p.PlayerId,
                       "|",
@@ -824,40 +830,40 @@ namespace TMS
                       "-",
                       p.PrefferedFoot
                     }));
-                    string text4 = "";
-                    foreach (string current in p.SecondaryPositions)
-                    {
-                      text4 = text4 + "," + current;
+                                string text4 = "";
+                                foreach (string current in p.SecondaryPositions)
+                                {
+                                    text4 = text4 + "," + current;
+                                }
+                                if (text4 != "")
+                                {
+                                    streamWriter.Write("-" + text4.Substring(1));
+                                }
+                                streamWriter.Write(Environment.NewLine);
+                            }
+                            p.Statistics.Add(statistics);
+                            if (flag && statistics != null)
+                            {
+                                p.Matches = statistics.Matches.OrderByDescending(m => m.Date).Take(4).ToList();
+                                flag = false;
+                            }
+                        }
                     }
-                    if (text4 != "")
-                    {
-                      streamWriter.Write("-" + text4.Substring(1));
-                    }
-                    streamWriter.Write(Environment.NewLine);
-                  }
-                  p.Statistics.Add(statistics);
-                  if (flag && statistics != null)
-                  {
-                    p.Matches = statistics.Matches.OrderByDescending(m => m.Date).Take(4).ToList();
-                    flag = false;
-                  }
-                }
-              }
 
-              this._counter++;
+                    this._counter++;
+                }
             }
-          }
-          catch (Exception ex)
-          {
-            Logger.Exception(ex);
-            MessageBox.Show(ex.Message);
-          }
-          finally
-          {
-              if(streamWriter!=null)
-                streamWriter.Dispose();
-          }
-            
+            catch (Exception ex)
+            {
+                Logger.Exception(ex);
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (streamWriter != null)
+                    streamWriter.Dispose();
+            }
+
         }
 
         private void dgvPlayers_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -937,8 +943,8 @@ namespace TMS
         private void btnStop_Click(object sender, EventArgs e)
         {
             _generatingInProgress = false;
-          btnGenerateExcel.Enabled = true;
-          btnStop.Visible = false;
+            btnGenerateExcel.Enabled = true;
+            btnStop.Visible = false;
         }
 
         #endregion Players
@@ -1046,14 +1052,14 @@ namespace TMS
             pbLivescore.Visible = false;
         }
 
-        private  void btnRefresh_Click(object sender, EventArgs e)
+        private void btnRefresh_Click(object sender, EventArgs e)
         {
             StartLivescoreFeedAsync();
         }
 
-        private  void rbSlijedi_Click(object sender, EventArgs e)
+        private void rbSlijedi_Click(object sender, EventArgs e)
         {
-             StartLivescoreFeedAsync();
+            StartLivescoreFeedAsync();
         }
 
         private void rbLive_Click(object sender, EventArgs e)
@@ -1074,7 +1080,7 @@ namespace TMS
 
         private void lbMatches_Click(object sender, EventArgs e)
         {
-             LoadLineups();
+            LoadLineups();
         }
 
         private void lbMatches_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -1305,44 +1311,44 @@ namespace TMS
 
         private void btnGenerateExcel_Click(object sender, EventArgs e)
         {
-           GenerateExcel();        
+            GenerateExcel();
         }
 
-      private async Task GenerateExcel()
-      {
-          try
-          {
-              _generatingInProgress = true;
-              if (_selectedTeam.Players == null)
-                  return;
-              foreach (DataGridViewRow r in dgvPlayers.Rows)
-              {
-                  Player p = (Player)r.DataBoundItem;
-                  _selectedTeam.Players.Where(pp => pp.PlayerId == p.PlayerId).FirstOrDefault().Lineup = p.Lineup;
-              }
-              if (_selectedTeam.GameLineups != null &&
-                  _selectedTeam.Players.Where(p => p.Lineup == Player.LineUpStatus.YES).Count() < 11)
-              {
-                  DialogResult dr =
-                    MessageBox.Show(
-                      "Neki od igraca iz najavljenog sastava nisu mapirani. Nastaviti generisanje dokumenta bez njih ?",
-                      "Pitanje", MessageBoxButtons.YesNo);
-                  if (dr != DialogResult.Yes)
-                      return;
-              }
-              DirectoryInfo directoryInfo = new DirectoryInfo(Application.StartupPath + "\\cache\\xls\\");
-              if (!directoryInfo.Exists)
-                  directoryInfo.Create();
+        private async Task GenerateExcel()
+        {
+            try
+            {
+                _generatingInProgress = true;
+                if (_selectedTeam.Players == null)
+                    return;
+                foreach (DataGridViewRow r in dgvPlayers.Rows)
+                {
+                    Player p = (Player)r.DataBoundItem;
+                    _selectedTeam.Players.Where(pp => pp.PlayerId == p.PlayerId).FirstOrDefault().Lineup = p.Lineup;
+                }
+                if (_selectedTeam.GameLineups != null &&
+                    _selectedTeam.Players.Where(p => p.Lineup == Player.LineUpStatus.YES).Count() < 11)
+                {
+                    DialogResult dr =
+                      MessageBox.Show(
+                        "Neki od igraca iz najavljenog sastava nisu mapirani. Nastaviti generisanje dokumenta bez njih ?",
+                        "Pitanje", MessageBoxButtons.YesNo);
+                    if (dr != DialogResult.Yes)
+                        return;
+                }
+                DirectoryInfo directoryInfo = new DirectoryInfo(Application.StartupPath + "\\cache\\xls\\");
+                if (!directoryInfo.Exists)
+                    directoryInfo.Create();
 
-              this.btnGenerateExcel.Enabled = false;
-              btnStop.Visible = true;
-              this._counter = 0;
-              this.tbStatus.Visible = true;
-              this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
+                this.btnGenerateExcel.Enabled = false;
+                btnStop.Visible = true;
+                this._counter = 0;
+                this.tbStatus.Visible = true;
+                this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
 
-              foreach (Player p in _selectedTeam.Players)
-              {
-                  this.tbStatus.Text = string.Concat(new object[]
+                foreach (Player p in _selectedTeam.Players)
+                {
+                    this.tbStatus.Text = string.Concat(new object[]
               {
                 (this._counter + 1).ToString(),
                 " od ",
@@ -1350,28 +1356,28 @@ namespace TMS
                 " - ",
                 p.Name
               });
-                  foreach (DataGridViewRow dgvr in dgvPlayers.Rows)
-                  {
-                      CurrentPlayer = p;
-                      if (dgvr.DataBoundItem == CurrentPlayer)
-                          dgvPlayers.CurrentCell = dgvr.Cells[0];
-                  }
-                  await GetPlayersData(p);
-                if (_generatingInProgress == false)
-                  return;
-              }
-              lbMatches.Enabled = true;
-              dtpDatum.Enabled = true;
-              this.lbTeams.Enabled = true;
-              this.lbCompetition.Enabled = true;
-              this.btnGenerateExcel.Enabled = true;
-              btnStop.Visible = false;
-              this.tbStatus.Visible = false;
-              this.cbTeams.Enabled = true;
-              this.cbCountries.Enabled = true;
-              this.lbCountries.Enabled = true;
-              Guid.NewGuid();
-              string text = string.Concat(new string[]
+                    foreach (DataGridViewRow dgvr in dgvPlayers.Rows)
+                    {
+                        CurrentPlayer = p;
+                        if (dgvr.DataBoundItem == CurrentPlayer)
+                            dgvPlayers.CurrentCell = dgvr.Cells[0];
+                    }
+                    await GetPlayersData(p);
+                    if (_generatingInProgress == false)
+                        return;
+                }
+                lbMatches.Enabled = true;
+                dtpDatum.Enabled = true;
+                this.lbTeams.Enabled = true;
+                this.lbCompetition.Enabled = true;
+                this.btnGenerateExcel.Enabled = true;
+                btnStop.Visible = false;
+                this.tbStatus.Visible = false;
+                this.cbTeams.Enabled = true;
+                this.cbCountries.Enabled = true;
+                this.lbCountries.Enabled = true;
+                Guid.NewGuid();
+                string text = string.Concat(new string[]
 			{
 				"cache\\xls\\",
 				this._selectedTeam.TeamName,
@@ -1383,21 +1389,21 @@ namespace TMS
 				DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss"),
 				".xlsx"
 			});
-              DocumentBuilder.CreateCXMLDocument(text, this._selectedTeam);
-              if (File.Exists(text))
-              {
-                  //this.BindDocuments();
-                  LoadDocuments();
-                  Process.Start(text);
-              }
-          }
-          catch (Exception ex)
-          {
-              Logger.Exception(ex);
-              MessageBox.Show(ex.Message);
-          }
-          _generatingInProgress = false;
-      }
+                DocumentBuilder.CreateCXMLDocument(text, this._selectedTeam);
+                if (File.Exists(text))
+                {
+                    //this.BindDocuments();
+                    LoadDocuments();
+                    Process.Start(text);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex);
+                MessageBox.Show(ex.Message);
+            }
+            _generatingInProgress = false;
+        }
 
         private void LoadDocuments()
         {
