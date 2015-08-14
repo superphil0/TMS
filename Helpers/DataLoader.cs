@@ -289,6 +289,50 @@ namespace TMS
             return result;
         }
 
+        public async static Task<List<Team>> LoadTeamsAlternativeAsync(string competitionid)
+        {
+            List<Team> result;
+            try
+            {
+                List<Team> list = new List<Team>();
+
+                HttpClient httpClient = new HttpClient();
+                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://www.transfermarkt.com/jumplist/startseite/wettbewerb/" + competitionid);
+                requestMessage.Headers.Add("User-Agent", "Mozilla/5.0");
+
+                HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
+                HtmlDocument htmlDocument = new HtmlDocument();
+                string ss = await response.Content.ReadAsStringAsync();
+                htmlDocument.LoadHtml(ss);
+
+
+                HtmlNodeCollection htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes("//div[@id='yw1']");
+                if (htmlNodeCollection != null)
+                {
+                   var nodes =  htmlNodeCollection.ElementAt(0).SelectNodes("table/tbody/tr");
+                   foreach(var row in nodes)
+                   {
+                       var href = row.SelectNodes("td").ElementAt(0).SelectNodes("a").ElementAt(0).Attributes["href"].Value;
+                       var teamid = href.Split('/').ElementAt(4);
+                       var title = row.SelectNodes("td").ElementAt(1).SelectNodes("a").ElementAt(0).InnerHtml;
+                       list.Add(new Team
+                        {
+                            TeamId = int.Parse(teamid),
+                            TeamName = title,
+                            CompetitionId = competitionid
+                        });
+                    }
+                }
+                result = list;
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex);
+                result = null;
+            }
+            return result;
+        }
+
         public async static Task<List<Player>> LoadPlayersAsync(int teamid)
         {
             List<Player> result = new List<Player>();

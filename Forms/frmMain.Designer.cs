@@ -48,8 +48,8 @@ namespace TMS
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnGenerateExcel = new System.Windows.Forms.Button();
             this.lbCompetition = new System.Windows.Forms.ListBox();
             this.lbTeams = new System.Windows.Forms.ListBox();
@@ -82,6 +82,8 @@ namespace TMS
             this.lbMatches = new System.Windows.Forms.DataGridView();
             this.dgvPlayers = new System.Windows.Forms.DataGridView();
             this.btnStop = new System.Windows.Forms.Button();
+            this.cbCurrentSeason = new System.Windows.Forms.ComboBox();
+            this.lblCurrentSeason = new System.Windows.Forms.Label();
             this.cmsMapTeam.SuspendLayout();
             this.cmLineupstatus.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLivescore)).BeginInit();
@@ -96,10 +98,10 @@ namespace TMS
             // btnGenerateExcel
             // 
             this.btnGenerateExcel.Enabled = false;
-            this.btnGenerateExcel.Location = new System.Drawing.Point(587, 489);
+            this.btnGenerateExcel.Location = new System.Drawing.Point(587, 509);
             this.btnGenerateExcel.Margin = new System.Windows.Forms.Padding(4);
             this.btnGenerateExcel.Name = "btnGenerateExcel";
-            this.btnGenerateExcel.Size = new System.Drawing.Size(274, 56);
+            this.btnGenerateExcel.Size = new System.Drawing.Size(274, 36);
             this.btnGenerateExcel.TabIndex = 6;
             this.btnGenerateExcel.Text = "NOVI EXCEL DOKUMENT";
             this.btnGenerateExcel.UseVisualStyleBackColor = true;
@@ -414,8 +416,8 @@ namespace TMS
             this.lbMatches.Name = "lbMatches";
             this.lbMatches.ReadOnly = true;
             this.lbMatches.RowHeadersVisible = false;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle3;
             this.lbMatches.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.lbMatches.Size = new System.Drawing.Size(370, 424);
             this.lbMatches.TabIndex = 40;
@@ -436,8 +438,8 @@ namespace TMS
             this.dgvPlayers.Name = "dgvPlayers";
             this.dgvPlayers.ReadOnly = true;
             this.dgvPlayers.RowHeadersWidth = 30;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this.dgvPlayers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvPlayers.Size = new System.Drawing.Size(255, 684);
             this.dgvPlayers.TabIndex = 32;
@@ -454,12 +456,32 @@ namespace TMS
             this.btnStop.Visible = false;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
+            // cbCurrentSeason
+            // 
+            this.cbCurrentSeason.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbCurrentSeason.FormattingEnabled = true;
+            this.cbCurrentSeason.Location = new System.Drawing.Point(741, 486);
+            this.cbCurrentSeason.Name = "cbCurrentSeason";
+            this.cbCurrentSeason.Size = new System.Drawing.Size(121, 24);
+            this.cbCurrentSeason.TabIndex = 42;
+            // 
+            // lblCurrentSeason
+            // 
+            this.lblCurrentSeason.AutoSize = true;
+            this.lblCurrentSeason.Location = new System.Drawing.Point(588, 489);
+            this.lblCurrentSeason.Name = "lblCurrentSeason";
+            this.lblCurrentSeason.Size = new System.Drawing.Size(57, 16);
+            this.lblCurrentSeason.TabIndex = 43;
+            this.lblCurrentSeason.Text = "Sezona:";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightSteelBlue;
             this.ClientSize = new System.Drawing.Size(1123, 702);
+            this.Controls.Add(this.lblCurrentSeason);
+            this.Controls.Add(this.cbCurrentSeason);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.pbLivescore);
             this.Controls.Add(this.pbLoadingTeams);
@@ -507,6 +529,9 @@ namespace TMS
             this.PerformLayout();
 
         }
+
+        private ComboBox cbCurrentSeason;
+        private Label lblCurrentSeason;
     }
 }
 

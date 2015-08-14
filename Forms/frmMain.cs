@@ -64,6 +64,13 @@ namespace TMS
             StartLivescoreFeedAsync();
             tmrReload.Start();
 
+            cbCurrentSeason.Items.Add(DateTime.Now.Year);
+            cbCurrentSeason.Items.Add(DateTime.Now.Year - 1);
+
+            if (DateTime.Now.Month < 7)
+                cbCurrentSeason.SelectedIndex = 1;
+            else
+                cbCurrentSeason.SelectedIndex = 0;
         }
 
         private List<Team> GetCachedTeams()
@@ -395,7 +402,11 @@ namespace TMS
                   select cc).ToList<Team>();
                 if (list.Count == 0)
                 {
-                    this._selectedCompetition.Teams = await DataLoader.LoadTeamsAsync(this._selectedCompetition.CompetitionId);
+                    var competitions = await DataLoader.LoadTeamsAsync(this._selectedCompetition.CompetitionId);
+                    if (competitions.Count == 0)
+                        competitions = await DataLoader.LoadTeamsAlternativeAsync(this._selectedCompetition.CompetitionId);
+                    this._selectedCompetition.Teams = competitions;
+
                     DirectoryInfo directoryInfo = new DirectoryInfo("cache");
                     if (!directoryInfo.Exists)
                     {
@@ -482,6 +493,9 @@ namespace TMS
         {
             if (_generatingInProgress == false && _playerLoadingInProgress == false)
                 this._selectedTeam = (Team)this.lbTeams.SelectedItem;
+
+
+
         }
 
         private void UpdateTeamAlternativeName(Team t)
@@ -684,14 +698,17 @@ namespace TMS
                     dgvPlayers.Rows[0].Selected = false;
 
                 string text;
-                if (DateTime.Now.Month >= 8)
-                {
-                    text = DateTime.Now.Year.ToString();
-                }
-                else
-                {
-                    text = (DateTime.Now.Year - 1).ToString();
-                }
+                //if (DateTime.Now.Month >= 8)
+                //{
+                //    text = DateTime.Now.Year.ToString();
+                //}
+                //else
+                //{
+                //    text = (DateTime.Now.Year - 1).ToString();
+                //}
+
+                text = cbCurrentSeason.SelectedItem.ToString();
+
                 for (int i = 0; i < this._selectedTeam.Players.Count; i++)
                 {
                     string text2 = this._selectedTeam.Players[i].TmUrl.Substring(1);
@@ -733,14 +750,15 @@ namespace TMS
                     for (int i = 0; i < 4; i++)
                     {
                         string year;
-                        if (DateTime.Now.Month < 7)
-                        {
-                            year = (DateTime.Now.Year - i - 1).ToString();
-                        }
-                        else
-                        {
-                            year = (DateTime.Now.Year - i).ToString();
-                        }
+                        //if (DateTime.Now.Month < 7)
+                        //{
+                        //    year = (DateTime.Now.Year - i - 1).ToString();
+                        //}
+                        //else
+                        //{
+                        //    year = (DateTime.Now.Year - i).ToString();
+                        //}
+                        year = ((int)cbCurrentSeason.SelectedItem - i).ToString();
                         bool flag3 = false;
                         Statistics statistics2 = new Statistics();
                         if (!flag)
@@ -768,14 +786,19 @@ namespace TMS
                         if (!flag3 || flag)
                         {
                             DateTime arg_265_0 = DateTime.Now;
-                            if (DateTime.Now.Month < 8)
-                            {
-                                statistics2.Year = (DateTime.Now.Year - i - 1).ToString();
-                            }
-                            else
-                            {
-                                statistics2.Year = (DateTime.Now.Year - i).ToString();
-                            }
+                            //if (DateTime.Now.Month < 8)
+                            //{
+                            //    statistics2.Year = (DateTime.Now.Year - i - 1).ToString();
+                            //}
+                            //else
+                            //{
+                            //    statistics2.Year = (DateTime.Now.Year - i).ToString();
+                            //}
+
+                            statistics2.Year = ((int)cbCurrentSeason.SelectedItem - i).ToString();
+
+
+
                             DateTime arg_2C2_0 = DateTime.Now;
                             string text = p.TmUrl.Substring(1);
                             string text2 = text.Substring(0, text.IndexOf("/"));
@@ -791,14 +814,14 @@ namespace TMS
                             string text3 = null;
                             statistics = await DataLoader.LoadPlayerStatisticsAsync(playerStatsUrl, flag, year,
                               p.MainPosition);
-                            if (statistics.Contract != null)
+                            if (statistics != null && statistics.Contract != null)
                             {
                                 p.Contract = statistics.Contract;
                             }
-                            if (statistics.NationalPlayer != null)
+                            if (statistics != null && statistics.NationalPlayer != null)
                                 p.NationalPlayer = statistics.NationalPlayer;
 
-                            if (statistics.NationalPlayerUrl != null)
+                            if (statistics != null && statistics.NationalPlayerUrl != null)
                                 p.NationalPlayerUrl = statistics.NationalPlayerUrl;
 
                             if (!flag && !flag2)
@@ -841,6 +864,7 @@ namespace TMS
                                 }
                                 streamWriter.Write(Environment.NewLine);
                             }
+                            //if(statistics!=null)
                             p.Statistics.Add(statistics);
                             if (flag && statistics != null)
                             {
@@ -1346,6 +1370,13 @@ namespace TMS
                 this.tbStatus.Visible = true;
                 this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
 
+                var pcd = _cachedStats.FirstOrDefault();
+                if (pcd != null)
+                {
+                    int maxYear = int.Parse(pcd.Statistics.Max(s => s.Year));
+                    cbCurrentSeason.SelectedItem = maxYear + 1;
+                }
+
                 foreach (Player p in _selectedTeam.Players)
                 {
                     this.tbStatus.Text = string.Concat(new object[]
@@ -1362,6 +1393,7 @@ namespace TMS
                         if (dgvr.DataBoundItem == CurrentPlayer)
                             dgvPlayers.CurrentCell = dgvr.Cells[0];
                     }
+
                     await GetPlayersData(p);
                     if (_generatingInProgress == false)
                         return;
