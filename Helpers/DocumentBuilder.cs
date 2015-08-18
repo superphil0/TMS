@@ -303,6 +303,177 @@ namespace TMS
     public static void CreateCompetitionArchive(string excelFileName, Competition c)
     {
       XLWorkbook xLWorkbook = new XLWorkbook();
+      CreateDbStylesheet(c, xLWorkbook);
+      CreateScheduleStylesheet(c, xLWorkbook);
+      xLWorkbook.SaveAs(excelFileName);
+      return;
+    }
+
+    private static void CreateScheduleStylesheet(Competition c, XLWorkbook xLWorkbook)
+    {
+      IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add("Schedule");
+
+      iXLWorksheet.ColumnWidth = 2;
+      iXLWorksheet.Style.Font.SetFontSize(10);
+
+      //Dictionary<string, string> ranges = new Dictionary<string, string>();
+      //ranges.Add("B", "K");
+      //ranges.Add("M", "V");
+      //ranges.Add("X", "AG");
+      //ranges.Add("AI", "AR");
+      //ranges.Add("AT", "BC");
+      //ranges.Add("BE", "BN");
+
+      string[] headers = new string[] { "UU", "GU", "AU", "MU", "MPG", "0", "GU", "AU", "GU", "AU" };
+
+      XLColor[][] colormatrix = new XLColor[10][];
+
+      colormatrix[0] = new XLColor[] {
+        XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0),
+        XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0) };
+
+      colormatrix[1] = new XLColor[] {
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80),
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
+
+      colormatrix[2] = new XLColor[] {
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105),
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(144, 238, 144) };
+
+      colormatrix[3] = new XLColor[] {
+        XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0),
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
+
+      colormatrix[4] = new XLColor[] {
+        XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105) };
+
+      colormatrix[5] = new XLColor[] {
+        XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
+        XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
+
+      colormatrix[6] = new XLColor[] {
+        XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 255, 255),
+        XLColor.FromArgb(189, 146, 222), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0) };
+
+      //int numberOfRows = ranges.Count;
+
+
+
+      for (int i = 0; i < c.Teams.Count; i++)
+      {
+        List<Match> teamSchedule = c.Teams[i].Schedule;
+        int row = i / 6;
+        int column = i % 6;
+
+        //iXLWorksheet.Cell(1, (i * 26) + 3).Value = c.Teams[i].TeamName;
+        //KeyValuePair<string, string> kvp = ranges.ElementAt(column);
+        var range = iXLWorksheet.Range(1, (i * 26) + 3, 1, (i * 26) + 26).Merge();
+        range.Value = c.Teams[i].TeamName;
+        range.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        iXLWorksheet.Row(1 + row * 8).Height = 20;
+        iXLWorksheet.Cell(1, (i * 26) + 3).Hyperlink = new XLHyperlink(c.Teams[i].Url);
+        iXLWorksheet.Cell(1, (i * 26) + 3).Style.Font.SetFontSize(12);
+        range.Style.Font.Bold = true;
+        range.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        range.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
+
+
+
+
+
+        for (int m = 0; m < teamSchedule.Count; m++)
+        {
+
+          var mdCell = iXLWorksheet.Cell(m * 8 + 6, 1);
+          mdCell.Style.Font.SetFontSize(16);
+          mdCell.Value = (m + 1).ToString();
+
+          var sc = iXLWorksheet.Cell((m * 8 + 3), 3 + i * 26);
+
+          //HOME
+          var scr = sc.CellBelow();
+          sc = sc.CellBelow();
+          for (int l = 0; l < headers.Length; l++)
+          {
+            scr.Value = headers[l];
+            scr.Style.Fill.BackgroundColor = colormatrix[0][l];
+            scr = scr.CellRight();
+          }
+
+          for (int j = 0; j < 6; j++)
+          {
+            scr = sc.CellBelow();
+            sc = sc.CellBelow();
+            for (int k = 0; k < 10; k++)
+            {
+              scr.Style.Fill.BackgroundColor = colormatrix[j + 1][k];
+              scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
+              scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+              scr.Value = 0;
+              scr = scr.CellRight();
+            }
+          }
+
+          sc = sc.CellBelow();
+
+          //var range = iXLWorksheet.Range(sc.Address.RowNumber, sc.Address.ColumnNumber, sc.Address.RowNumber, sc.Address.ColumnNumber + 9).Merge();
+          //range.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Right;
+          //range.Value = teamSchedule[m].HomeTeam.TeamName;
+          //sc.Hyperlink = new XLHyperlink(teamSchedule[m].HomeTeam.Url);
+
+          
+       
+          var cellRange = iXLWorksheet.Cell(sc.Address.RowNumber, sc.Address.ColumnNumber);
+          sc.Hyperlink = new XLHyperlink(teamSchedule[m].HomeTeam.Url);
+          if (teamSchedule[m].Date.HasValue)
+            sc.Value = teamSchedule[m].Date.Value.ToString("dd.MM.yyyy") + " - " + teamSchedule[m].HomeTeam.TeamName;
+          else
+            sc.Value = "" + " - " + teamSchedule[m].HomeTeam.TeamName;
+
+
+
+          //AWAY
+          sc = iXLWorksheet.Cell((m * 8 + 3), 3 + i * 26 + 11);
+          scr = sc.CellBelow();
+          sc = sc.CellBelow();
+          for (int l = 0; l < headers.Length; l++)
+          {
+            scr.Value = headers[l];
+            scr.Style.Fill.BackgroundColor = colormatrix[0][l];
+            scr = scr.CellRight();
+          }
+
+          for (int j = 0; j < 6; j++)
+          {
+            scr = sc.CellBelow();
+            sc = sc.CellBelow();
+            for (int k = 0; k < 10; k++)
+            {
+              scr.Style.Fill.BackgroundColor = colormatrix[j + 1][k];
+              scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
+              scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+              scr.Value = 0;
+              scr = scr.CellRight();
+            }
+          }
+
+          sc = sc.CellBelow();
+
+          //range = iXLWorksheet.Range(sc.Address.RowNumber, sc.Address.ColumnNumber, sc.Address.RowNumber, sc.Address.ColumnNumber + 9).Merge();
+          //range.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
+          //range.Value = teamSchedule[m].VisitingTeam.TeamName;
+          //sc.Hyperlink = new XLHyperlink(teamSchedule[m].VisitingTeam.Url);
+
+          cellRange = iXLWorksheet.Cell(sc.Address.RowNumber, sc.Address.ColumnNumber);
+          cellRange.Value = teamSchedule[m].VisitingTeam.TeamName;
+          sc.Hyperlink = new XLHyperlink(teamSchedule[m].VisitingTeam.Url);
+        }
+      }
+    }
+
+    private static void CreateDbStylesheet(Competition c, XLWorkbook xLWorkbook)
+    {
       IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add("DB");
 
       iXLWorksheet.ColumnWidth = 2;
@@ -328,6 +499,25 @@ namespace TMS
         XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80),
         XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
 
+      colormatrix[2] = new XLColor[] {
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105),
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(144, 238, 144) };
+
+      colormatrix[3] = new XLColor[] {
+        XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0),
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
+
+      colormatrix[4] = new XLColor[] {
+        XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
+        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105) };
+
+      colormatrix[5] = new XLColor[] {
+        XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
+        XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
+
+      colormatrix[6] = new XLColor[] {
+        XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 255, 255),
+        XLColor.FromArgb(189, 146, 222), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0) };
 
       int numberOfRows = ranges.Count;
 
@@ -339,10 +529,13 @@ namespace TMS
         int column = i % 6;
         KeyValuePair<string, string> kvp = ranges.ElementAt(column);
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Merge().Value = c.Teams[i].TeamName;
+        iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        iXLWorksheet.Row(1 + row * 8).Height = 20;
         iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString()).Hyperlink = new XLHyperlink(c.Teams[i].Url);
+        iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString()).Style.Font.SetFontSize(12);
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Font.Bold = true;
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-        iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Fill.BackgroundColor = XLColor.Yellow;
+        iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
 
         var sc = iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString());
 
@@ -361,15 +554,14 @@ namespace TMS
           sc = sc.CellBelow();
           for (int k = 0; k < 10; k++)
           {
-            scr.Style.Fill.BackgroundColor = colormatrix[1][k];
+            scr.Style.Fill.BackgroundColor = colormatrix[j + 1][k];
+            scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
+            scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
             scr.Value = 0;
             scr = scr.CellRight();
           }
         }
       }
-
-      xLWorkbook.SaveAs(excelFileName);
-      return;
     }
   }
 }
