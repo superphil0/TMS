@@ -18,17 +18,29 @@ namespace TMS
 			get;
 			set;
 		}
-		public string HomeTeam
+		public string HomeTeamName
 		{
 			get;
 			set;
 		}
-		public string VisitingTeam
+		public string VisitingTeamName
 		{
 			get;
 			set;
 		}
-		public string Result
+
+    public Team HomeTeam
+    {
+      get;
+      set;
+    }
+    public Team VisitingTeam
+    {
+      get;
+      set;
+    }
+
+    public string Result
 		{
 			get;
 			set;
