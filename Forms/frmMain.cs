@@ -61,7 +61,7 @@ namespace TMS
             this.cbTeams.SelectedIndex = -1;
             LoadCountriesAsync();
             LoadDocuments();
-            StartLivescoreFeedAsync();
+           // StartLivescoreFeedAsync();
             tmrReload.Start();
 
             cbCurrentSeason.Items.Add(DateTime.Now.Year);
@@ -438,6 +438,10 @@ namespace TMS
                     }
                     streamWriter.Close();
                 }
+                foreach(var el in list)
+        {
+          el.Url = "http://www.transfermarkt.de/jumplist/startseite/verein/" + el.TeamId;
+        }
                 this._selectedCompetition.Teams = list;
                 lbCompetition.Enabled = true;
                 this.pbLoadingTeams.Visible = false;
@@ -1474,5 +1478,26 @@ namespace TMS
         }
 
         #endregion Documents
+
+        private void btnArhiva_Click(object sender, EventArgs e)
+        {
+            string text = string.Concat(new string[]
+    {
+                "cache\\arhiva\\",_selectedCountry.CountryName,
+                "\\",
+                this._selectedCompetition.CompetitionName,
+                " [",
+                this._selectedCompetition.CompetitionId.ToString(),
+                "] ",             
+                DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss"),
+                ".xlsx"
+    });
+
+            DocumentBuilder.CreateCompetitionArchive(text, _selectedCompetition);
+      if (File.Exists(text))
+      {     
+        Process.Start(text);
+      }
+    }
     }
 }

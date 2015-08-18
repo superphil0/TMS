@@ -271,11 +271,11 @@ namespace TMS
                     for (int i = 2; i < array.Length - 1; i++)
                     {
                         string[] array2 = Regex.Split(array[i], "\"");
-                        list.Add(new Team
-                        {
-                            TeamId = int.Parse(array2[1]),
-                            TeamName = array2[2].Substring(1),
-                            CompetitionId = competitionid
+            list.Add(new Team
+            {
+              TeamId = int.Parse(array2[1]),
+              TeamName = array2[2].Substring(1),
+              CompetitionId = competitionid
                         });
                     }
                 }
