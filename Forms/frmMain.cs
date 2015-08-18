@@ -1474,5 +1474,21 @@ namespace TMS
         }
 
         #endregion Documents
+
+        private void btnArhiva_Click(object sender, EventArgs e)
+        {
+            string text = string.Concat(new string[]
+    {
+                "cache\\arhiva\\",
+                this._selectedCompetition.CompetitionName,
+                " [",
+                this._selectedCompetition.CompetitionId.ToString(),
+                "] ",             
+                DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss"),
+                ".xlsx"
+    });
+
+            DocumentBuilder.CreateCompetitionArchive(text, _selectedCompetition);
+        }
     }
 }

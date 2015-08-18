@@ -8,7 +8,7 @@ namespace TMS
     internal class DocumentBuilder
     {
         private static List<XLColor> seasonColors = new List<XLColor>
-		{
+        {            
 			XLColor.LightGreen,
 			XLColor.Yellow,
 			XLColor.Orange,
@@ -296,6 +296,68 @@ namespace TMS
             {
                 Logger.Exception(ex);
             }
+        }
+
+        public static void CreateCompetitionArchive(string excelFileName, Competition c)
+        {
+            XLWorkbook xLWorkbook = new XLWorkbook();
+            IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add("DB");
+
+            iXLWorksheet.ColumnWidth = 2;
+            iXLWorksheet.Style.Font.SetFontSize(10);
+
+            Dictionary<string, string> ranges = new Dictionary<string, string>();
+            ranges.Add("B", "K");
+            ranges.Add("M", "V");
+            ranges.Add("X", "AG");
+            ranges.Add("AI", "AR");
+            ranges.Add("AT", "BC");
+            ranges.Add("BE", "BN");
+
+            string[] headers = new string[] { "UU", "GU", "AU", "MU", "MPG", "0", "GU", "AU", "GU", "AU" };
+
+            int numberOfRows = ranges.Count;
+
+         
+
+            for(int i=0;i< c.Teams.Count;i++)
+            {
+                int row = i / 6;
+                int column = i % 6;
+                KeyValuePair<string, string> kvp = ranges.ElementAt(column);                
+                iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Merge().Value = c.Teams[i].TeamName;
+                iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Font.Bold = true;
+                iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Fill.BackgroundColor = XLColor.Yellow;
+
+                var sc = iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString());
+
+                var scr = sc.CellBelow();
+                sc = sc.CellBelow();
+                for (int l=0; l<headers.Length;l++)
+                {
+                    scr.Value = headers[l];
+                    scr.Style.Fill.BackgroundColor = XLColor.Amber;
+                    scr = scr.CellRight();
+                    //255 192 0
+        
+                }
+
+                for(int j=0;j<6;j++)
+                {  
+                    scr = sc.CellBelow();
+                    sc = sc.CellBelow();
+                    for (int k = 0; k < 10; k++)
+                    {        
+                                        
+                        scr.Value = 0;
+                        scr = scr.CellRight();
+                    }
+                }
+            }
+
+            xLWorkbook.SaveAs(excelFileName);
+            return;
         }
     }
 }
