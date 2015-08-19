@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace TMS
 {
@@ -306,7 +307,28 @@ namespace TMS
       CreateDbStylesheet(c, xLWorkbook);
       CreateScheduleStylesheet(c, xLWorkbook);
       xLWorkbook.SaveAs(excelFileName);
-      return;
+    }
+
+    public static void UpdateCompetitionArchive(string excelFileName, Competition c)
+    {
+      try
+      {
+        XLWorkbook xLWorkbook = new XLWorkbook(excelFileName);
+        xLWorkbook.Worksheet("Schedule").Delete();
+        CreateScheduleStylesheet(c, xLWorkbook);
+        xLWorkbook.Save();
+      }
+      catch(Exception ex)
+      {
+        if (ex.Message.Contains("being used"))
+        {
+          MessageBox.Show("Zatvori arhivu pa pokusaj opet!");
+        }
+        else
+        {
+          MessageBox.Show("Greska!");
+        }
+      }
     }
 
     private static void CreateScheduleStylesheet(Competition c, XLWorkbook xLWorkbook)
@@ -529,7 +551,8 @@ namespace TMS
             sc = sc.CellBelow();
 
             var cellRange = iXLWorksheet.Cell(sc.Address.RowNumber, sc.Address.ColumnNumber);
-            sc.Hyperlink = new XLHyperlink(teamSchedule[m].HomeTeam.Url);
+            if(teamSchedule[m].HomeTeam.Url!=null)
+              sc.Hyperlink = new XLHyperlink(teamSchedule[m].HomeTeam.Url);
             if (teamSchedule[m].Date.HasValue)
               sc.Value = teamSchedule[m].Date.Value.ToString("dd.MM.yyyy") + " - " + teamSchedule[m].HomeTeam.TeamName;
             else
@@ -579,7 +602,8 @@ namespace TMS
 
             cellRange = iXLWorksheet.Cell(sc.Address.RowNumber, sc.Address.ColumnNumber);
             cellRange.Value = teamSchedule[m].VisitingTeam.TeamName;
-            sc.Hyperlink = new XLHyperlink(teamSchedule[m].VisitingTeam.Url);
+            if (teamSchedule[m].VisitingTeam.Url != null)
+              sc.Hyperlink = new XLHyperlink(teamSchedule[m].VisitingTeam.Url);
 
             //RESULT
             string res = teamSchedule[m].Result;

@@ -48,8 +48,8 @@ namespace TMS
         private void InitializeComponent()
         {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
       this.btnGenerateExcel = new System.Windows.Forms.Button();
       this.lbCompetition = new System.Windows.Forms.ListBox();
       this.lbTeams = new System.Windows.Forms.ListBox();
@@ -86,6 +86,7 @@ namespace TMS
       this.lblCurrentSeason = new System.Windows.Forms.Label();
       this.btnArhiva = new System.Windows.Forms.Button();
       this.lbArhiva = new System.Windows.Forms.ListBox();
+      this.btnAzurirajArhivu = new System.Windows.Forms.Button();
       this.cmsMapTeam.SuspendLayout();
       this.cmLineupstatus.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.pbLivescore)).BeginInit();
@@ -171,6 +172,7 @@ namespace TMS
       this.btnDeleteFile.TabIndex = 17;
       this.btnDeleteFile.Text = "Obriši";
       this.btnDeleteFile.UseVisualStyleBackColor = true;
+      this.btnDeleteFile.Click += new System.EventHandler(this.btnDeleteFile_Click);
       // 
       // lbCountries
       // 
@@ -418,8 +420,8 @@ namespace TMS
       this.lbMatches.Name = "lbMatches";
       this.lbMatches.ReadOnly = true;
       this.lbMatches.RowHeadersVisible = false;
-      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle3;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle1;
       this.lbMatches.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
       this.lbMatches.Size = new System.Drawing.Size(370, 424);
       this.lbMatches.TabIndex = 40;
@@ -440,8 +442,8 @@ namespace TMS
       this.dgvPlayers.Name = "dgvPlayers";
       this.dgvPlayers.ReadOnly = true;
       this.dgvPlayers.RowHeadersWidth = 30;
-      dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle4;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle2;
       this.dgvPlayers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
       this.dgvPlayers.Size = new System.Drawing.Size(255, 684);
       this.dgvPlayers.TabIndex = 32;
@@ -482,7 +484,7 @@ namespace TMS
       this.btnArhiva.Name = "btnArhiva";
       this.btnArhiva.Size = new System.Drawing.Size(194, 23);
       this.btnArhiva.TabIndex = 44;
-      this.btnArhiva.Text = "Arhiva";
+      this.btnArhiva.Text = "Napravi novu arhivu";
       this.btnArhiva.UseVisualStyleBackColor = true;
       this.btnArhiva.Click += new System.EventHandler(this.btnArhiva_Click);
       // 
@@ -500,12 +502,23 @@ namespace TMS
       this.lbArhiva.TabIndex = 45;
       this.lbArhiva.DoubleClick += new System.EventHandler(this.lbArhiva_DoubleClick);
       // 
+      // btnAzurirajArhivu
+      // 
+      this.btnAzurirajArhivu.Location = new System.Drawing.Point(210, 492);
+      this.btnAzurirajArhivu.Name = "btnAzurirajArhivu";
+      this.btnAzurirajArhivu.Size = new System.Drawing.Size(127, 23);
+      this.btnAzurirajArhivu.TabIndex = 46;
+      this.btnAzurirajArhivu.Text = "Azuriraj arhivu";
+      this.btnAzurirajArhivu.UseVisualStyleBackColor = true;
+      this.btnAzurirajArhivu.Click += new System.EventHandler(this.btnAzurirajArhivu_Click);
+      // 
       // frmMain
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.LightSteelBlue;
       this.ClientSize = new System.Drawing.Size(1123, 702);
+      this.Controls.Add(this.btnAzurirajArhivu);
       this.Controls.Add(this.lbArhiva);
       this.Controls.Add(this.btnArhiva);
       this.Controls.Add(this.lblCurrentSeason);
@@ -562,6 +575,7 @@ namespace TMS
         private Label lblCurrentSeason;
         private Button btnArhiva;
     private ListBox lbArhiva;
+    private Button btnAzurirajArhivu;
   }
 }
 
