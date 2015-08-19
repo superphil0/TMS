@@ -480,6 +480,7 @@ namespace TMS
       // 
       // btnArhiva
       // 
+      this.btnArhiva.Enabled = false;
       this.btnArhiva.Location = new System.Drawing.Point(10, 462);
       this.btnArhiva.Name = "btnArhiva";
       this.btnArhiva.Size = new System.Drawing.Size(194, 23);
@@ -504,6 +505,7 @@ namespace TMS
       // 
       // btnAzurirajArhivu
       // 
+      this.btnAzurirajArhivu.Enabled = false;
       this.btnAzurirajArhivu.Location = new System.Drawing.Point(210, 492);
       this.btnAzurirajArhivu.Name = "btnAzurirajArhivu";
       this.btnAzurirajArhivu.Size = new System.Drawing.Size(127, 23);

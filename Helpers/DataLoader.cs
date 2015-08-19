@@ -650,7 +650,8 @@ namespace TMS
     }
 
     public async static Task<List<Match>> LoadSchedule(List<Team> cachedTeams, Team team, string year)
-    {
+    {    
+
       List<Match> schedule = new List<Match>();
       try
       {

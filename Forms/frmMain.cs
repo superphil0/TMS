@@ -22,6 +22,7 @@ namespace TMS
     private Player CurrentPlayer;
     private bool _generatingInProgress = false;
     private bool _playerLoadingInProgress = false;
+    private bool _scheduleUpdateInProgress = false;
     private List<Game> games = new List<Game>();
     private List<Game> gamesUpcoming = new List<Game>();
     private List<Game> gamesLive = new List<Game>();
@@ -62,7 +63,7 @@ namespace TMS
       LoadCountriesAsync();
       LoadDocuments();
 
-      // StartLivescoreFeedAsync();
+      StartLivescoreFeedAsync();
       tmrReload.Start();
 
       cbCurrentSeason.Items.Add(DateTime.Now.Year);
@@ -191,6 +192,8 @@ namespace TMS
     private void lbCountries_Click(object sender, EventArgs e)
     {
       LoadCompetitionsAsync();
+      if(_generatingInProgress==false)
+        btnArhiva.Enabled = true;
     }
 
     private async Task LoadCountriesAsync()
@@ -265,7 +268,11 @@ namespace TMS
     private void cbCountries_KeyDown(object sender, KeyEventArgs e)
     {
       if (e.KeyCode == Keys.Return)
+      {
         LoadCompetitionsAsync();
+        if(_generatingInProgress==false)
+          btnArhiva.Enabled = true;
+      }
     }
 
     #endregion Countries
@@ -364,6 +371,8 @@ namespace TMS
         lbCountries.Enabled = true;
 
         LoadArchive();
+        if(_generatingInProgress==false)
+          btnAzurirajArhivu.Enabled = true;
       }
       catch (Exception ex)
       {
@@ -1116,6 +1125,7 @@ namespace TMS
 
     private void lbMatches_CellClick(object sender, DataGridViewCellEventArgs e)
     {
+      
       var senderGrid = (DataGridView)sender;
 
       if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn &&
@@ -1126,6 +1136,8 @@ namespace TMS
       }
       else
       {
+        if (_scheduleUpdateInProgress == true)
+          return;
         //if (_generatingInProgress == false)
         LoadLineups();
       }
@@ -1349,6 +1361,8 @@ namespace TMS
     {
       try
       {
+        if (_selectedTeam == null)
+          return;
         _generatingInProgress = true;
         if (_selectedTeam.Players == null)
           return;
@@ -1481,7 +1495,7 @@ namespace TMS
         if (di.Exists == false)
           di.Create();
 
-        foreach (FileInfo fi in di.GetFiles().Where(f=>f.Name.StartsWith("~")==false))
+        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name.StartsWith("~") == false))
           allFiles.Add(fi);
 
         lbArhiva.DataSource = allFiles.OrderByDescending(f => f.LastWriteTime).ToList();
@@ -1508,8 +1522,21 @@ namespace TMS
 
     private async void btnArhiva_Click(object sender, EventArgs e)
     {
-      string text = string.Concat(new string[]
-{
+      try
+      {
+        btnGenerateExcel.Enabled = false;
+        cbTeams.Enabled = false;
+        lbTeams.Enabled = false;
+        lbCompetition.Enabled = false;
+        cbCountries.Enabled = false;
+        lbCountries.Enabled = false;
+        btnArhiva.Enabled = false;
+        btnAzurirajArhivu.Enabled = false;
+        _scheduleUpdateInProgress = true;
+        btnDeleteFile.Enabled = false;
+
+        string text = string.Concat(new string[]
+  {
                 "cache\\arhiva\\",_selectedCountry.CountryName,
                 "\\",
                 this._selectedCompetition.CompetitionName,
@@ -1518,23 +1545,41 @@ namespace TMS
                 "] ",
                 DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss"),
                 ".xlsx"
-});
+  });
 
-      foreach (Team t in _selectedCompetition.Teams)
-      {
-        List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
-        lbTeams.SelectedItem = t;
-        t.Schedule = schedule; 
-      }   
+        foreach (Team t in _selectedCompetition.Teams)
+        {
+          List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
+          lbTeams.SelectedItem = t;
+          t.Schedule = schedule;
+        }
 
-      DocumentBuilder.CreateCompetitionArchive(text, _selectedCompetition);
-      if (File.Exists(text))
+        DocumentBuilder.CreateCompetitionArchive(text, _selectedCompetition);
+        if (File.Exists(text))
+        {
+          Process.Start(text);
+          LoadArchive();
+
+        }
+
+     
+      }
+      catch (Exception ex)
       {
-        Process.Start(text);
-        LoadArchive();
+        Logger.Exception(ex);
       }
 
-
+      btnDeleteFile.Enabled = true;
+      _scheduleUpdateInProgress = false;
+      cbTeams.Enabled = true;
+      lbTeams.Enabled = true;
+      lbCompetition.Enabled = true;
+      cbCountries.Enabled = true;
+      lbCountries.Enabled = true;
+      btnArhiva.Enabled = true;
+      btnAzurirajArhivu.Enabled = true;
+      _scheduleUpdateInProgress = false;
+      btnGenerateExcel.Enabled = true;
     }
 
     private void lbArhiva_DoubleClick(object sender, EventArgs e)
@@ -1548,30 +1593,60 @@ namespace TMS
 
     private async void btnAzurirajArhivu_Click(object sender, EventArgs e)
     {
-      if (lbArhiva.SelectedItem != null)
+      try
       {
-        string a = lbArhiva.SelectedItem.ToString();
-        string competitionId = a.Substring(a.IndexOf("[") + 1);
-        competitionId = competitionId.Substring(0, competitionId.IndexOf("]"));
-        var competition = _cachedCompetitions.Where(cc => cc.CompetitionId == competitionId).FirstOrDefault();
-        if (competition != null)
+        btnGenerateExcel.Enabled = false;
+        _scheduleUpdateInProgress = true;
+        cbTeams.Enabled = false;
+        lbTeams.Enabled = false;
+        lbCompetition.Enabled = false;
+        cbCountries.Enabled = false;
+        lbCountries.Enabled = false;
+        btnArhiva.Enabled = false;
+        btnAzurirajArhivu.Enabled = false;
+        btnDeleteFile.Enabled = false;
+
+        if (lbArhiva.SelectedItem != null)
         {
-          lbCompetition.SelectedItem = competition;
-          await LoadTeamsAsync();
-          var teams = _cachedTeams.Where(ct => ct.CompetitionId == competitionId).ToList();
-          foreach (var t in teams)
+          string a = lbArhiva.SelectedItem.ToString();
+          string competitionId = a.Substring(a.IndexOf("[") + 1);
+          competitionId = competitionId.Substring(0, competitionId.IndexOf("]"));
+          var competition = _cachedCompetitions.Where(cc => cc.CompetitionId == competitionId).FirstOrDefault();
+          if (competition != null)
           {
-            List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
-            t.Schedule = schedule;
-            lbTeams.SelectedItem = t;
+            lbCompetition.SelectedItem = competition;
+            await LoadTeamsAsync();
+            lbCompetition.Enabled = false;
+            var teams = _cachedTeams.Where(ct => ct.CompetitionId == competitionId).ToList();
+            foreach (var t in teams)
+            {
+              List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
+              t.Schedule = schedule;
+              lbTeams.SelectedItem = t;
+            }
+            competition.Teams = teams;
+
+            DocumentBuilder.UpdateCompetitionArchive("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + a, competition);
+
+            Process.Start("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + a);
           }
-          competition.Teams = teams;
-
-          DocumentBuilder.UpdateCompetitionArchive("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + a, competition);
-
-          Process.Start("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + a);
         }
       }
+      catch (Exception ex)
+      {
+        Logger.Exception(ex);
+      }
+
+      btnGenerateExcel.Enabled = true;
+      btnDeleteFile.Enabled = true;
+      cbTeams.Enabled = true;
+      lbTeams.Enabled = true;
+      lbCompetition.Enabled = true;
+      cbCountries.Enabled = true;
+      lbCountries.Enabled = true;
+      btnArhiva.Enabled = true;
+      btnAzurirajArhivu.Enabled = true;
+      _scheduleUpdateInProgress = false;
     }
 
     private void btnDeleteFile_Click(object sender, EventArgs e)
