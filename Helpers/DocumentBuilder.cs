@@ -521,6 +521,7 @@ namespace TMS
                             mdatecell.Style.Font.SetFontColor(XLColor.FromArgb(15,26,62));
                             mdatecell.Style.Fill.SetBackgroundColor(XLColor.LightGray);
                             mdatecell.Style.Font.Bold = true;
+                            mdatecell.Style.Font.Italic = true;
                             mdatecell.WorksheetColumn().Width = 8;
                             mdatecell.Value = mdate;
                             mdatecell.Hyperlink = new XLHyperlink(teamSchedule[m].MatchReportUrl);
@@ -530,6 +531,7 @@ namespace TMS
                             mtimecell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
                             mtimecell.Style.Font.SetFontColor(XLColor.FromArgb(15, 26, 62));
                             mtimecell.Style.Font.Bold = true;
+                            mtimecell.Style.Font.Italic = true;
                             mtimecell.Style.Fill.SetBackgroundColor(XLColor.LightGray);
                             mtimecell.WorksheetColumn().Width = 8;
                             mtimecell.Value = mtime;
@@ -577,7 +579,7 @@ namespace TMS
 
                         sc = sc.CellBelow();
 
-                        sc.Style.Font.SetFontSize(11);
+                        sc.Style.Font.SetFontSize(10);
                         var cellRange = iXLWorksheet.Cell(sc.Address.RowNumber, sc.Address.ColumnNumber);
                         if (teamSchedule[m].HomeTeam.Url != null)
                             sc.Hyperlink = new XLHyperlink(teamSchedule[m].HomeTeam.Url);
@@ -627,7 +629,7 @@ namespace TMS
                         }
 
                         sc = sc.CellBelow();
-                        sc.Style.Font.SetFontSize(11);
+                        sc.Style.Font.SetFontSize(10);
                         cellRange = iXLWorksheet.Cell(sc.Address.RowNumber, sc.Address.ColumnNumber);
                         cellRange.Value = teamSchedule[m].VisitingTeam.TeamName;
                         if (teamSchedule[m].VisitingTeam.Url != null)
@@ -637,8 +639,8 @@ namespace TMS
                         string res = teamSchedule[m].Result;
                         string hg = res.Split(':')[0];
                         string ag = res.Split(':')[1].Trim();
-                        var hgCell = iXLWorksheet.Cell((8 * m) + 5, 26 * (i + 1) - 13);
-                        var agCell = iXLWorksheet.Cell((8 * m) + 5, 26 * (i + 1) - 2);
+                        var hgCell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1) - 13);
+                        var agCell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1) - 2);
                         hgCell.Value = hg;
                         hgCell.Hyperlink = new XLHyperlink(teamSchedule[m].MatchReportUrl);
                         agCell.Value = ag;
@@ -657,68 +659,88 @@ namespace TMS
 
                         //header
                         var cell = iXLWorksheet.Cell((8 * m) + 3, 26 * (i + 1) - 2);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellX3.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 3, 26 * (i + 1) - 1);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellY3.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 3, 26 * (i + 1));
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellZ3.CopyTo(cell);
 
                         //red 1
                         cell = iXLWorksheet.Cell((8 * m) + 4, 26 * (i + 1) - 2);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellX4.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 4, 26 * (i + 1) - 1);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellY4.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 4, 26 * (i + 1));
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellZ4.CopyTo(cell);
 
                         //red 2                        
                         cell = iXLWorksheet.Cell((8 * m) + 5, 26 * (i + 1) - 1);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellY5.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 5, 26 * (i + 1));
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellZ5.CopyTo(cell);
 
                         //red 3                        
                         cell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1) - 1);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellY6.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1));
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellZ6.CopyTo(cell);
 
                         //red 4
                         cell = iXLWorksheet.Cell((8 * m) + 7, 26 * (i + 1) - 1);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellY7.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 7, 26 * (i + 1));
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellZ7.CopyTo(cell);
 
                         //red 5
                         cell = iXLWorksheet.Cell((8 * m) + 8, 26 * (i + 1) - 2);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellX8.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 8, 26 * (i + 1) - 1);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellY8.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 8, 26 * (i + 1));
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellZ8.CopyTo(cell);
 
                         //red 6
                         cell = iXLWorksheet.Cell((8 * m) + 9, 26 * (i + 1) - 2);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellX9.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 9, 26 * (i + 1) - 1);
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellY9.CopyTo(cell);
 
                         cell = iXLWorksheet.Cell((8 * m) + 9, 26 * (i + 1));
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellZ9.CopyTo(cell);
 
                         //red 7
                         cell = iXLWorksheet.Cell((8 * m) + 10, 26 * (i + 1));
+                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
                         cellZ10.CopyTo(cell);
+
 
                         #endregion formulas
                     }
