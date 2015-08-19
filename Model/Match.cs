@@ -8,7 +8,7 @@ namespace TMS
 			get;
 			set;
 		}
-		public string TmUrl
+		public string MatchReportUrl
 		{
 			get;
 			set;
