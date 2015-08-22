@@ -78,6 +78,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\frmCompetitionMapping.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmCompetitionMapping.Designer.cs">
+      <DependentUpon>frmCompetitionMapping.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\AdditionalPlayerData.cs" />
     <Compile Include="Model\Competition.cs" />
     <Compile Include="Model\Country.cs" />
@@ -117,6 +123,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmCompetitionMapping.resx">
+      <DependentUpon>frmCompetitionMapping.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmTeamMapping.resx">
       <DependentUpon>frmTeamMapping.cs</DependentUpon>

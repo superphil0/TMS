@@ -71,5 +71,7 @@ namespace TMS
         }
 
         public bool HasLineup { get; set; }
+
+        public string CompetitionId { get; set; }
     }
 }

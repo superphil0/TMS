@@ -71,5 +71,7 @@ namespace TMS
         public string UrlName { get; set; }
 
         public List<Match> Schedule { get; set; }
+
+        public string Tag { get; set; }
     }
 }

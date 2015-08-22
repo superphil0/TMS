@@ -54,9 +54,10 @@ namespace TMS
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            this._cachedCountries = this.GetCachedCountries();
             this._cachedCompetitions = this.GetCachedCompetitions();
             this._cachedTeams = this.GetCachedTeams();
-            this._cachedCountries = this.GetCachedCountries();
+
             this.cbTeams.DataSource = this._cachedTeams;
             this.cbTeams.DisplayMember = "TeamName";
             this.cbTeams.ValueMember = "TeamId";
@@ -168,12 +169,21 @@ namespace TMS
             {
               '|'
             });
-                        list.Add(new Competition
+
+                        var c = new Competition
                         {
                             CompetitionId = array[2],
                             CompetitionName = array[3],
                             CompetitionCountryId = int.Parse(array[0])
-                        });
+                        };
+
+                        if (array.Length > 4)
+                            c.AlternativeName = array[4];
+
+                        var country = _cachedCountries.Where(cc => cc.CountryId == c.CompetitionCountryId).FirstOrDefault();
+                        c.CompetitionCountry = country.CountryName;
+
+                        list.Add(c);
                     }
                     streamReader.Close();
                 }
@@ -234,7 +244,7 @@ namespace TMS
                           select cc).ToList<Country>().Count == 0)
                         {
                             this._cachedCountries.Add(c);
-                            streamWriter.WriteLine(c.CountryId.ToString() + "|" + c.CountryName+"|"+c.Top);
+                            streamWriter.WriteLine(c.CountryId.ToString() + "|" + c.CountryName + "|" + c.Top);
                         }
                     }
                     streamWriter.Close();
@@ -260,7 +270,7 @@ namespace TMS
                 this.cbCountries.Focus();
                 this.cbCountries.Select();
 
-               
+
 
                 lbCountries.Enabled = true;
             }
@@ -567,6 +577,44 @@ namespace TMS
             }
         }
 
+
+        private void UpdateCompetitionAlternativeName(Competition c)
+        {
+            try
+            {
+                StreamReader sr = new StreamReader(Application.StartupPath + "/cache/competitions.txt");
+                List<string> lines = new List<string>();
+                while (sr.EndOfStream == false)
+                {
+                    string line = sr.ReadLine();
+                    if (line.Contains(c.CompetitionId + "|" + c.CompetitionName))
+                    {
+                        var parts = line.Split('|');
+                        if (parts.Count() == 4)
+                            line += "|" + c.AlternativeName;
+                        else
+                            line = line.Substring(0, line.LastIndexOf("|") + 1) + c.AlternativeName;
+                    }
+                    lines.Add(line);
+                }
+                sr.Close();
+
+                StreamWriter sw = new StreamWriter(Application.StartupPath + "/cache/competitions.txt");
+                foreach (string s in lines)
+                {
+                    sw.WriteLine(s);
+                }
+                sw.Close();
+            }
+            catch (Exception e)
+            {
+                Logger.Exception(e);
+                MessageBox.Show(e.Message);
+            }
+        }
+
+
+
         private void UpdateCountryTop(Country c)
         {
             try
@@ -576,9 +624,9 @@ namespace TMS
                 while (sr.EndOfStream == false)
                 {
                     string line = sr.ReadLine();
-                    if (line.Contains(c.CountryId + "|" +c.CountryName))
+                    if (line.Contains(c.CountryId + "|" + c.CountryName))
                     {
-                        line = line.Substring(0, line.LastIndexOf("|")) +"|"+ c.Top;
+                        line = line.Substring(0, line.LastIndexOf("|")) + "|" + c.Top;
                     }
                     lines.Add(line);
                 }
@@ -601,7 +649,11 @@ namespace TMS
         private List<Team> FindTeamsByName(string teamName)
         {
             // return _cachedTeams.Where(tt => tt.TeamName.Contains(teamName) || (tt.AlternativeName != null && tt.AlternativeName.Equals(teamName))).ToList();
-            return _cachedTeams.Where(tt => Helper.RemoveDiacritics(tt.TeamName, false).Contains(teamName) || (tt.AlternativeName != null && tt.AlternativeName.Equals(teamName))).ToList();
+            var teams = _cachedTeams.Where(tt => tt.AlternativeName != null && tt.AlternativeName.Equals(teamName));
+            if (teams.Count() != 0)
+                return teams.ToList();
+            else
+                return _cachedTeams.Where(tt => Helper.RemoveDiacritics(tt.TeamName, false).Contains(teamName)).ToList();
         }
 
         private void mapirajTimToolStripMenuItem_Click(object sender, EventArgs e)
@@ -622,6 +674,17 @@ namespace TMS
                     cbTeams.DataSource = _cachedTeams;
                     LoadLineups();
                 }
+            }
+            else
+            {
+                if (t.Tag == "H")
+                    t.AlternativeName = SelectedGame.Home;
+                else
+                    t.AlternativeName = SelectedGame.Away;
+                UpdateTeamAlternativeName(t);
+                this._cachedTeams = GetCachedTeams();
+                cbTeams.DataSource = _cachedTeams;
+                LoadLineups();
             }
         }
 
@@ -1123,17 +1186,28 @@ namespace TMS
 
             lbMatches.AutoGenerateColumns = false;
             lbMatches.Columns.Clear();
-            lbMatches.Columns.Add(new DataGridViewImageColumn() { Width=30 });
+            lbMatches.Columns.Add(new DataGridViewImageColumn() { Width = 20 });
+            lbMatches.Columns.Add(new DataGridViewImageColumn() { Width = 30 });
             lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Progress", Width = 35 });
-            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Home", Width = 110 });
-            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Away", Width = 110 });
-            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Result", Width = 35 });
+            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Home", Width = 105 });
+            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Away", Width = 105 });
+            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Result", Width = 30 });
             lbMatches.Columns.Add(new DataGridViewButtonColumn() { UseColumnTextForButtonValue = true, Text = "LS", Width = 30 });
 
-       
 
-        //http://www.transfermarkt.com/images/flagge/small/49.png
 
+            foreach (var g in games)
+            {
+                var competition = _cachedCompetitions.Where(cc => cc.AlternativeName != null && cc.AlternativeName.Equals(g.LineupUrl.Split('/')[4] + "/" + g.LineupUrl.Split('/')[5])).FirstOrDefault();
+                if (competition != null)
+                    g.CompetitionId = competition.CompetitionId;
+            }
+
+            if (rbIzabranaLiga.Checked == true)
+            {
+                var competitionId = ((Competition)lbCompetition.SelectedItem).CompetitionId;
+                games.RemoveAll(ga => ga.CompetitionId != competitionId);
+            }
 
             lbMatches.DataSource = games;
 
@@ -1143,10 +1217,42 @@ namespace TMS
             foreach (DataGridViewRow r in lbMatches.Rows)
             {
                 Game g = (Game)r.DataBoundItem;
-                if (DateTime.Now.Subtract(g.LastChange).TotalSeconds < 60)
-                    r.Cells[1].Style.BackColor = Color.LightGreen;
 
-                var tt = g.LineupUrl.Split('/')[4].Replace("-", " ").ToUpper() + " - "+ g.LineupUrl.Split('/')[5].Replace("-", " ").ToUpper();
+                var competition = _cachedCompetitions.Where(cc => cc.CompetitionId == g.CompetitionId).FirstOrDefault();
+                if (g.CompetitionId != null)
+                {
+                    DataGridViewImageCell c = (DataGridViewImageCell)r.Cells[0];
+                    if (File.Exists(Application.StartupPath + "/cache/img/competitions/" + competition.CompetitionId + ".png"))
+                    {
+                        c.Value = Image.FromFile("cache/img/competitions/" + competition.CompetitionId + ".png");
+                        c.ToolTipText = competition.CompetitionName;
+                    }
+                    else
+                    {
+                        using (WebClient webClient = new WebClient())
+                        {
+                            try
+                            {
+                                DirectoryInfo d = new DirectoryInfo(Application.StartupPath + "/cache/img/competitions");
+                                if (d.Exists == false)
+                                    d.Create();
+
+                                webClient.DownloadFile("http://www.transfermarkt.com/images/logo/tiny/" + competition.CompetitionId.ToLower() + ".png", Application.StartupPath + "/cache/img/competitions/" + competition.CompetitionId + ".png");
+                                c.Value = Image.FromFile("cache/img/competitions/" + competition.CompetitionId + ".png");
+                                c.ToolTipText = competition.CompetitionName;
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.Exception(e);
+                            }
+                        }
+                    }
+                }
+
+                if (DateTime.Now.Subtract(g.LastChange).TotalSeconds < 60)
+                    r.Cells[2].Style.BackColor = Color.LightGreen;
+
+                var tt = g.LineupUrl.Split('/')[4].Replace("-", " ").ToUpper() + " - " + g.LineupUrl.Split('/')[5].Replace("-", " ").ToUpper();
 
                 r.Cells[1].ToolTipText = tt;
                 r.Cells[2].ToolTipText = tt;
@@ -1154,16 +1260,17 @@ namespace TMS
                 r.Cells[4].ToolTipText = tt;
 
                 var t = FindTeamsByName(g.Home);
-                if(t.Count!=0)
+                IEnumerable<string> distinctTeams = t.Select(x => x.TeamName).Distinct();
+                if (distinctTeams.Count() == 1)
                 {
                     var cou = _cachedCompetitions.Where(co => co.CompetitionId == t[0].CompetitionId).FirstOrDefault();
-                    DataGridViewImageCell c = (DataGridViewImageCell)r.Cells[0];
+                    DataGridViewImageCell c = (DataGridViewImageCell)r.Cells[1];
                     if (File.Exists("cache/img/" + cou.CompetitionCountryId + ".png"))
                     {
                         c.Value = Image.FromFile("cache/img/" + cou.CompetitionCountryId + ".png");
                         var country = _cachedCountries.Where(cc => cc.CountryId == cou.CompetitionCountryId).FirstOrDefault();
-                        if(country!=null)
-                        c.ToolTipText = country.CountryName;
+                        if (country != null)
+                            c.ToolTipText = country.CountryName;
                     }
                     else
                     {
@@ -1172,8 +1279,13 @@ namespace TMS
                             try
                             {
                                 webClient.DownloadFile("http://www.transfermarkt.com/images/flagge/small/" + cou.CompetitionCountryId + ".png", Application.StartupPath + "/cache/img/" + cou.CompetitionCountryId + ".png");
+
+                                c.Value = Image.FromFile("cache/img/" + cou.CompetitionCountryId + ".png");
+                                var country = _cachedCountries.Where(cc => cc.CountryId == cou.CompetitionCountryId).FirstOrDefault();
+                                if (country != null)
+                                    c.ToolTipText = country.CountryName;
                             }
-                            catch(Exception e)
+                            catch (Exception e)
                             {
                                 Logger.Exception(e);
                             }
@@ -1266,7 +1378,9 @@ namespace TMS
                     foreach (Team t in teams)
                     {
                         t.GameLineups = SelectedGameLinups.HomeLineup;
+                        t.Tag = "H";
                         listBoxSource.Add(t);
+
                     }
 
                     teams = FindTeamsByName(SelectedGame.Away);
@@ -1280,6 +1394,7 @@ namespace TMS
                     foreach (Team t in teams)
                     {
                         t.GameLineups = SelectedGameLinups.AwayLineup;
+                        t.Tag = "A";
                         listBoxSource.Add(t);
                     }
 
@@ -1784,6 +1899,41 @@ namespace TMS
                     topToolStripMenuItem.Checked = country.Top;
                 }
             }
+        }
+
+        private void mapirajToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (SelectedGame == null)
+                return;
+            var competitionShortName = SelectedGame.LineupUrl.Split('/')[4] + "/" + SelectedGame.LineupUrl.Split('/')[5];
+
+            frmCompetitionMapping frm = new frmCompetitionMapping();
+            frm.CachedCompetitions = this._cachedCompetitions;
+            frm.CompetitionToMap = competitionShortName;
+            DialogResult dr = frm.ShowDialog();
+            if (dr == System.Windows.Forms.DialogResult.OK)
+            {
+                Competition mappedCompetition = frm.MappedComeptition;
+                mappedCompetition.AlternativeName = competitionShortName;
+                UpdateCompetitionAlternativeName(mappedCompetition);
+                //this._cachedCompetitions = this.GetCachedCompetitions();
+                //lbCompetition.DataSource = _cachedCompetitions;
+                //this.lbCompetition.DisplayMember = "CompetitionName";
+                //this.lbCompetition.ValueMember = "CompetitionId";
+            }
+
+        }
+
+
+
+        private void rbIzabranaLiga_Click(object sender, EventArgs e)
+        {
+            StartLivescoreFeedAsync();
+        }
+
+        private void rbSve_Click(object sender, EventArgs e)
+        {
+            StartLivescoreFeedAsync();
         }
     }
 }

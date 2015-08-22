@@ -802,7 +802,7 @@ namespace TMS
 
             int numberOfRows = ranges.Count;
 
-
+            IXLCell scr=null;
 
             for (int i = 0; i < c.Teams.Count; i++)
             {
@@ -820,7 +820,7 @@ namespace TMS
 
                 var sc = iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString());
 
-                var scr = sc.CellBelow();
+                scr = sc.CellBelow();
                 sc = sc.CellBelow();
                 for (int l = 0; l < headers.Length; l++)
                 {
@@ -842,7 +842,7 @@ namespace TMS
                         scr = scr.CellRight();
                     }
                 }
-            }
+            }               
         }
     }
 }
