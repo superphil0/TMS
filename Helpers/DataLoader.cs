@@ -308,6 +308,8 @@ namespace TMS
                 htmlDocument.LoadHtml(ss);
 
 
+                var fnc = htmlDocument.DocumentNode.SelectNodes("//div[@class='flagge']/a/img");
+
                 HtmlNodeCollection htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes("//div[@id='yw1']");
                 if (htmlNodeCollection != null)
                 {

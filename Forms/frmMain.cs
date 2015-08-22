@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -136,7 +137,8 @@ namespace TMS
                         list.Add(new Country
                         {
                             CountryId = int.Parse(array[0]),
-                            CountryName = array[1]
+                            CountryName = array[1],
+                            Top = bool.Parse(array[2])
                         });
                     }
                     streamReader.Close();
@@ -192,9 +194,12 @@ namespace TMS
 
         private void lbCountries_Click(object sender, EventArgs e)
         {
-            LoadCompetitionsAsync();
-            if (_generatingInProgress == false)
-                btnArhiva.Enabled = true;
+            if (((Country)lbCountries.SelectedItem).CountryId != -1)
+            {
+                LoadCompetitionsAsync();
+                if (_generatingInProgress == false)
+                    btnArhiva.Enabled = true;
+            }
         }
 
         private async Task LoadCountriesAsync()
@@ -229,12 +234,20 @@ namespace TMS
                           select cc).ToList<Country>().Count == 0)
                         {
                             this._cachedCountries.Add(c);
-                            streamWriter.WriteLine(c.CountryId.ToString() + "|" + c.CountryName);
+                            streamWriter.WriteLine(c.CountryId.ToString() + "|" + c.CountryName+"|"+c.Top);
                         }
                     }
                     streamWriter.Close();
                 }
                 this._countries = cachedCountries;
+                var topCountries = cachedCountries.Where(cc => cc.Top == true).ToList();
+
+                foreach (var c in topCountries)
+                {
+                    _countries.Insert(0, c);
+                }
+
+                _countries.Insert(topCountries.Count, new Country() { CountryId = -1, CountryName = "-----" });
 
                 this.pbLoadingCountries.Visible = false;
                 this.lbCountries.DataSource = this._countries;
@@ -246,6 +259,8 @@ namespace TMS
                 this.cbCountries.Text = "";
                 this.cbCountries.Focus();
                 this.cbCountries.Select();
+
+               
 
                 lbCountries.Enabled = true;
             }
@@ -428,19 +443,20 @@ namespace TMS
                         directoryInfo.Create();
                     }
                     StreamWriter streamWriter = new StreamWriter("cache\\teams.txt", true);
-
-                    foreach (Team t in _selectedCompetition.Teams)
+                    if (_selectedCompetition.Teams != null)
                     {
-                        t.CompetitionName = this._selectedCompetition.CompetitionName;
-                        if ((
-                          from cc in this._cachedTeams
-                          where cc.CompetitionId == t.CompetitionId && cc.TeamId == t.TeamId
-                          select cc).ToList<Team>().Count == 0)
+                        foreach (Team t in _selectedCompetition.Teams)
                         {
-                            list.Add(t);
-                            this._cachedTeams.Add(t);
-                            streamWriter.WriteLine(string.Concat(new string[]
-                    {
+                            t.CompetitionName = this._selectedCompetition.CompetitionName;
+                            if ((
+                              from cc in this._cachedTeams
+                              where cc.CompetitionId == t.CompetitionId && cc.TeamId == t.TeamId
+                              select cc).ToList<Team>().Count == 0)
+                            {
+                                list.Add(t);
+                                this._cachedTeams.Add(t);
+                                streamWriter.WriteLine(string.Concat(new string[]
+                        {
                       this._selectedCompetition.CompetitionId.ToString(),
                       "|",
                       this._selectedCompetition.CompetitionName,
@@ -450,7 +466,8 @@ namespace TMS
                       t.TeamName,
                       "|",
                       t.UrlName
-                    }));
+                        }));
+                            }
                         }
                     }
                     streamWriter.Close();
@@ -537,6 +554,37 @@ namespace TMS
                 sr.Close();
 
                 StreamWriter sw = new StreamWriter(Application.StartupPath + "/cache/teams.txt");
+                foreach (string s in lines)
+                {
+                    sw.WriteLine(s);
+                }
+                sw.Close();
+            }
+            catch (Exception e)
+            {
+                Logger.Exception(e);
+                MessageBox.Show(e.Message);
+            }
+        }
+
+        private void UpdateCountryTop(Country c)
+        {
+            try
+            {
+                StreamReader sr = new StreamReader(Application.StartupPath + "/cache/countries.txt");
+                List<string> lines = new List<string>();
+                while (sr.EndOfStream == false)
+                {
+                    string line = sr.ReadLine();
+                    if (line.Contains(c.CountryId + "|" +c.CountryName))
+                    {
+                        line = line.Substring(0, line.LastIndexOf("|")) +"|"+ c.Top;
+                    }
+                    lines.Add(line);
+                }
+                sr.Close();
+
+                StreamWriter sw = new StreamWriter(Application.StartupPath + "/cache/countries.txt");
                 foreach (string s in lines)
                 {
                     sw.WriteLine(s);
@@ -1075,11 +1123,16 @@ namespace TMS
 
             lbMatches.AutoGenerateColumns = false;
             lbMatches.Columns.Clear();
-            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Progress", Width = 40 });
-            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Home", Width = 120 });
-            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Away", Width = 120 });
-            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Result", Width = 40 });
+            lbMatches.Columns.Add(new DataGridViewImageColumn() { Width=30 });
+            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Progress", Width = 35 });
+            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Home", Width = 110 });
+            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Away", Width = 110 });
+            lbMatches.Columns.Add(new DataGridViewTextBoxColumn() { DataPropertyName = "Result", Width = 35 });
             lbMatches.Columns.Add(new DataGridViewButtonColumn() { UseColumnTextForButtonValue = true, Text = "LS", Width = 30 });
+
+       
+
+        //http://www.transfermarkt.com/images/flagge/small/49.png
 
 
             lbMatches.DataSource = games;
@@ -1091,7 +1144,42 @@ namespace TMS
             {
                 Game g = (Game)r.DataBoundItem;
                 if (DateTime.Now.Subtract(g.LastChange).TotalSeconds < 60)
-                    r.Cells[0].Style.BackColor = Color.LightGreen;
+                    r.Cells[1].Style.BackColor = Color.LightGreen;
+
+                var tt = g.LineupUrl.Split('/')[4].Replace("-", " ").ToUpper() + " - "+ g.LineupUrl.Split('/')[5].Replace("-", " ").ToUpper();
+
+                r.Cells[1].ToolTipText = tt;
+                r.Cells[2].ToolTipText = tt;
+                r.Cells[3].ToolTipText = tt;
+                r.Cells[4].ToolTipText = tt;
+
+                var t = FindTeamsByName(g.Home);
+                if(t.Count!=0)
+                {
+                    var cou = _cachedCompetitions.Where(co => co.CompetitionId == t[0].CompetitionId).FirstOrDefault();
+                    DataGridViewImageCell c = (DataGridViewImageCell)r.Cells[0];
+                    if (File.Exists("cache/img/" + cou.CompetitionCountryId + ".png"))
+                    {
+                        c.Value = Image.FromFile("cache/img/" + cou.CompetitionCountryId + ".png");
+                        var country = _cachedCountries.Where(cc => cc.CountryId == cou.CompetitionCountryId).FirstOrDefault();
+                        if(country!=null)
+                        c.ToolTipText = country.CountryName;
+                    }
+                    else
+                    {
+                        using (WebClient webClient = new WebClient())
+                        {
+                            try
+                            {
+                                webClient.DownloadFile("http://www.transfermarkt.com/images/flagge/small/" + cou.CompetitionCountryId + ".png", Application.StartupPath + "/cache/img/" + cou.CompetitionCountryId + ".png");
+                            }
+                            catch(Exception e)
+                            {
+                                Logger.Exception(e);
+                            }
+                        }
+                    }
+                }
             }
 
             pbLivescore.Visible = false;
@@ -1130,7 +1218,6 @@ namespace TMS
 
         private void lbMatches_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-
             var senderGrid = (DataGridView)sender;
 
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn &&
@@ -1434,6 +1521,8 @@ namespace TMS
                 this.cbTeams.Enabled = true;
                 this.cbCountries.Enabled = true;
                 this.lbCountries.Enabled = true;
+                btnArhiva.Enabled = true;
+                btnAzurirajArhivu.Enabled = true;
                 Guid.NewGuid();
                 string text = string.Concat(new string[]
         {
@@ -1667,6 +1756,33 @@ namespace TMS
             }
             catch (Exception ex)
             {
+            }
+        }
+
+        private void topToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (((Country)lbCountries.SelectedItem).CountryId != -1)
+            {
+                var c = lbCountries.SelectedItem;
+                if (c != null)
+                {
+                    var country = (Country)c;
+                    country.Top = !country.Top;
+                    UpdateCountryTop(country);
+                }
+            }
+        }
+
+        private void cmsTop_Opening(object sender, CancelEventArgs e)
+        {
+            if (((Country)lbCountries.SelectedItem).CountryId != -1)
+            {
+                var c = lbCountries.SelectedItem;
+                if (c != null)
+                {
+                    var country = (Country)c;
+                    topToolStripMenuItem.Checked = country.Top;
+                }
             }
         }
     }
