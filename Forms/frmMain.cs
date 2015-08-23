@@ -254,10 +254,11 @@ namespace TMS
 
                 foreach (var c in topCountries)
                 {
+                    c.CountryName = c.CountryName;
                     _countries.Insert(0, c);
                 }
 
-                _countries.Insert(topCountries.Count, new Country() { CountryId = -1, CountryName = "-----" });
+                _countries.Insert(topCountries.Count, new Country() { CountryId = -1, CountryName = "----------------------" });
 
                 this.pbLoadingCountries.Visible = false;
                 this.lbCountries.DataSource = this._countries;
@@ -1205,8 +1206,11 @@ namespace TMS
 
             if (rbIzabranaLiga.Checked == true)
             {
-                var competitionId = ((Competition)lbCompetition.SelectedItem).CompetitionId;
-                games.RemoveAll(ga => ga.CompetitionId != competitionId);
+                if (lbCompetition.SelectedItem != null)
+                {
+                    var competitionId = ((Competition)lbCompetition.SelectedItem).CompetitionId;
+                    games.RemoveAll(ga => ga.CompetitionId != competitionId);
+                }
             }
 
             lbMatches.DataSource = games;
@@ -1219,13 +1223,23 @@ namespace TMS
                 Game g = (Game)r.DataBoundItem;
 
                 var competition = _cachedCompetitions.Where(cc => cc.CompetitionId == g.CompetitionId).FirstOrDefault();
+                if (DateTime.Now.Subtract(g.LastChange).TotalSeconds < 60)
+                    r.Cells[2].Style.BackColor = Color.LightGreen;
+
+                var tt = g.LineupUrl.Split('/')[4].Replace("-", " ").ToUpper() + " - " + g.LineupUrl.Split('/')[5].Replace("-", " ").ToUpper();
+
+                r.Cells[1].ToolTipText = tt;
+                r.Cells[2].ToolTipText = tt;
+                r.Cells[3].ToolTipText = tt;
+                r.Cells[4].ToolTipText = tt;
+
                 if (g.CompetitionId != null)
                 {
-                    DataGridViewImageCell c = (DataGridViewImageCell)r.Cells[0];
+                    DataGridViewImageCell cell = (DataGridViewImageCell)r.Cells[0];
                     if (File.Exists(Application.StartupPath + "/cache/img/competitions/" + competition.CompetitionId + ".png"))
                     {
-                        c.Value = Image.FromFile("cache/img/competitions/" + competition.CompetitionId + ".png");
-                        c.ToolTipText = competition.CompetitionName;
+                        cell.Value = Image.FromFile("cache/img/competitions/" + competition.CompetitionId + ".png");
+                        cell.ToolTipText = competition.CompetitionName;
                     }
                     else
                     {
@@ -1238,8 +1252,8 @@ namespace TMS
                                     d.Create();
 
                                 webClient.DownloadFile("http://www.transfermarkt.com/images/logo/tiny/" + competition.CompetitionId.ToLower() + ".png", Application.StartupPath + "/cache/img/competitions/" + competition.CompetitionId + ".png");
-                                c.Value = Image.FromFile("cache/img/competitions/" + competition.CompetitionId + ".png");
-                                c.ToolTipText = competition.CompetitionName;
+                                cell.Value = Image.FromFile("cache/img/competitions/" + competition.CompetitionId + ".png");
+                                cell.ToolTipText = competition.CompetitionName;
                             }
                             catch (Exception e)
                             {
@@ -1247,23 +1261,8 @@ namespace TMS
                             }
                         }
                     }
-                }
-
-                if (DateTime.Now.Subtract(g.LastChange).TotalSeconds < 60)
-                    r.Cells[2].Style.BackColor = Color.LightGreen;
-
-                var tt = g.LineupUrl.Split('/')[4].Replace("-", " ").ToUpper() + " - " + g.LineupUrl.Split('/')[5].Replace("-", " ").ToUpper();
-
-                r.Cells[1].ToolTipText = tt;
-                r.Cells[2].ToolTipText = tt;
-                r.Cells[3].ToolTipText = tt;
-                r.Cells[4].ToolTipText = tt;
-
-                var t = FindTeamsByName(g.Home);
-                IEnumerable<string> distinctTeams = t.Select(x => x.TeamName).Distinct();
-                if (distinctTeams.Count() == 1)
-                {
-                    var cou = _cachedCompetitions.Where(co => co.CompetitionId == t[0].CompetitionId).FirstOrDefault();
+                    
+                    var cou = _cachedCompetitions.Where(co => co.CompetitionId == g.CompetitionId).FirstOrDefault();
                     DataGridViewImageCell c = (DataGridViewImageCell)r.Cells[1];
                     if (File.Exists("cache/img/" + cou.CompetitionCountryId + ".png"))
                     {
