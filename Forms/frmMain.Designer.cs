@@ -47,8 +47,8 @@ namespace TMS
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnGenerateExcel = new System.Windows.Forms.Button();
             this.lbCompetition = new System.Windows.Forms.ListBox();
             this.lbTeams = new System.Windows.Forms.ListBox();
@@ -185,7 +185,6 @@ namespace TMS
             // lbCountries
             // 
             this.lbCountries.ContextMenuStrip = this.cmsTop;
-            this.lbCountries.DrawMode = System.Windows.Forms.DrawMode.Normal;
             this.lbCountries.FormattingEnabled = true;
             this.lbCountries.ItemHeight = 16;
             this.lbCountries.Location = new System.Drawing.Point(11, 43);
@@ -438,8 +437,8 @@ namespace TMS
             this.lbMatches.Name = "lbMatches";
             this.lbMatches.ReadOnly = true;
             this.lbMatches.RowHeadersVisible = false;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle1;
             this.lbMatches.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.lbMatches.Size = new System.Drawing.Size(370, 392);
             this.lbMatches.TabIndex = 40;
@@ -474,8 +473,8 @@ namespace TMS
             this.dgvPlayers.Name = "dgvPlayers";
             this.dgvPlayers.ReadOnly = true;
             this.dgvPlayers.RowHeadersWidth = 30;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvPlayers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvPlayers.Size = new System.Drawing.Size(255, 684);
             this.dgvPlayers.TabIndex = 32;
@@ -500,6 +499,7 @@ namespace TMS
             this.cbCurrentSeason.Name = "cbCurrentSeason";
             this.cbCurrentSeason.Size = new System.Drawing.Size(121, 24);
             this.cbCurrentSeason.TabIndex = 42;
+            this.cbCurrentSeason.SelectedIndexChanged += new System.EventHandler(this.cbCurrentSeason_SelectedIndexChanged);
             // 
             // lblCurrentSeason
             // 

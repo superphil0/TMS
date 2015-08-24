@@ -541,10 +541,10 @@ namespace TMS
         private void lbTeams_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (_generatingInProgress == false && _playerLoadingInProgress == false)
+            {
+                cbCurrentSeason.SelectedIndex = 0;
                 this._selectedTeam = (Team)this.lbTeams.SelectedItem;
-
-
-
+            }
         }
 
         private void UpdateTeamAlternativeName(Team t)
@@ -766,6 +766,21 @@ namespace TMS
                 dgvPlayers.Columns.Add(c);
 
 
+                c = new DataGridViewTextBoxColumn();
+                c.DataPropertyName = "UU";
+                c.Width = 30;
+                dgvPlayers.Columns.Add(c);
+
+                c = new DataGridViewTextBoxColumn();
+                c.DataPropertyName = "MU";
+                c.Width = 30;
+                dgvPlayers.Columns.Add(c);
+
+                c = new DataGridViewTextBoxColumn();
+                c.DataPropertyName = "UG";
+                c.Width = 30;
+                dgvPlayers.Columns.Add(c);
+
                 DataGridViewButtonColumn bc = new DataGridViewButtonColumn()
                 {
                     UseColumnTextForButtonValue = true,
@@ -783,11 +798,23 @@ namespace TMS
                 dgvPlayers.DataSource = this._selectedTeam.Players;
                 foreach (DataGridViewRow dgvr in dgvPlayers.Rows)
                 {
-                    dgvr.Cells[4].Style = new DataGridViewCellStyle()
+                    dgvr.Cells[7].Style = new DataGridViewCellStyle()
                     {
                         Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Italic)
                     };
                     Player player = (Player)dgvr.DataBoundItem;
+
+                    //this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
+
+                    //var pcd = _cachedStats.Where(cc => cc.PlayerId == player.PlayerId).FirstOrDefault();
+
+                    //if (pcd != null)
+                    //{
+                    //    dgvr.Cells[3].Value = pcd.Statistics.FirstOrDefault().GamesPlayed;
+                    //    dgvr.Cells[4].Value = pcd.Statistics.FirstOrDefault().MinutesPlayed;
+                    //    dgvr.Cells[5].Value = pcd.Statistics.FirstOrDefault().GoalsScored;
+                    //}
+
                     if (player.Lineup == Player.LineUpStatus.YES)
                     {
                         dgvr.Cells[0].Style.BackColor = Color.LightGreen;
@@ -1100,6 +1127,7 @@ namespace TMS
         private void btnStop_Click(object sender, EventArgs e)
         {
             _generatingInProgress = false;
+            _playerLoadingInProgress = false;
             btnGenerateExcel.Enabled = true;
             btnStop.Visible = false;
         }
@@ -1261,7 +1289,7 @@ namespace TMS
                             }
                         }
                     }
-                    
+
                     var cou = _cachedCompetitions.Where(co => co.CompetitionId == g.CompetitionId).FirstOrDefault();
                     DataGridViewImageCell c = (DataGridViewImageCell)r.Cells[1];
                     if (File.Exists("cache/img/" + cou.CompetitionCountryId + ".png"))
@@ -1376,7 +1404,8 @@ namespace TMS
                     }
                     foreach (Team t in teams)
                     {
-                        t.GameLineups = SelectedGameLinups.HomeLineup;
+                        if (SelectedGameLinups != null)
+                            t.GameLineups = SelectedGameLinups.HomeLineup;
                         t.Tag = "H";
                         listBoxSource.Add(t);
 
@@ -1392,7 +1421,8 @@ namespace TMS
                     }
                     foreach (Team t in teams)
                     {
-                        t.GameLineups = SelectedGameLinups.AwayLineup;
+                        if (SelectedGameLinups != null)
+                            t.GameLineups = SelectedGameLinups.AwayLineup;
                         t.Tag = "A";
                         listBoxSource.Add(t);
                     }
@@ -1598,7 +1628,7 @@ namespace TMS
                 this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
 
                 var pcd = _cachedStats.FirstOrDefault();
-                if (pcd != null)
+                if (pcd != null && cbCurrentSeason.SelectedIndex == 0)
                 {
                     int maxYear = int.Parse(pcd.Statistics.Max(s => s.Year));
                     cbCurrentSeason.SelectedItem = maxYear + 1;
@@ -1624,7 +1654,9 @@ namespace TMS
                     await GetPlayersData(p);
                     if (_generatingInProgress == false)
                         return;
+                    UpdatePlayersGrid(p.PlayerId);
                 }
+               
                 lbMatches.Enabled = true;
                 dtpDatum.Enabled = true;
                 this.lbTeams.Enabled = true;
@@ -1664,6 +1696,23 @@ namespace TMS
                 MessageBox.Show(ex.Message);
             }
             _generatingInProgress = false;
+
+         
+        }
+
+        private void UpdatePlayersGrid(int playerId)
+        {
+            foreach (DataGridViewRow dgvr in dgvPlayers.Rows)
+            {
+                Player player = (Player)dgvr.DataBoundItem;
+                
+                if (player.Statistics != null && player.PlayerId==playerId)
+                {
+                    dgvr.Cells[3].Value = player.Statistics[0].GamesPlayed;
+                    dgvr.Cells[4].Value = player.Statistics[0].MinutesPlayed;
+                    dgvr.Cells[5].Value = player.Statistics[0].GoalsScored;
+                }
+            }
         }
 
         private void LoadDocuments()
@@ -1933,6 +1982,25 @@ namespace TMS
         private void rbSve_Click(object sender, EventArgs e)
         {
             StartLivescoreFeedAsync();
+        }
+
+        private void cbCurrentSeason_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lbTeams.SelectedItem != null)
+            {
+                var selectedTeam = (Team)lbTeams.SelectedItem;
+                if (cbCurrentSeason.SelectedIndex == 1)
+                {
+                    this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
+                    var pcd = _cachedStats.FirstOrDefault();
+                    if (pcd != null)
+                    {
+                        int maxYear = int.Parse(pcd.Statistics.Max(s => s.Year));
+                        if (maxYear == (int)cbCurrentSeason.SelectedItem)
+                            File.Delete("cache\\" + this._selectedTeam.TeamId.ToString() + ".txt");
+                    }
+                }
+            }
         }
     }
 }
