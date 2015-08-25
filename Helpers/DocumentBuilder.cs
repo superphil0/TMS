@@ -334,111 +334,6 @@ namespace TMS
       }
     }
 
-    //private static void UpdateScheduleStylesheet(Competition c, XLWorkbook xlWorkbook)
-    //{
-    //  var dbWorksheet = xlWorkbook.Worksheet("DB");
-    //  try
-    //  {
-    //    IXLWorksheet iXLWorksheet = xlWorkbook.Worksheets.Add("Schedule");
-    //    for (int i = 0; i < c.Teams.Count; i++)
-    //    {
-    //      List<Match> teamSchedule = c.Teams[i].Schedule;
-    //      for (int m = 0; m < teamSchedule.Count; m++)
-    //      {
-    //        var sc = iXLWorksheet.Cell((m * 8 + 2), 3 + i * 26);
-
-    //        //HOME
-    //        var scr = sc.CellBelow();
-    //        sc = sc.CellBelow();
-    //        for (int l = 0; l < 10; l++)
-    //        {
-    //          scr = scr.CellRight();
-    //        }
-
-    //        for (int j = 0; j < 6; j++)
-    //        {
-    //          scr = sc.CellBelow();
-    //          sc = sc.CellBelow();
-    //          for (int k = 0; k < 10; k++)
-    //          {
-    //            var linkedTeam = c.Teams.Where(t => t.TeamId == teamSchedule[m].HomeTeam.TeamId).FirstOrDefault();
-    //            int linkedTeamIndex = c.Teams.IndexOf(linkedTeam);
-
-    //            int dbrow = linkedTeamIndex / 6;
-    //            int dbcolumn = linkedTeamIndex % 6;
-
-    //            if (DateTime.Now <= teamSchedule[m].Date)
-    //              scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
-    //            else
-    //            {
-    //              scr.Value = dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Value;
-    //              scr.FormulaA1 = null;
-    //            }
-
-    //            scr = scr.CellRight();
-    //          }
-    //        }
-
-    //        sc = sc.CellBelow();
-
-
-    //        var val = iXLWorksheet.Cell(8 * m + 5, 13).Value;
-
-
-    //        //AWAY
-    //        sc = iXLWorksheet.Cell((m * 8 + 2), 3 + i * 26 + 11);
-    //        scr = sc.CellBelow();
-    //        sc = sc.CellBelow();
-    //        for (int l = 0; l < 10; l++)
-    //        {
-    //          scr = scr.CellRight();
-    //        }
-
-    //        for (int j = 0; j < 6; j++)
-    //        {
-    //          scr = sc.CellBelow();
-    //          sc = sc.CellBelow();
-    //          for (int k = 0; k < 10; k++)
-    //          {
-    //            var linkedTeam = c.Teams.Where(t => t.TeamId == teamSchedule[m].VisitingTeam.TeamId).FirstOrDefault();
-    //            int linkedTeamIndex = c.Teams.IndexOf(linkedTeam);
-
-    //            int dbrow = linkedTeamIndex / 6;
-    //            int dbcolumn = linkedTeamIndex % 6;
-
-    //            if (DateTime.Now <= teamSchedule[m].Date)
-    //              scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
-    //            else
-    //            {
-    //              scr.Value = dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k);
-    //              scr.FormulaA1 = null;
-    //            }
-
-    //            scr = scr.CellRight();
-    //          }
-    //        }
-
-    //        sc = sc.CellBelow();
-    //        sc.Style.Font.SetFontSize(10);
-
-    //        //RESULT
-    //        string res = teamSchedule[m].Result;
-    //        string hg = res.Split(':')[0];
-    //        string ag = res.Split(':')[1].Trim();
-    //        var hgCell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1) - 13);
-    //        var agCell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1) - 2);
-    //        hgCell.Value = hg;
-    //        hgCell.Hyperlink = new XLHyperlink(teamSchedule[m].MatchReportUrl);
-    //        agCell.Value = ag;
-    //        agCell.Hyperlink = new XLHyperlink(teamSchedule[m].MatchReportUrl);
-    //      }
-    //    }
-    //  }
-    //  catch (Exception e)
-    //  {
-    //    Logger.Exception(e);
-    //  }
-    //}
 
 
     private static void CreateScheduleStylesheet(Competition c, XLWorkbook xLWorkbook, bool updateMode)
@@ -1075,7 +970,7 @@ namespace TMS
         KeyValuePair<string, string> kvp = ranges.ElementAt(column);
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Merge().Value = c.Teams[i].TeamName;
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-        iXLWorksheet.Row(1 + row * 8).Height = 15.75 * 0.5;
+        iXLWorksheet.Row(1 + row * 8).Height = 24.75 * 0.75;
         iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString()).Hyperlink = new XLHyperlink(c.Teams[i].Url);
         iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString()).Style.Font.SetFontSize(12);
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Font.Bold = true;

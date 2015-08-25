@@ -1807,7 +1807,9 @@ namespace TMS
                 foreach (Team t in _selectedCompetition.Teams)
                 {
                     List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
+                    var season = cbCurrentSeason.SelectedItem;
                     lbTeams.SelectedItem = t;
+                    cbCurrentSeason.SelectedItem = season;
                     t.Schedule = schedule;
                 }
 
