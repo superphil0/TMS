@@ -1670,18 +1670,22 @@ namespace TMS
                 btnArhiva.Enabled = true;
                 btnAzurirajArhivu.Enabled = true;
                 Guid.NewGuid();
-                string text = string.Concat(new string[]
-        {
-        "cache\\xls\\",
-        this._selectedTeam.TeamName,
-        " [",
-        this._selectedTeam.TeamId.ToString(),
-        "]\\",
-        this._selectedTeam.TeamName,
-        "_",
-        DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss"),
-        ".xlsx"
-        });
+                //        string text = string.Concat(new string[]
+                //{
+                //"cache\\xls\\",
+                //this._selectedTeam.TeamName,
+                //" [",
+                //this._selectedTeam.TeamId.ToString(),
+                //"]\\",
+                //this._selectedTeam.TeamName,
+                //"_",
+                //DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss"),
+                //".xlsx"
+                //});
+
+                string text = "cache\\arhiva\\" + _selectedCountry.CountryName + "\\"+lbArhiva.SelectedItem;
+
+
                 DocumentBuilder.CreateCXMLDocument(text, this._selectedTeam);
                 if (File.Exists(text))
                 {
