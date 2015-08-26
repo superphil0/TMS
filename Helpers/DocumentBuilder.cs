@@ -35,6 +35,52 @@ namespace TMS
 
             List<Player> lineupPlayers = t.Players.Where(p => p.Lineup == Player.LineUpStatus.YES).ToList();
 
+            Player emptyGoalkeeper = new Player() { MainPosition = "GK", Statistics = new List<Statistics>() { new Statistics() { }, new Statistics() { }, new Statistics() { }, new Statistics() { } } };
+            Player emptyDefender = new Player() { MainPosition = "CB", Statistics = new List<Statistics>() { new Statistics() { }, new Statistics() { }, new Statistics() { }, new Statistics() { } } };
+            Player emptyMidfielder = new Player() { MainPosition = "DM", Statistics = new List<Statistics>() { new Statistics() { }, new Statistics() { }, new Statistics() { }, new Statistics() { } } };
+            Player emptyAttacker = new Player() { MainPosition = "SS", Statistics = new List<Statistics>() { new Statistics() { }, new Statistics() { }, new Statistics() { }, new Statistics() { } } };
+
+            int gkCount = 5;
+            int dfCount = 14;
+            int mfCount = 14;
+            int atCount = 14;
+
+            var goalkeepers = lineupPlayers.Where(lp => lp.MainPosition == "GK");
+            var defenders = lineupPlayers.Where(lp => lp.MainPosition == "CB" || lp.MainPosition == "LB" || lp.MainPosition == "RB");
+            var midfielders = lineupPlayers.Where(lp => lp.MainPosition == "DM" || lp.MainPosition == "CM" || lp.MainPosition == "LM" ||
+                                lp.MainPosition == "RM" || lp.MainPosition == "AM");
+            var attackers = lineupPlayers.Where(lp => lp.MainPosition == "LW" || lp.MainPosition == "RW" || lp.MainPosition == "CF" ||
+                                    lp.MainPosition == "SS");
+
+            lineupPlayers = new List<Player>();
+
+            for (int i = 0; i < gkCount; i++)
+                if (i < goalkeepers.Count())
+                    lineupPlayers.Add(goalkeepers.ElementAt(i));
+                else
+                    lineupPlayers.Add(emptyGoalkeeper);
+
+            for (int i = 0; i < dfCount; i++)
+                if (i < defenders.Count())
+                    lineupPlayers.Add(defenders.ElementAt(i));
+                else
+                    lineupPlayers.Add(emptyDefender);
+
+            for (int i = 0; i < mfCount; i++)
+                if (i < midfielders.Count())
+                    lineupPlayers.Add(midfielders.ElementAt(i));
+                else
+                    lineupPlayers.Add(emptyMidfielder);
+
+            for (int i = 0; i < atCount; i++)
+                if (i < attackers.Count())
+                    lineupPlayers.Add(attackers.ElementAt(i));
+                else
+                    lineupPlayers.Add(emptyAttacker);
+
+
+
+
             try
             {
                 int playersCount = lineupPlayers.Count();
@@ -299,7 +345,7 @@ namespace TMS
                     }
                 }
 
-                CreateSummaryTable(iXLWorksheet.Cell("S1"));
+                CreateSummaryTable(iXLWorksheet.Cell("H237"));
                 //xLWorkbook.SaveAs(excelFilename);
                 xLWorkbook.Save();
             }
@@ -341,69 +387,76 @@ namespace TMS
 
         private static void CreateSummaryTable(IXLCell scr)
         {
-            string[] headers = new string[] { "UU", "GU", "AU", "MU", "MPG", "0", "GU", "AU", "GU", "AU" };
+            XLWorkbook template = new XLWorkbook("cache\\arhiva\\Template.xlsx");
+            var sheet = template.Worksheet("Template");
 
-            XLColor[][] colormatrix = new XLColor[10][];
+            var summaryTableRange = sheet.Range(237, 8, 242, 17);
 
-            colormatrix[0] = new XLColor[] {
-        XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0),
-        XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0) };
+            summaryTableRange.CopyTo(scr);
 
-            colormatrix[1] = new XLColor[] {
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80),
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
+            //    string[] headers = new string[] { "UU", "GU", "AU", "MU", "MPG", "0", "GU", "AU", "GU", "AU" };
 
-            colormatrix[2] = new XLColor[] {
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105),
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(144, 238, 144) };
+            //    XLColor[][] colormatrix = new XLColor[10][];
 
-            colormatrix[3] = new XLColor[] {
-        XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0),
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
+            //    colormatrix[0] = new XLColor[] {
+            //XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0),
+            //XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0) };
 
-            colormatrix[4] = new XLColor[] {
-        XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105) };
+            //    colormatrix[1] = new XLColor[] {
+            //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80),
+            //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
 
-            colormatrix[5] = new XLColor[] {
-        XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
-        XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
+            //    colormatrix[2] = new XLColor[] {
+            //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105),
+            //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(144, 238, 144) };
 
-            colormatrix[6] = new XLColor[] {
-        XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 255, 255),
-        XLColor.FromArgb(189, 146, 222), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0) };
+            //    colormatrix[3] = new XLColor[] {
+            //XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0),
+            //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
 
-            var sc = scr;
+            //    colormatrix[4] = new XLColor[] {
+            //XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
+            //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105) };
 
-            for (int l = 0; l < headers.Length; l++)
-            {
-                scr.Value = headers[l];
-                scr.Style.Fill.BackgroundColor = colormatrix[0][l];
-                scr.Style.Font.SetFontSize(8);
-                scr = scr.CellRight();
-            }
+            //    colormatrix[5] = new XLColor[] {
+            //XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
+            //XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
 
-            for (int j = 0; j < 6; j++)
-            {
-                scr = sc.CellBelow();
-                scr.WorksheetRow().Height = 15.075 * 0.70;
-                sc = sc.CellBelow();
-                sc.WorksheetRow().Height = 15.075 * 0.70;
-                for (int k = 0; k < 10; k++)
-                {
-                    scr.Style.Fill.BackgroundColor = colormatrix[j + 1][k];
-                    scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
-                    scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            //    colormatrix[6] = new XLColor[] {
+            //XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 255, 255),
+            //XLColor.FromArgb(189, 146, 222), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0) };
 
-                    if (j == 2 && (k == 6 || k == 7))
-                        scr.Style.Font.FontColor = XLColor.Red;
+            //    var sc = scr;
 
-                    scr.Style.Font.SetFontSize(8);
-                    scr.Value = 0;
-                    scr.SetFormulaA1("M4");
-                    scr = scr.CellRight();
-                }
-            }
+            //    for (int l = 0; l < headers.Length; l++)
+            //    {
+            //        scr.Value = headers[l];
+            //        scr.Style.Fill.BackgroundColor = colormatrix[0][l];
+            //        scr.Style.Font.SetFontSize(8);
+            //        scr = scr.CellRight();
+            //    }
+
+            //    for (int j = 0; j < 6; j++)
+            //    {
+            //        scr = sc.CellBelow();
+            //        scr.WorksheetRow().Height = 15.075 * 0.70;
+            //        sc = sc.CellBelow();
+            //        sc.WorksheetRow().Height = 15.075 * 0.70;
+            //        for (int k = 0; k < 10; k++)
+            //        {
+            //            scr.Style.Fill.BackgroundColor = colormatrix[j + 1][k];
+            //            scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
+            //            scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            //            if (j == 2 && (k == 6 || k == 7))
+            //                scr.Style.Font.FontColor = XLColor.Red;
+
+            //            scr.Style.Font.SetFontSize(8);
+            //            scr.Value = 0;
+            //            scr.SetFormulaA1("M4");
+            //            scr = scr.CellRight();
+            //        }
+            //    }
         }
 
         private static void CreateScheduleStylesheet(Competition c, XLWorkbook xLWorkbook, bool updateMode)
@@ -1069,7 +1122,7 @@ namespace TMS
                         scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
                         scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                         scr.Value = 0;
-                        scr.FormulaA1 = "'"+c.Teams[i].TeamName+ "'!" + iXLWorksheet.Cell(2 + j, 19 + k).Address.ToString();
+                        scr.FormulaA1 = "'" + c.Teams[i].TeamName + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();
                         scr = scr.CellRight();
                     }
                 }
