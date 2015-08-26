@@ -510,7 +510,7 @@ namespace TMS
                 cellZ5.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
                 cellZ5.SetFormulaA1("SUM(((R9+R9+S8+R7+R4+V5+V5+(W5/2)+T5))/7)/H4");
 
-                var cellAA5 = iXLWorksheet.Cell(4, 27);
+                var cellAA5 = iXLWorksheet.Cell(5, 27);
                 cellAA5.SetFormulaA1("SUM(Y5-Z5)");
                 cellAA5.Style.Font.Bold = false;
                 cellAA5.Style.Font.SetFontSize(8);
@@ -527,7 +527,7 @@ namespace TMS
                 cellZ6.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
                 cellZ6.SetFormulaA1("SUM((V5+V5+P7+R8+S8)/2)/(H4+H4)");
 
-                var cellAA6 = iXLWorksheet.Cell(4, 27);
+                var cellAA6 = iXLWorksheet.Cell(6, 27);
                 cellAA6.SetFormulaA1("SUM(Y6-Z6)");
                 cellAA6.Style.Font.Bold = false;
                 cellAA6.Style.Font.SetFontSize(8);
@@ -543,7 +543,7 @@ namespace TMS
                 cellZ7.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
                 cellZ7.SetFormulaA1("SUM((T5+T7+S8+R9+V5+V5)/3)/(H4+H4)");
 
-                var cellAA7 = iXLWorksheet.Cell(4, 27);
+                var cellAA7 = iXLWorksheet.Cell(7, 27);
                 cellAA7.SetFormulaA1("SUM(Y7-Z7)");
                 cellAA7.Style.Font.Bold = false;
                 cellAA7.Style.Font.SetFontSize(8);
@@ -563,7 +563,7 @@ namespace TMS
                 cellZ8.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
                 cellZ8.SetFormulaA1("SUM((R4+S8+T8)/2)/H4");
 
-                var cellAA8 = iXLWorksheet.Cell(4, 27);
+                var cellAA8 = iXLWorksheet.Cell(8, 27);
                 cellAA8.SetFormulaA1("SUM(Y8-Z8)");
                 cellAA8.Style.Font.Bold = false;
                 cellAA8.Style.Font.SetFontSize(8);
@@ -584,7 +584,7 @@ namespace TMS
                 cellZ9.Style.Fill.BackgroundColor = XLColor.FromArgb(146, 208, 80);
                 cellZ9.SetFormulaA1("SUM(Z4:Z8)/5");
 
-                var cellAA9 = iXLWorksheet.Cell(4, 27);
+                var cellAA9 = iXLWorksheet.Cell(9, 27);
                 cellAA9.SetFormulaA1("SUM(Y9-Z9)");
                 cellAA9.Style.Font.Bold = false;
                 cellAA9.Style.Font.SetFontSize(8);
