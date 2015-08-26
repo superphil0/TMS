@@ -36,7 +36,7 @@ namespace TMS
 				return;
 			}
 			string b = CryptoProvider.CalculateMD5Hash(this.tbPassword.Text);
-			if (this.password == b && this.tbUserName.Text == this.username)
+			if (this.password.ToUpper() == b.ToUpper() && this.tbUserName.Text == this.username)
 			{
 				base.DialogResult = DialogResult.OK;
 				base.Close();
