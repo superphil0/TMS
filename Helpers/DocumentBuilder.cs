@@ -368,7 +368,9 @@ namespace TMS
             try
             {
                 XLWorkbook xLWorkbook = new XLWorkbook(excelFileName);
-                xLWorkbook.Worksheet("Schedule").Delete();
+                var scheduleWorksheet = xLWorkbook.Worksheets.Where(w => w.Name == "Schedule").FirstOrDefault();
+                if (scheduleWorksheet != null)
+                    scheduleWorksheet.Delete();
                 CreateScheduleStylesheet(c, xLWorkbook, true);
                 xLWorkbook.Save();
             }
@@ -464,194 +466,18 @@ namespace TMS
             var dbWorksheet = xLWorkbook.Worksheet("DB");
             try
             {
+                var templateWorksheet = new XLWorkbook("cache\\arhiva\\Template.xlsx");
+                var matchWorksheet = templateWorksheet.Worksheet("Match");
+                var matchHomeRange = matchWorksheet.Range("A1", "Y8");
+
                 IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add("Schedule");
                 iXLWorksheet.Position = 2;
                 iXLWorksheet.ColumnWidth = 3.57 * 0.7;
                 iXLWorksheet.Columns(1, 1).Width = 5.14 * 0.7;
-                //iXLWorksheet.Style.Font.SetFontSize(8);
 
                 iXLWorksheet.Style.Font.Bold = true;
                 iXLWorksheet.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
                 iXLWorksheet.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-                string[] headers = new string[] { "UU", "GU", "AU", "MU", "MPG", "0", "GU", "AU", "GU", "AU" };
-
-                XLColor[][] colormatrix = new XLColor[10][];
-
-                colormatrix[0] = new XLColor[] {
-        XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0),
-        XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0) };
-
-                colormatrix[1] = new XLColor[] {
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80),
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
-
-                colormatrix[2] = new XLColor[] {
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105),
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(144, 238, 144) };
-
-                colormatrix[3] = new XLColor[] {
-        XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0),
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
-
-                colormatrix[4] = new XLColor[] {
-        XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
-        XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105) };
-
-                colormatrix[5] = new XLColor[] {
-        XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
-        XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
-
-                colormatrix[6] = new XLColor[] {
-        XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 255, 255),
-        XLColor.FromArgb(189, 146, 222), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0) };
-
-
-                #region formulas
-
-                iXLWorksheet.Range("X3", "Z9").Style.Font.Bold = true;
-                iXLWorksheet.Range("X3", "Z9").Style.Font.SetFontSize(8.5);
-                iXLWorksheet.Range("X3", "Z9").Style.Font.FontColor = XLColor.FromArgb(0, 32, 96);
-                iXLWorksheet.Range("X3", "Z9").Style.Font.SetFontName("Segoe UI Black");
-                //Segoe UI Black
-
-                //0, 32, 96
-                #region headers
-                //headers
-                var cellX3 = iXLWorksheet.Cell(3, 24);
-                cellX3.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 201, 105);
-                cellX3.SetFormulaA1("SUM((((Q5 * 100) / ((F5 / E5) * 100)) - P5))");
-
-                var cellY3 = iXLWorksheet.Cell(3, 25);
-                cellY3.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 255);
-                cellY3.SetFormulaA1("SUM((((((D5+I4)/F5)+((D4/F4)*K5)+(D4+I4)/F4)+(I5+G4)))/5)/S4");
-
-                var cellZ3 = iXLWorksheet.Cell(3, 26);
-                cellZ3.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 255);
-                cellZ3.SetFormulaA1("SUM((((((O5+T4)/Q5)+((O4/Q4)*V5)+(O4+T4)/Q4)+(T5+R4)))/5)/H4");
-                #endregion headers
-
-                #region row1
-
-                var cellX4 = iXLWorksheet.Cell(4, 24);
-                cellX4.Style.Fill.BackgroundColor = XLColor.FromArgb(169, 208, 142);
-                cellX4.SetFormulaA1("SUM((((Q4*100)/((F4/E4)*100))-P4))");
-
-                var cellY4 = iXLWorksheet.Cell(4, 25);
-                cellY4.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellY4.SetFormulaA1("SUM((G7+H8+G4+K5+K5+K5))/6");
-
-                var cellZ4 = iXLWorksheet.Cell(4, 26);
-                cellZ4.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellZ4.SetFormulaA1("SUM((R7+S8+R4+V5+V5+V5))/6");
-
-                var cellAA4 = iXLWorksheet.Cell(4, 27);
-                cellAA4.SetFormulaA1("SUM(Y4-Z4)");
-                cellAA4.Style.Font.Bold = false;
-                cellAA4.Style.Font.SetFontSize(8);
-
-
-                #endregion row1
-
-                #region row2     
-
-                var cellY5 = iXLWorksheet.Cell(5, 25);
-                cellY5.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellY5.SetFormulaA1("SUM(((G9+G9+H8+G7+G4+K5+K5+(L5/2)+I5))/7)/S4");
-
-                var cellZ5 = iXLWorksheet.Cell(5, 26);
-                cellZ5.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellZ5.SetFormulaA1("SUM(((R9+R9+S8+R7+R4+V5+V5+(W5/2)+T5))/7)/H4");
-
-                var cellAA5 = iXLWorksheet.Cell(5, 27);
-                cellAA5.SetFormulaA1("SUM(Y5-Z5)");
-                cellAA5.Style.Font.Bold = false;
-                cellAA5.Style.Font.SetFontSize(8);
-
-                #endregion row2
-
-                #region row3     
-
-                var cellY6 = iXLWorksheet.Cell(6, 25);
-                cellY6.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellY6.SetFormulaA1("SUM((K5+K5+E7+G8+H8)/2)/(S4+S4)");
-
-                var cellZ6 = iXLWorksheet.Cell(6, 26);
-                cellZ6.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellZ6.SetFormulaA1("SUM((V5+V5+P7+R8+S8)/2)/(H4+H4)");
-
-                var cellAA6 = iXLWorksheet.Cell(6, 27);
-                cellAA6.SetFormulaA1("SUM(Y6-Z6)");
-                cellAA6.Style.Font.Bold = false;
-                cellAA6.Style.Font.SetFontSize(8);
-                #endregion row3
-
-                #region row4     
-
-                var cellY7 = iXLWorksheet.Cell(7, 25);
-                cellY7.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellY7.SetFormulaA1("SUM((I5+I7+H8+G9+K5+K5)/3)/(S4+S4)");
-
-                var cellZ7 = iXLWorksheet.Cell(7, 26);
-                cellZ7.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellZ7.SetFormulaA1("SUM((T5+T7+S8+R9+V5+V5)/3)/(H4+H4)");
-
-                var cellAA7 = iXLWorksheet.Cell(7, 27);
-                cellAA7.SetFormulaA1("SUM(Y7-Z7)");
-                cellAA7.Style.Font.Bold = false;
-                cellAA7.Style.Font.SetFontSize(8);
-                #endregion row4
-
-                #region row5 
-
-                var cellX8 = iXLWorksheet.Cell(8, 24);
-                cellX8.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 201, 105);
-                cellX8.SetFormulaA1("SUM((((Q5*100)/((F5/D5)*100))-O5))");
-
-                var cellY8 = iXLWorksheet.Cell(8, 25);
-                cellY8.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellY8.SetFormulaA1("SUM((G4+H8+I8)/2)/S4");
-
-                var cellZ8 = iXLWorksheet.Cell(8, 26);
-                cellZ8.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 0);
-                cellZ8.SetFormulaA1("SUM((R4+S8+T8)/2)/H4");
-
-                var cellAA8 = iXLWorksheet.Cell(8, 27);
-                cellAA8.SetFormulaA1("SUM(Y8-Z8)");
-                cellAA8.Style.Font.Bold = false;
-                cellAA8.Style.Font.SetFontSize(8);
-
-                #endregion row5
-
-                #region row6 
-
-                var cellX9 = iXLWorksheet.Cell(9, 24);
-                cellX9.Style.Fill.BackgroundColor = XLColor.FromArgb(169, 208, 142);
-                cellX9.SetFormulaA1("SUM((((Q4*100)/((F4/D4)*100))-O4))");
-
-                var cellY9 = iXLWorksheet.Cell(9, 25);
-                cellY9.Style.Fill.BackgroundColor = XLColor.FromArgb(146, 208, 80);
-                cellY9.SetFormulaA1("SUM(Y4:Y8)/5");
-
-                var cellZ9 = iXLWorksheet.Cell(9, 26);
-                cellZ9.Style.Fill.BackgroundColor = XLColor.FromArgb(146, 208, 80);
-                cellZ9.SetFormulaA1("SUM(Z4:Z8)/5");
-
-                var cellAA9 = iXLWorksheet.Cell(9, 27);
-                cellAA9.SetFormulaA1("SUM(Y9-Z9)");
-                cellAA9.Style.Font.Bold = false;
-                cellAA9.Style.Font.SetFontSize(8);
-
-                #endregion row6
-
-                #region row7
-
-                var cellZ10 = iXLWorksheet.Cell(10, 26);
-                cellZ10.SetFormulaA1("SUM(I7+H9)-(T7+S9)");
-
-                #endregion row7
-
-                #endregion formulas
 
                 for (int i = 0; i < c.Teams.Count; i++)
                 {
@@ -709,48 +535,31 @@ namespace TMS
                             mtimecell.Hyperlink = new XLHyperlink(teamSchedule[m].MatchReportUrl);
                         }
 
-
-
                         var sc = iXLWorksheet.Cell((m * 8 + 2), 3 + i * 26);
 
                         //HOME
                         var scr = sc.CellBelow();
 
                         scr.WorksheetRow().Height = 15.075 * 0.70;
-
                         sc = sc.CellBelow();
-
                         sc.WorksheetRow().Height = 15.075 * 0.70;
 
-                        for (int l = 0; l < headers.Length; l++)
-                        {
-                            scr.Value = headers[l];
-                            scr.Style.Fill.BackgroundColor = colormatrix[0][l];
-                            scr.Style.Font.SetFontSize(8);
-                            scr = scr.CellRight();
-                        }
+
+                        scr = iXLWorksheet.Cell(8 * m + 3, 26 * i + 3);
+                        matchHomeRange.CopyTo(scr);
+                        
 
                         for (int j = 0; j < 6; j++)
                         {
-                            scr = sc.CellBelow();
-                            scr.WorksheetRow().Height = 15.075 * 0.70;
-                            sc = sc.CellBelow();
-                            sc.WorksheetRow().Height = 15.075 * 0.70;
                             for (int k = 0; k < 10; k++)
                             {
-                                scr.Style.Fill.BackgroundColor = colormatrix[j + 1][k];
-                                scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
-                                scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                                if (j == 2 && (k == 6 || k == 7))
-                                    scr.Style.Font.FontColor = XLColor.Red;
-
+                                #region home
                                 var linkedTeam = c.Teams.Where(t => t.TeamId == teamSchedule[m].HomeTeam.TeamId).FirstOrDefault();
                                 int linkedTeamIndex = c.Teams.IndexOf(linkedTeam);
 
                                 int dbrow = linkedTeamIndex / 6;
                                 int dbcolumn = linkedTeamIndex % 6;
-
+                                scr = iXLWorksheet.Cell(8 * m + 4 + j, 26 * i + 3 + k);
                                 if (updateMode == true)
                                 {
                                     if (DateTime.Now <= teamSchedule[m].Date)
@@ -763,13 +572,34 @@ namespace TMS
                                 }
                                 else
                                     scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
-                                scr.Style.Font.SetFontSize(8);
-                                scr = scr.CellRight();
+                                #endregion
+
+                                #region away
+                                linkedTeam = c.Teams.Where(t => t.TeamId == teamSchedule[m].VisitingTeam.TeamId).FirstOrDefault();
+                                linkedTeamIndex = c.Teams.IndexOf(linkedTeam);
+
+                                dbrow = linkedTeamIndex / 6;
+                                dbcolumn = linkedTeamIndex % 6;
+                                scr = iXLWorksheet.Cell(8 * m + 4 + j, 26 * i + 14 + k);
+                                if (updateMode == true)
+                                {
+                                    if (DateTime.Now <= teamSchedule[m].Date)
+                                        scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
+                                    else
+                                    {
+                                        scr.Value = dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Value;
+                                        scr.FormulaA1 = null;
+                                    }
+                                }
+                                else
+                                    scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
+
+                                #endregion
                             }
                         }
 
                         sc = sc.CellBelow();
-
+                        sc = iXLWorksheet.Cell(8 * m + 10, 26 * i + 3);
                         sc.WorksheetRow().Height = 15.075 * 0.70;
 
                         sc.Style.Font.SetFontSize(10);
@@ -782,11 +612,7 @@ namespace TMS
                             sc.Value = "" + " - " + teamSchedule[m].HomeTeam.TeamName;
 
                         sc.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
-
-
-
                         var val = iXLWorksheet.Cell(8 * m + 5, 13).Value;
-
 
                         //AWAY
                         sc = iXLWorksheet.Cell((m * 8 + 2), 3 + i * 26 + 11);
@@ -794,54 +620,9 @@ namespace TMS
                         scr.WorksheetRow().Height = 15.075 * 0.70;
                         sc = sc.CellBelow();
                         sc.WorksheetRow().Height = 15.075 * 0.70;
-                        for (int l = 0; l < headers.Length; l++)
-                        {
-                            scr.Value = headers[l];
-                            scr.Style.Fill.BackgroundColor = colormatrix[0][l];
-                            scr.Style.Font.SetFontSize(8);
-                            scr = scr.CellRight();
-                        }
 
-                        for (int j = 0; j < 6; j++)
-                        {
-                            scr = sc.CellBelow();
-                            scr.WorksheetRow().Height = 15.075 * 0.70;
-                            sc = sc.CellBelow();
-                            sc.WorksheetRow().Height = 15.075 * 0.70;
-                            for (int k = 0; k < 10; k++)
-                            {
-                                scr.Style.Fill.BackgroundColor = colormatrix[j + 1][k];
-                                scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                                if (j == 2 && (k == 6 || k == 7))
-                                    scr.Style.Font.FontColor = XLColor.Red;
-
-                                var linkedTeam = c.Teams.Where(t => t.TeamId == teamSchedule[m].VisitingTeam.TeamId).FirstOrDefault();
-                                int linkedTeamIndex = c.Teams.IndexOf(linkedTeam);
-
-                                int dbrow = linkedTeamIndex / 6;
-                                int dbcolumn = linkedTeamIndex % 6;
-
-                                if (updateMode == true)
-                                {
-                                    if (DateTime.Now <= teamSchedule[m].Date)
-                                        scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
-                                    else
-                                    {
-                                        scr.Value = dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Value;
-                                        scr.FormulaA1 = null;
-                                    }
-                                }
-                                else
-                                    scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
-
-                                scr.Style.Font.SetFontSize(8);
-
-                                scr = scr.CellRight();
-                            }
-                        }
-
-                        sc = sc.CellBelow();
+                        sc = iXLWorksheet.Cell(8 * m + 10, 26 * i + 14);
                         sc.WorksheetRow().Height = 15.075 * 0.70;
                         sc.Style.Font.SetFontSize(10);
                         cellRange = iXLWorksheet.Cell(sc.Address.RowNumber, sc.Address.ColumnNumber);
@@ -851,6 +632,7 @@ namespace TMS
 
                         sc.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
 
+                        #region RESULT
                         //RESULT
                         string res = teamSchedule[m].Result;
                         string hg = res.Split(':')[0];
@@ -919,112 +701,7 @@ namespace TMS
                         hgCell.Style.Font.Bold = true;
                         agCell.Style.Font.Bold = true;
 
-                        #region forumulas
-
-                        //header
-                        var cell = iXLWorksheet.Cell((8 * m) + 3, 26 * (i + 1) - 2);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellX3.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 3, 26 * (i + 1) - 1);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellY3.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 3, 26 * (i + 1));
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellZ3.CopyTo(cell);
-
-                        //red 1
-                        cell = iXLWorksheet.Cell((8 * m) + 4, 26 * (i + 1) - 2);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellX4.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 4, 26 * (i + 1) - 1);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellY4.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 4, 26 * (i + 1));
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellZ4.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 4, 26 * (i + 1) + 1);
-                        cellAA4.CopyTo(cell);
-
-                        //red 2                        
-                        cell = iXLWorksheet.Cell((8 * m) + 5, 26 * (i + 1) - 1);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellY5.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 5, 26 * (i + 1));
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellZ5.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 5, 26 * (i + 1) + 1);
-                        cellAA5.CopyTo(cell);
-
-                        //red 3                        
-                        cell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1) - 1);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellY6.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1));
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellZ6.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 6, 26 * (i + 1) + 1);
-                        cellAA6.CopyTo(cell);
-
-                        //red 4
-                        cell = iXLWorksheet.Cell((8 * m) + 7, 26 * (i + 1) - 1);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellY7.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 7, 26 * (i + 1));
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellZ7.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 7, 26 * (i + 1) + 1);
-                        cellAA7.CopyTo(cell);
-
-                        //red 5
-                        cell = iXLWorksheet.Cell((8 * m) + 8, 26 * (i + 1) - 2);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellX8.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 8, 26 * (i + 1) - 1);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellY8.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 8, 26 * (i + 1));
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellZ8.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 8, 26 * (i + 1) + 1);
-                        cellAA8.CopyTo(cell);
-
-                        //red 6
-                        cell = iXLWorksheet.Cell((8 * m) + 9, 26 * (i + 1) - 2);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellX9.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 9, 26 * (i + 1) - 1);
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellY9.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 9, 26 * (i + 1));
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellZ9.CopyTo(cell);
-
-                        cell = iXLWorksheet.Cell((8 * m) + 9, 26 * (i + 1) + 1);
-                        cellAA9.CopyTo(cell);
-
-                        //red 7
-                        cell = iXLWorksheet.Cell((8 * m) + 10, 26 * (i + 1));
-                        cell.Style.Border.SetOutsideBorder(XLBorderStyleValues.Thin);
-                        cellZ10.CopyTo(cell);
-
-
-                        #endregion formulas
+                        #endregion                   
                     }
                 }
             }
@@ -1130,3 +807,4 @@ namespace TMS
         }
     }
 }
+

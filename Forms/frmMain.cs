@@ -1897,6 +1897,14 @@ namespace TMS
                     return;
                 }
 
+                string templateFileName = "cache\\arhiva\\Template.xlsx";
+
+                if (IsFileLocked(new FileInfo(templateFileName)))
+                {
+                    MessageBox.Show("Template.xlsx je otvoren. Zatvori ga pa pokusaj opet.");
+                    return;
+                }
+
                 btnGenerateExcel.Enabled = false;
                 _scheduleUpdateInProgress = true;
                 cbTeams.Enabled = false;
