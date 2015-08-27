@@ -697,6 +697,7 @@ namespace TMS
         frmTeamMapping frm = new frmTeamMapping();
         frm.CachedTeams = this._cachedTeams;
         frm.TeamToMap = t.TeamName;
+        frm.CompetitionId = SelectedGame.CompetitionId;
         DialogResult dr = frm.ShowDialog();
         if (dr == System.Windows.Forms.DialogResult.OK)
         {

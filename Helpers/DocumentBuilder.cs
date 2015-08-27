@@ -552,8 +552,10 @@ namespace TMS
             matchHomeRange.CopyTo(scr);
 
 
+            iXLWorksheet.RowHeight = 15.75 * 0.75;
+
             for (int j = 0; j < 6; j++)
-            {
+            {              
               for (int k = 0; k < 10; k++)
               {
                 #region home
