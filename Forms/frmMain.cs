@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -516,7 +516,7 @@ namespace TMS
           this.lbTeams.Focus();
         }
 
-        LoadArchive();
+        LoadArchive(_selectedCompetition);
       }
       catch (Exception e)
       {
@@ -564,8 +564,19 @@ namespace TMS
       if (_generatingInProgress == false && _playerLoadingInProgress == false)
       {
         cbCurrentSeason.SelectedIndex = 0;
-        this._selectedTeam = (Team)this.lbTeams.SelectedItem;
+      
       }
+
+      this._selectedTeam = (Team)this.lbTeams.SelectedItem;
+
+      if (_selectedTeam != null)
+      {
+        var competition = _cachedCompetitions.Where(cc => cc.CompetitionId == _selectedTeam.CompetitionId).FirstOrDefault();
+        LoadArchive(competition);
+      }
+
+
+
     }
 
     private void UpdateTeamAlternativeName(Team t)
@@ -668,14 +679,14 @@ namespace TMS
       }
     }
 
-    private List<Team> FindTeamsByName(string teamName)
+    private List<Team> FindTeamsByName(string teamName, string competitionId=null)
     {
       // return _cachedTeams.Where(tt => tt.TeamName.Contains(teamName) || (tt.AlternativeName != null && tt.AlternativeName.Equals(teamName))).ToList();
-      var teams = _cachedTeams.Where(tt => tt.AlternativeName != null && tt.AlternativeName.Equals(teamName));
+      var teams = _cachedTeams.Where(tt => tt.AlternativeName != null && tt.AlternativeName.Equals(teamName) && (tt.CompetitionId==competitionId || competitionId==null));
       if (teams.Count() != 0)
         return teams.ToList();
       else
-        return _cachedTeams.Where(tt => Helper.RemoveDiacritics(tt.TeamName, false).Contains(teamName)).ToList();
+        return _cachedTeams.Where(tt => Helper.RemoveDiacritics(tt.TeamName, false).Contains(teamName) && (tt.CompetitionId == competitionId || competitionId == null)).ToList();
     }
 
     private void mapirajTimToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1326,8 +1337,10 @@ namespace TMS
             {
               try
               {
-                webClient.DownloadFile("http://www.transfermarkt.com/images/flagge/small/" + cou.CompetitionCountryId + ".png", Application.StartupPath + "/cache/img/" + cou.CompetitionCountryId + ".png");
-
+                if(competition.CompetitionCountryId>0)
+                  {
+                  webClient.DownloadFile("http://www.transfermarkt.com/images/flagge/small/" + cou.CompetitionCountryId + ".png", Application.StartupPath + "/cache/img/" + cou.CompetitionCountryId + ".png");
+                }
                 c.Value = Image.FromFile("cache/img/" + cou.CompetitionCountryId + ".png");
                 var country = _cachedCountries.Where(cc => cc.CountryId == cou.CompetitionCountryId).FirstOrDefault();
                 if (country != null)
@@ -1414,7 +1427,7 @@ namespace TMS
           lbMatches.Enabled = true;
           List<Team> listBoxSource = new List<Team>();
 
-          List<Team> teams = FindTeamsByName(SelectedGame.Home);
+          List<Team> teams = FindTeamsByName(SelectedGame.Home,SelectedGame.CompetitionId);
           if (teams.Count() == 0)
           {
             Team t = new Team();
@@ -1432,7 +1445,7 @@ namespace TMS
 
           }
 
-          teams = FindTeamsByName(SelectedGame.Away);
+          teams = FindTeamsByName(SelectedGame.Away, SelectedGame.CompetitionId);
           if (teams.Count() == 0)
           {
             Team t = new Team();
@@ -1619,7 +1632,22 @@ namespace TMS
       try
       {
 
-        string archiveFileName = "cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + lbArhiva.SelectedItem;
+        if (lbArhiva.SelectedItem == null)
+        {
+          MessageBox.Show("Nije izabrana arhiva lige u kojoj se klub takmiči!");
+          return;
+        }    
+
+        var comp = _cachedCompetitions.Where(cc => cc.CompetitionId == _selectedTeam.CompetitionId).FirstOrDefault();      
+
+        if(comp==null)
+        {
+          MessageBox.Show("Izabrani tim nije mapiran. Mapiraj tim pa pokušaj opet!");
+            return;
+        }
+        
+
+        string archiveFileName =  "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + lbArhiva.SelectedItem;
 
         if (IsFileLocked(new FileInfo(archiveFileName)))
         {
@@ -1768,17 +1796,19 @@ namespace TMS
 
     }
 
-    private void LoadArchive()
+    private void LoadArchive(Competition c)
     {
       try
       {
+        if (c == null)
+          return;
         List<FileInfo> allFiles = new List<FileInfo>();
 
-        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//cache//arhiva//" + _selectedCountry.CountryName);
+        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//cache//arhiva//" + c.CompetitionCountry);
         if (di.Exists == false)
           di.Create();
 
-        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name.StartsWith("~") == false && f.Name.Contains("[" + _selectedCompetition.CompetitionId + "]")))
+        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name.StartsWith("~") == false && f.Name.Contains("[" + c.CompetitionId + "]")))
           allFiles.Add(fi);
 
         lbArhiva.DataSource = allFiles.OrderByDescending(f => f.LastWriteTime).ToList();
@@ -1843,7 +1873,7 @@ namespace TMS
         if (File.Exists(text))
         {
           Process.Start(text);
-          LoadArchive();
+          LoadArchive(_selectedCompetition);
 
         }
 
@@ -1988,7 +2018,7 @@ namespace TMS
         {
           string a = lbArhiva.SelectedItem.ToString();
           File.Delete("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + a);
-          LoadArchive();
+          LoadArchive(_selectedCompetition);
         }
       }
       catch (Exception ex)
