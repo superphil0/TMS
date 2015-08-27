@@ -22,7 +22,11 @@ namespace TMS
     {
       XLWorkbook xLWorkbook = new XLWorkbook(excelFilename);
       var existing = xLWorkbook.Worksheets.Where(ws => ws.Name == t.TeamName).FirstOrDefault();
-      int index = existing.Position;
+      int index;
+      if (existing == null)
+        index = 2;
+      else
+        index = existing.Position;
       if (existing != null)
         existing.Delete();
       IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add(t.TeamName);
@@ -467,6 +471,7 @@ namespace TMS
       int i = 0, m = 0;
       int dbrow, dbcolumn, linkedTeamIndex;
       Team linkedTeam;
+      List<Match> teamSchedule;
       try
       {
         var templateWorksheet = new XLWorkbook("cache\\arhiva\\Template.xlsx");
@@ -484,7 +489,7 @@ namespace TMS
 
         for (i = 0; i < c.Teams.Count; i++)
         {
-          List<Match> teamSchedule = c.Teams[i].Schedule;
+          teamSchedule = c.Teams[i].Schedule;
           int row = i / 6;
           int column = i % 6;
 

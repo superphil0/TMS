@@ -832,6 +832,10 @@ namespace TMS
             string id = href.Split('/')[4];
 
             var opponentTeam = cachedTeams.Where(ct => ct.TeamId.ToString() == id).FirstOrDefault();
+            if(opponentTeam==null)
+            {
+              opponentTeam = new Team() { TeamId = int.Parse(id), CompetitionId = team.CompetitionId};
+            }
 
             string opponentName = opponent.SelectNodes("a").FirstOrDefault().InnerHtml;
 
