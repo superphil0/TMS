@@ -20,24 +20,34 @@ namespace TMS
     };
     public static void CreateCXMLDocument(string excelFilename, Team t)
     {
-      XLWorkbook xLWorkbook = new XLWorkbook(excelFilename);
-      var existing = xLWorkbook.Worksheets.Where(ws => ws.Name == t.TeamName).FirstOrDefault();
-      int index;
-      if (existing == null)
-        index = 2;
-      else
-        index = existing.Position;
-      if (existing != null)
-        existing.Delete();
+      if (File.Exists(excelFilename))
+      {
+        File.Delete(excelFilename);
+      }
+      XLWorkbook xLWorkbook = new XLWorkbook();
       IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add(t.TeamName);
-      iXLWorksheet.Position = index;
+
+      //var iXLWorksheet = xLWorkbook.Worksheets.Where(ws => ws.Name == t.TeamName).FirstOrDefault();
+      //var existing = xLWorkbook.Worksheets.Where(ws => ws.Name == t.TeamName).FirstOrDefault();
+      //int index;
+      //if (existing == null)
+      //  index = 2;
+      //else
+      //  index = existing.Position;
+      //if (existing != null)
+      //  existing.Delete();
+      //IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add(t.TeamName);
+      //iXLWorksheet.Position = index;
 
       iXLWorksheet.Cell("A1").Value = (t.TeamName);
       iXLWorksheet.Cell("A1").Style.Font.FontSize = (16.0);
       iXLWorksheet.Cell("A1").Style.Font.FontColor = (XLColor.DarkBlue);
       iXLWorksheet.Cell("A1").Hyperlink = (new XLHyperlink("http://www.transfermarkt.com/" + t.Url));
 
-      List<Player> lineupPlayers = t.Players.Where(p => p.Lineup == Player.LineUpStatus.YES).ToList();
+      List<Player> lineupPlayers = new List<Player>();
+      if (t.Players != null)
+        lineupPlayers = t.Players.Where(p => p.Lineup == Player.LineUpStatus.YES).ToList();
+      
 
       Player emptyGoalkeeper = new Player() { MainPosition = "GK", Statistics = new List<Statistics>() { new Statistics() { }, new Statistics() { }, new Statistics() { }, new Statistics() { } } };
       Player emptyDefender = new Player() { MainPosition = "CB", Statistics = new List<Statistics>() { new Statistics() { }, new Statistics() { }, new Statistics() { }, new Statistics() { } } };
@@ -340,7 +350,7 @@ namespace TMS
                 "0.000001");
               iXLWorksheet.Cell("N" + (i * 5 + l + 2).ToString()).Value = statistics.GoalsScored.Replace("-",
                 "0.000001");
-              iXLWorksheet.Cell("O" + (i * 5 + l + 2).ToString()).Value = statistics.Assists.Replace("-", "1");
+              iXLWorksheet.Cell("O" + (i * 5 + l + 2).ToString()).Value = statistics.Assists.Replace("-", "0.000001");
               iXLWorksheet.Cell("P" + (i * 5 + l + 2).ToString()).Value = statistics.MinutesPlayed.Replace("-",
                 "0.000001");
               iXLWorksheet.Cell("Q" + (i * 5 + l + 2).ToString()).Value = statistics.MinutesPerGoal.Replace("-",
@@ -350,8 +360,20 @@ namespace TMS
         }
 
         CreateSummaryTable(iXLWorksheet.Cell("H237"));
+
         //xLWorkbook.SaveAs(excelFilename);
-        xLWorkbook.Save();
+
+        //var test = new XLWorkbook(excelFilename);
+        //test.Save();
+        //xLWorkbook.Save();
+        //xLWorkbook.Dispose();
+
+        MemoryStream ms = new MemoryStream();
+        xLWorkbook.SaveAs(ms);       
+        FileStream file = new FileStream(excelFilename, FileMode.Create, FileAccess.Write);
+        ms.WriteTo(file);
+        file.Close();
+        ms.Close();
       }
       catch (Exception ex)
       {
@@ -361,10 +383,22 @@ namespace TMS
 
     public static void CreateCompetitionArchive(string excelFileName, Competition c)
     {
+      foreach (Team t in c.Teams)
+      {
+        string fileName = "cache\\arhiva\\" + c.CompetitionCountry + "\\" + c.CompetitionName + "\\" + t.TeamName + ".xlsx";
+        CreateCXMLDocument(fileName, t);
+      }
+
       XLWorkbook xLWorkbook = new XLWorkbook();
       CreateDbStylesheet(c, xLWorkbook);
       CreateScheduleStylesheet(c, xLWorkbook, false);
-      xLWorkbook.SaveAs(excelFileName);
+      //xLWorkbook.SaveAs(excelFileName);
+      MemoryStream ms = new MemoryStream();
+      xLWorkbook.SaveAs(ms);
+      FileStream file = new FileStream(excelFileName, FileMode.Create, FileAccess.Write);
+      ms.WriteTo(file);
+      file.Close();
+      ms.Close();
     }
 
     public static void UpdateCompetitionArchive(string excelFileName, Competition c)
@@ -372,9 +406,9 @@ namespace TMS
       try
       {
         XLWorkbook xLWorkbook = new XLWorkbook(excelFileName);
-        var scheduleWorksheet = xLWorkbook.Worksheets.Where(w => w.Name == "Schedule").FirstOrDefault();
-        if (scheduleWorksheet != null)
-          scheduleWorksheet.Delete();
+        //var scheduleWorksheet = xLWorkbook.Worksheets.Where(w => w.Name == "Schedule").FirstOrDefault();
+        //if (scheduleWorksheet != null)
+        //  scheduleWorksheet.Delete();
         CreateScheduleStylesheet(c, xLWorkbook, true);
         xLWorkbook.Save();
       }
@@ -400,69 +434,7 @@ namespace TMS
 
       summaryTableRange.CopyTo(scr);
 
-      //    string[] headers = new string[] { "UU", "GU", "AU", "MU", "MPG", "0", "GU", "AU", "GU", "AU" };
-
-      //    XLColor[][] colormatrix = new XLColor[10][];
-
-      //    colormatrix[0] = new XLColor[] {
-      //XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0),
-      //XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0), XLColor.FromArgb(255, 192, 0) };
-
-      //    colormatrix[1] = new XLColor[] {
-      //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80), XLColor.FromArgb(146, 208, 80),
-      //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
-
-      //    colormatrix[2] = new XLColor[] {
-      //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105),
-      //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(144, 238, 144) };
-
-      //    colormatrix[3] = new XLColor[] {
-      //XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0),
-      //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
-
-      //    colormatrix[4] = new XLColor[] {
-      //XLColor.FromArgb(144, 238, 144), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
-      //XLColor.FromArgb(0, 176, 80), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 201, 105) };
-
-      //    colormatrix[5] = new XLColor[] {
-      //XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255),
-      //XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 201, 105), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(137, 207, 240), XLColor.FromArgb(137, 207, 240) };
-
-      //    colormatrix[6] = new XLColor[] {
-      //XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(169, 208, 142), XLColor.FromArgb(255, 255, 255),
-      //XLColor.FromArgb(189, 146, 222), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(255, 255, 255), XLColor.FromArgb(191, 143, 0), XLColor.FromArgb(191, 143, 0) };
-
-      //    var sc = scr;
-
-      //    for (int l = 0; l < headers.Length; l++)
-      //    {
-      //        scr.Value = headers[l];
-      //        scr.Style.Fill.BackgroundColor = colormatrix[0][l];
-      //        scr.Style.Font.SetFontSize(8);
-      //        scr = scr.CellRight();
-      //    }
-
-      //    for (int j = 0; j < 6; j++)
-      //    {
-      //        scr = sc.CellBelow();
-      //        scr.WorksheetRow().Height = 15.075 * 0.70;
-      //        sc = sc.CellBelow();
-      //        sc.WorksheetRow().Height = 15.075 * 0.70;
-      //        for (int k = 0; k < 10; k++)
-      //        {
-      //            scr.Style.Fill.BackgroundColor = colormatrix[j + 1][k];
-      //            scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
-      //            scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-      //            if (j == 2 && (k == 6 || k == 7))
-      //                scr.Style.Font.FontColor = XLColor.Red;
-
-      //            scr.Style.Font.SetFontSize(8);
-      //            scr.Value = 0;
-      //            scr.SetFormulaA1("M4");
-      //            scr = scr.CellRight();
-      //        }
-      //    }
+      template.Dispose();
     }
 
     private static void CreateScheduleStylesheet(Competition c, XLWorkbook xLWorkbook, bool updateMode)
@@ -477,15 +449,23 @@ namespace TMS
         var templateWorksheet = new XLWorkbook("cache\\arhiva\\Template.xlsx");
         var matchWorksheet = templateWorksheet.Worksheet("Match");
         var matchHomeRange = matchWorksheet.Range("A1", "Y8");
+        IXLWorksheet iXLWorksheet;
+        if (updateMode == false)
+        {
+          iXLWorksheet = xLWorkbook.Worksheets.Add("Schedule");
+          iXLWorksheet.Position = 2;
+          iXLWorksheet.ColumnWidth = 3.57 * 0.7;
+          iXLWorksheet.Columns(1, 1).Width = 5.14 * 0.7;
 
-        IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add("Schedule");
-        iXLWorksheet.Position = 2;
-        iXLWorksheet.ColumnWidth = 3.57 * 0.7;
-        iXLWorksheet.Columns(1, 1).Width = 5.14 * 0.7;
+          iXLWorksheet.Style.Font.Bold = true;
+          iXLWorksheet.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+          iXLWorksheet.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        }
+        else
+        {
+          iXLWorksheet = xLWorkbook.Worksheet("Schedule");
+        }
 
-        iXLWorksheet.Style.Font.Bold = true;
-        iXLWorksheet.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
-        iXLWorksheet.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
         for (i = 0; i < c.Teams.Count; i++)
         {
@@ -552,15 +532,14 @@ namespace TMS
             sc = sc.CellBelow();
             sc.WorksheetRow().Height = 15.075 * 0.70;
 
-
-            scr = iXLWorksheet.Cell(8 * m + 3, 26 * i + 3);
-            matchHomeRange.CopyTo(scr);
-
-
-            iXLWorksheet.RowHeight = 15.75 * 0.75;
+            if (updateMode == false)
+            {
+              scr = iXLWorksheet.Cell(8 * m + 3, 26 * i + 3);
+              matchHomeRange.CopyTo(scr);
+            }
 
             for (int j = 0; j < 6; j++)
-            {              
+            {
               for (int k = 0; k < 10; k++)
               {
                 #region home
@@ -572,20 +551,21 @@ namespace TMS
                   dbrow = linkedTeamIndex / 6;
                   dbcolumn = linkedTeamIndex % 6;
                   scr = iXLWorksheet.Cell(8 * m + 4 + j, 26 * i + 3 + k);
+                  scr.WorksheetRow().Height = 15.75 * 0.70;
                   if (updateMode == true)
                   {
                     if (DateTime.Now <= teamSchedule[m].Date)
                       scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
                     else
                     {
-                      scr.Value = dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Value;
+                      scr.Value = scr.ValueCached;
                       scr.FormulaA1 = null;
                     }
                   }
                   else
                     scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
                 }
-                
+
                 #endregion
 
                 #region away
@@ -594,18 +574,19 @@ namespace TMS
 
                 if (linkedTeam != null)
                 {
-
                   dbrow = linkedTeamIndex / 6;
                   dbcolumn = linkedTeamIndex % 6;
                   scr = iXLWorksheet.Cell(8 * m + 4 + j, 26 * i + 14 + k);
+                  scr.WorksheetRow().Height = 15.75 * 0.70;
                   if (updateMode == true)
                   {
                     if (DateTime.Now <= teamSchedule[m].Date)
                       scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
                     else
                     {
-                      scr.Value = dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Value;
+                      scr.Value = scr.ValueCached;
                       scr.FormulaA1 = null;
+                      
                     }
                   }
                   else
@@ -617,7 +598,6 @@ namespace TMS
 
             sc = sc.CellBelow();
             sc = iXLWorksheet.Cell(8 * m + 10, 26 * i + 3);
-            sc.WorksheetRow().Height = 15.075 * 0.70;
 
             sc.Style.Font.SetFontSize(10);
             var cellRange = iXLWorksheet.Cell(sc.Address.RowNumber, sc.Address.ColumnNumber);
@@ -723,6 +703,7 @@ namespace TMS
             #endregion
           }
         }
+
       }
       catch (Exception e)
       {
@@ -784,7 +765,7 @@ namespace TMS
 
       for (int i = 0; i < c.Teams.Count; i++)
       {
-        xLWorkbook.Worksheets.Add(c.Teams[i].TeamName.ToString());
+        //xLWorkbook.Worksheets.Add(c.Teams[i].TeamName.ToString());
         int row = i / 6;
         int column = i % 6;
         KeyValuePair<string, string> kvp = ranges.ElementAt(column);
@@ -818,7 +799,9 @@ namespace TMS
             scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
             scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
             scr.Value = 0;
-            scr.FormulaA1 = "'" + c.Teams[i].TeamName + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();
+            //scr.FormulaA1 = "'" + c.Teams[i].TeamName + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();
+            scr.FormulaA1 = "'" + Application.StartupPath + "\\cache\\arhiva\\" + c.CompetitionCountry+"\\"+c.CompetitionName + "\\[" + c.Teams[i].TeamName + ".xlsx]" + c.Teams[i].TeamName + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();
+            //'C:\TMS\TMS\bin\Debug\cache\arhiva\Austria\[Austria Vienna.xlsx]Austria Vienna'!H238
             scr = scr.CellRight();
           }
         }

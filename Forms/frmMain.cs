@@ -253,6 +253,7 @@ namespace TMS
           }
           streamWriter.Close();
         }
+
         this._countries = cachedCountries.Where(cc => cc.Top == false).ToList();
         var topCountries = cachedCountries.Where(cc => cc.Top == true).ToList();
 
@@ -416,7 +417,7 @@ namespace TMS
         this.lbCompetition.Select();
         lbCountries.Enabled = true;
 
-     
+
         if (_generatingInProgress == false)
           btnAzurirajArhivu.Enabled = true;
       }
@@ -564,7 +565,7 @@ namespace TMS
       if (_generatingInProgress == false && _playerLoadingInProgress == false)
       {
         cbCurrentSeason.SelectedIndex = 0;
-      
+
       }
 
       this._selectedTeam = (Team)this.lbTeams.SelectedItem;
@@ -679,10 +680,10 @@ namespace TMS
       }
     }
 
-    private List<Team> FindTeamsByName(string teamName, string competitionId=null)
+    private List<Team> FindTeamsByName(string teamName, string competitionId = null)
     {
       // return _cachedTeams.Where(tt => tt.TeamName.Contains(teamName) || (tt.AlternativeName != null && tt.AlternativeName.Equals(teamName))).ToList();
-      var teams = _cachedTeams.Where(tt => tt.AlternativeName != null && tt.AlternativeName.Equals(teamName) && (tt.CompetitionId==competitionId || competitionId==null));
+      var teams = _cachedTeams.Where(tt => tt.AlternativeName != null && tt.AlternativeName.Equals(teamName) && (tt.CompetitionId == competitionId || competitionId == null));
       if (teams.Count() != 0)
         return teams.ToList();
       else
@@ -739,11 +740,19 @@ namespace TMS
         this.dgvPlayers.DataSource = null;
         this.tbStatus.Clear();
         this._selectedTeam = (Team)this.lbTeams.SelectedItem;
-        Team arg_75_0 = (Team)this.lbTeams.SelectedItem;
         this.btnGenerateExcel.Enabled = false;
         this.pbLoadingPlayers.Visible = true;
 
         this._selectedTeam.Players = await DataLoader.LoadPlayersAsync(this._selectedTeam.TeamId);
+
+        _cachedStats = LoadCachedData(_selectedTeam.TeamId);
+
+        foreach(var p in _selectedTeam.Players)
+        {
+          var pl = _cachedStats.Where(cs => cs.PlayerId == p.PlayerId).FirstOrDefault();
+          if (pl != null)
+            p.CurrentSeasonStatistics = pl.CurrentSeasonStatistics;
+        }
 
         if (_selectedTeam.GameLineups != null)
         {
@@ -837,16 +846,12 @@ namespace TMS
           };
           Player player = (Player)dgvr.DataBoundItem;
 
-          //this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
-
-          //var pcd = _cachedStats.Where(cc => cc.PlayerId == player.PlayerId).FirstOrDefault();
-
-          //if (pcd != null)
-          //{
-          //    dgvr.Cells[3].Value = pcd.Statistics.FirstOrDefault().GamesPlayed;
-          //    dgvr.Cells[4].Value = pcd.Statistics.FirstOrDefault().MinutesPlayed;
-          //    dgvr.Cells[5].Value = pcd.Statistics.FirstOrDefault().GoalsScored;
-          //}
+          if (player.CurrentSeasonStatistics != null)
+          {
+            dgvr.Cells[3].Value = player.CurrentSeasonStatistics.GamesPlayed;
+            dgvr.Cells[4].Value = player.CurrentSeasonStatistics.MinutesPlayed;
+            dgvr.Cells[5].Value = player.CurrentSeasonStatistics.GoalsScored;
+          }
 
           if (player.Lineup == Player.LineUpStatus.YES)
           {
@@ -890,15 +895,7 @@ namespace TMS
         if (dgvPlayers.Rows.Count > 0)
           dgvPlayers.Rows[0].Selected = false;
 
-        string text;
-        //if (DateTime.Now.Month >= 8)
-        //{
-        //    text = DateTime.Now.Year.ToString();
-        //}
-        //else
-        //{
-        //    text = (DateTime.Now.Year - 1).ToString();
-        //}
+        string text;      
 
         text = cbCurrentSeason.SelectedItem.ToString();
 
@@ -906,15 +903,7 @@ namespace TMS
         {
           string text2 = this._selectedTeam.Players[i].TmUrl.Substring(1);
           string text3 = text2.Substring(0, text2.IndexOf("/"));
-          this._selectedTeam.Players[i].PlayerStatsUrl = string.Concat(new object[]
-    {
-                text3,
-                "/leistungsdaten/spieler/",
-                this._selectedTeam.Players[i].PlayerId,
-                "/saison/",
-                text,
-                "/plus/1"
-    });
+          this._selectedTeam.Players[i].PlayerStatsUrl = text3+"/leistungsdaten/spieler/"+this._selectedTeam.Players[i].PlayerId+"/saison/"+text+"/plus/1";
         }
       }
       catch (Exception ex)
@@ -927,7 +916,7 @@ namespace TMS
 
     private async Task GetPlayersData(Player p)
     {
-      StreamWriter streamWriter = null;
+      StreamWriter streamWriter = null, currentSeasonData = null;
       try
       {
         if (p.Lineup == Player.LineUpStatus.YES)
@@ -936,25 +925,20 @@ namespace TMS
 
           p.Statistics = new List<Statistics>();
           p.Matches = new List<Match>();
-          streamWriter =
-            new StreamWriter("cache\\" + this._selectedTeam.TeamId.ToString() + ".txt", true);
-          bool flag = true;
+          streamWriter = new StreamWriter("cache\\" + this._selectedTeam.TeamId.ToString() + ".txt", true);
+
+          currentSeasonData = new StreamWriter("cache\\" + this._selectedTeam.TeamId.ToString() + "_tmp.txt", true);
+
+          bool currentSeason = true;
           bool flag2 = false;
           for (int i = 0; i < 4; i++)
           {
             string year;
-            //if (DateTime.Now.Month < 7)
-            //{
-            //    year = (DateTime.Now.Year - i - 1).ToString();
-            //}
-            //else
-            //{
-            //    year = (DateTime.Now.Year - i).ToString();
-            //}
+
             year = ((int)cbCurrentSeason.SelectedItem - i).ToString();
             bool flag3 = false;
             Statistics statistics2 = new Statistics();
-            if (!flag)
+            if (!currentSeason)
             {
               List<Player> list = (
                 from cs in this._cachedStats
@@ -976,48 +960,26 @@ namespace TMS
                 }
               }
             }
-            if (!flag3 || flag)
+            if (!flag3 || currentSeason)
             {
-              DateTime arg_265_0 = DateTime.Now;
-              //if (DateTime.Now.Month < 8)
-              //{
-              //    statistics2.Year = (DateTime.Now.Year - i - 1).ToString();
-              //}
-              //else
-              //{
-              //    statistics2.Year = (DateTime.Now.Year - i).ToString();
-              //}
-
               statistics2.Year = ((int)cbCurrentSeason.SelectedItem - i).ToString();
 
-
-
-              DateTime arg_2C2_0 = DateTime.Now;
               string text = p.TmUrl.Substring(1);
               string text2 = text.Substring(0, text.IndexOf("/"));
-              string playerStatsUrl = string.Concat(new object[]
-    {
-                    text2,
-                    "/leistungsdaten/spieler/",
-                    p.PlayerId,
-                    "/saison/",
-                    year,
-                    "/plus/1"
-    });
-              string text3 = null;
-              statistics = await DataLoader.LoadPlayerStatisticsAsync(playerStatsUrl, flag, year,
-                p.MainPosition);
+              string playerStatsUrl = text2 + "/leistungsdaten/spieler/" + p.PlayerId + "/saison/" + year + "/plus/1";
+
+              statistics = await DataLoader.LoadPlayerStatisticsAsync(playerStatsUrl, currentSeason, year, p.MainPosition);
+
               if (statistics != null && statistics.Contract != null)
-              {
                 p.Contract = statistics.Contract;
-              }
+
               if (statistics != null && statistics.NationalPlayer != null)
                 p.NationalPlayer = statistics.NationalPlayer;
 
               if (statistics != null && statistics.NationalPlayerUrl != null)
                 p.NationalPlayerUrl = statistics.NationalPlayerUrl;
 
-              if (!flag && !flag2)
+              if (!currentSeason && !flag2)
               {
                 flag2 = true;
                 List<string> secondaryPositions = new List<string>();
@@ -1026,43 +988,32 @@ namespace TMS
                 p.PrefferedFoot = additionalPlayerData.PrefferedFoot;
                 p.SecondaryPositions = additionalPlayerData.SecondaryPositions;
               }
-              if (statistics != null && !flag && statistics.GamesPlayed != null)
+
+              var playerData = p.PlayerId + "|" + year + "-" + statistics.GamesPlayed.Replace("-", "0") + "-" + statistics.GoalsScored.Replace("-", "0") +
+                      "-" + statistics.Assists.Replace("-", "0") + "-" + statistics.MinutesPlayed.Replace(".", "").Replace("-", "0.000001") +
+                      "-" + statistics.MinutesPerGoal.Replace(".", "").Replace("-", "0.000001") + "-" + p.PrefferedFoot;
+
+              if (statistics != null && !currentSeason && statistics.GamesPlayed != null)
               {
-                streamWriter.Write(string.Concat(new object[]
-    {
-                      p.PlayerId,
-                      "|",
-                      year,
-                      "-",
-                      statistics.GamesPlayed.Replace("-", "0"),
-                      "-",
-                      statistics.GoalsScored.Replace("-", "0"),
-                      "-",
-                      statistics.Assists.Replace("-", "0"),
-                      "-",
-                      statistics.MinutesPlayed.Replace(".", "").Replace("-", "0.000001"),
-                      "-",
-                      statistics.MinutesPerGoal.Replace(".", "").Replace("-", "0.000001"),
-                      "-",
-                      p.PrefferedFoot
-    }));
+                streamWriter.Write(playerData);
+
                 string text4 = "";
                 foreach (string current in p.SecondaryPositions)
-                {
                   text4 = text4 + "," + current;
-                }
+
                 if (text4 != "")
-                {
                   streamWriter.Write("-" + text4.Substring(1));
-                }
+
                 streamWriter.Write(Environment.NewLine);
               }
-              //if(statistics!=null)
+
               p.Statistics.Add(statistics);
-              if (flag && statistics != null)
+              if (currentSeason && statistics != null)
               {
                 p.Matches = statistics.Matches.OrderByDescending(m => m.Date).Take(4).ToList();
-                flag = false;
+                currentSeason = false;
+
+                currentSeasonData.WriteLine(playerData);
               }
             }
           }
@@ -1079,6 +1030,9 @@ namespace TMS
       {
         if (streamWriter != null)
           streamWriter.Dispose();
+
+        if (currentSeasonData != null)
+          currentSeasonData.Dispose();
       }
 
     }
@@ -1101,6 +1055,7 @@ namespace TMS
 
       try
       {
+        //LOADING PREVIOUS SEASON DATA
         if (File.Exists("cache\\" + teamId + ".txt"))
         {
           StreamReader streamReader = new StreamReader("cache\\" + teamId + ".txt");
@@ -1148,6 +1103,40 @@ namespace TMS
           }
           streamReader.Close();
         }
+
+        //LOADING CURRENT SEASON DATA
+        if (File.Exists("cache\\" + teamId + "_tmp.txt"))
+        {
+          StreamReader streamReader = new StreamReader("cache\\" + teamId + "_tmp.txt");
+          while (!streamReader.EndOfStream)
+          {
+            string input = streamReader.ReadLine();
+            string[] array = Regex.Split(input, "\\|");
+            string text = array[0];
+                   
+            int playerId = int.Parse(text);
+            Statistics statistics = new Statistics();
+            string[] array2 = Regex.Split(array[1], "-");
+            statistics.Year = array2[0];
+            statistics.GamesPlayed = array2[1];
+            statistics.GoalsScored = array2[2];
+            statistics.Assists = array2[3];
+            statistics.MinutesPlayed = array2[4];
+            statistics.MinutesPerGoal = array2[5];
+
+            var existing = _cachedStats.Where(cs => cs.PlayerId == playerId).FirstOrDefault();
+            if (existing != null)
+              existing.CurrentSeasonStatistics = statistics;
+            else
+            {
+              Player player = new Player();
+              player.PlayerId = int.Parse(text);
+              player.CurrentSeasonStatistics = statistics;
+              _cachedStats.Add(player);
+            }
+          }
+          streamReader.Close();
+        }
       }
       catch (Exception ex)
       {
@@ -1156,6 +1145,9 @@ namespace TMS
       }
       return this._cachedStats;
     }
+
+
+
 
     private void btnStop_Click(object sender, EventArgs e)
     {
@@ -1325,31 +1317,36 @@ namespace TMS
 
           var cou = _cachedCompetitions.Where(co => co.CompetitionId == g.CompetitionId).FirstOrDefault();
           DataGridViewImageCell c = (DataGridViewImageCell)r.Cells[1];
-          if (File.Exists("cache/img/" + cou.CompetitionCountryId + ".png"))
-          {
-            c.Value = Image.FromFile("cache/img/" + cou.CompetitionCountryId + ".png");
-            var country = _cachedCountries.Where(cc => cc.CountryId == cou.CompetitionCountryId).FirstOrDefault();
-            if (country != null)
-              c.ToolTipText = country.CountryName;
-          }
+
+          if (competition.CompetitionCountryId < 0)
+            c.Value = Image.FromFile("cache/img/competitions/" + competition.CompetitionId + ".png");
           else
           {
-            using (WebClient webClient = new WebClient())
+            if (File.Exists("cache/img/" + cou.CompetitionCountryId + ".png"))
             {
-              try
+              c.Value = Image.FromFile("cache/img/" + cou.CompetitionCountryId + ".png");
+              var country = _cachedCountries.Where(cc => cc.CountryId == cou.CompetitionCountryId).FirstOrDefault();
+              if (country != null)
+                c.ToolTipText = country.CountryName;
+            }
+            else
+            {
+              using (WebClient webClient = new WebClient())
               {
-                if(competition.CompetitionCountryId>0)
-                  {
+                try
+                {
+
                   webClient.DownloadFile("http://www.transfermarkt.com/images/flagge/small/" + cou.CompetitionCountryId + ".png", Application.StartupPath + "/cache/img/" + cou.CompetitionCountryId + ".png");
+
+                  c.Value = Image.FromFile("cache/img/" + cou.CompetitionCountryId + ".png");
+                  var country = _cachedCountries.Where(cc => cc.CountryId == cou.CompetitionCountryId).FirstOrDefault();
+                  if (country != null)
+                    c.ToolTipText = country.CountryName;
                 }
-                c.Value = Image.FromFile("cache/img/" + cou.CompetitionCountryId + ".png");
-                var country = _cachedCountries.Where(cc => cc.CountryId == cou.CompetitionCountryId).FirstOrDefault();
-                if (country != null)
-                  c.ToolTipText = country.CountryName;
-              }
-              catch (Exception e)
-              {
-                Logger.Exception(e);
+                catch (Exception e)
+                {
+                  Logger.Exception(e);
+                }
               }
             }
           }
@@ -1428,7 +1425,7 @@ namespace TMS
           lbMatches.Enabled = true;
           List<Team> listBoxSource = new List<Team>();
 
-          List<Team> teams = FindTeamsByName(SelectedGame.Home,SelectedGame.CompetitionId);
+          List<Team> teams = FindTeamsByName(SelectedGame.Home, SelectedGame.CompetitionId);
           if (teams.Count() == 0)
           {
             Team t = new Team();
@@ -1637,18 +1634,18 @@ namespace TMS
         {
           MessageBox.Show("Nije izabrana arhiva lige u kojoj se klub takmiči!");
           return;
-        }    
+        }
 
-        var comp = _cachedCompetitions.Where(cc => cc.CompetitionId == _selectedTeam.CompetitionId).FirstOrDefault();      
+        var comp = _cachedCompetitions.Where(cc => cc.CompetitionId == _selectedTeam.CompetitionId).FirstOrDefault();
 
-        if(comp==null)
+        if (comp == null)
         {
           MessageBox.Show("Izabrani tim nije mapiran. Mapiraj tim pa pokušaj opet!");
-            return;
+          return;
         }
-        
 
-        string archiveFileName =  "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + lbArhiva.SelectedItem;
+
+        string archiveFileName = "cache\\arhiva\\" + comp.CompetitionCountry+"\\"+comp.CompetitionName + "\\" + lbArhiva.SelectedItem;
 
         if (IsFileLocked(new FileInfo(archiveFileName)))
         {
@@ -1694,16 +1691,13 @@ namespace TMS
           cbCurrentSeason.SelectedItem = maxYear + 1;
         }
 
+        var currentSeasonData = new FileInfo("cache\\" + this._selectedTeam.TeamId.ToString() + "_tmp.txt");
+        if (currentSeasonData.Exists == true)
+          currentSeasonData.Delete();
+
         foreach (Player p in _selectedTeam.Players)
         {
-          this.tbStatus.Text = string.Concat(new object[]
-    {
-                (this._counter + 1).ToString(),
-                " od ",
-                this._selectedTeam.Players.Where(pl => pl.Lineup == TMS.Player.LineUpStatus.YES).Count(),
-                " - ",
-                p.Name
-    });
+          this.tbStatus.Text = (this._counter + 1).ToString() + " od " + this._selectedTeam.Players.Where(pl => pl.Lineup == TMS.Player.LineUpStatus.YES).Count() + " - " + p.Name;
           foreach (DataGridViewRow dgvr in dgvPlayers.Rows)
           {
             CurrentPlayer = p;
@@ -1731,17 +1725,11 @@ namespace TMS
         btnAzurirajArhivu.Enabled = true;
         Guid.NewGuid();
 
+        var fileName = archiveFileName;
+        fileName = "cache\\arhiva\\" + comp.CompetitionCountry +"\\"+comp.CompetitionName+ "\\" +_selectedTeam.TeamName+ ".xlsx";
+        DocumentBuilder.CreateCXMLDocument(fileName, this._selectedTeam);
 
-
-        DocumentBuilder.CreateCXMLDocument(archiveFileName, this._selectedTeam);
-
-        MessageBox.Show("OK!");
-        //if (File.Exists(text))
-        //{
-        //    //this.BindDocuments();
-        //    //LoadDocuments();
-        //    //Process.Start(text);
-        //}
+        Process.Start(fileName);
       }
       catch (Exception ex)
       {
@@ -1805,7 +1793,7 @@ namespace TMS
           return;
         List<FileInfo> allFiles = new List<FileInfo>();
 
-        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//cache//arhiva//" + c.CompetitionCountry);
+        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//cache//arhiva//" + c.CompetitionCountry+"//"+c.CompetitionName);
         if (di.Exists == false)
           di.Create();
 
@@ -1849,17 +1837,7 @@ namespace TMS
         _scheduleUpdateInProgress = true;
         btnDeleteFile.Enabled = false;
 
-        string text = string.Concat(new string[]
-  {
-                "cache\\arhiva\\",_selectedCountry.CountryName,
-                "\\",
-                this._selectedCompetition.CompetitionName,
-                " [",
-                this._selectedCompetition.CompetitionId.ToString(),
-                "] ",
-                DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss"),
-                ".xlsx"
-  });
+        string text = "cache\\arhiva\\"+_selectedCountry.CountryName+"\\"+_selectedCompetition.CompetitionName+"\\"+"["+this._selectedCompetition.CompetitionId.ToString()+"] "+ this._selectedCompetition.CompetitionName+" "+DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss")+".xlsx";
 
         foreach (Team t in _selectedCompetition.Teams)
         {
@@ -1875,10 +1853,7 @@ namespace TMS
         {
           Process.Start(text);
           LoadArchive(_selectedCompetition);
-
         }
-
-
       }
       catch (Exception ex)
       {
@@ -1941,13 +1916,13 @@ namespace TMS
     {
       try
       {
-        string archiveFileName = "cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + lbArhiva.SelectedItem;
+        //string archiveFileName = "cache\\arhiva\\" + _selectedCountry.CountryName + "\\"+_ + lbArhiva.SelectedItem;
 
-        if (IsFileLocked(new FileInfo(archiveFileName)))
-        {
-          MessageBox.Show("Arhiva '" + archiveFileName + "' je otvorena. Zatvori je pa pokusaj opet.");
-          return;
-        }
+        //if (IsFileLocked(new FileInfo(archiveFileName)))
+        //{
+        //  MessageBox.Show("Arhiva '" + archiveFileName + "' je otvorena. Zatvori je pa pokusaj opet.");
+        //  return;
+        //}
 
         string templateFileName = "cache\\arhiva\\Template.xlsx";
 
@@ -1988,9 +1963,9 @@ namespace TMS
             }
             competition.Teams = teams;
 
-            DocumentBuilder.UpdateCompetitionArchive("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + a, competition);
+            DocumentBuilder.UpdateCompetitionArchive("cache\\arhiva\\" + _selectedCountry.CountryName+"\\"+competition.CompetitionName + "\\" + a, competition);
 
-            Process.Start("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + a);
+            Process.Start("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + competition.CompetitionName + "\\" + a);
           }
         }
       }
@@ -2018,7 +1993,7 @@ namespace TMS
         if (lbArhiva.SelectedItem != null)
         {
           string a = lbArhiva.SelectedItem.ToString();
-          File.Delete("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + a);
+          File.Delete("cache\\arhiva\\" + _selectedCountry.CountryName+"\\"+_selectedCompetition.CompetitionName + "\\" + a);
           LoadArchive(_selectedCompetition);
         }
       }

@@ -517,7 +517,15 @@ namespace TMS
     public async static Task<Statistics> LoadPlayerStatisticsAsync(string playerStatsUrl, bool loadMatches, string year, string playerPosition)
     {
       string contract = null;
-      Statistics statistics = new Statistics();
+      Statistics statistics = new Statistics()
+      {
+        GamesPlayed = "-",
+        GoalsScored = "-",
+        MinutesPlayed = "-",
+        Assists = "0",
+        Year = year,
+        MinutesPerGoal = "-"
+      };
       Statistics result;
       try
       {
@@ -832,9 +840,9 @@ namespace TMS
             string id = href.Split('/')[4];
 
             var opponentTeam = cachedTeams.Where(ct => ct.TeamId.ToString() == id).FirstOrDefault();
-            if(opponentTeam==null)
+            if (opponentTeam == null)
             {
-              opponentTeam = new Team() { TeamId = int.Parse(id), CompetitionId = team.CompetitionId};
+              opponentTeam = new Team() { TeamId = int.Parse(id), CompetitionId = team.CompetitionId };
             }
 
             string opponentName = opponent.SelectNodes("a").FirstOrDefault().InnerHtml;
