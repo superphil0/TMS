@@ -92,6 +92,7 @@ namespace TMS
       this.rbIzabranaLiga = new System.Windows.Forms.RadioButton();
       this.rbSve = new System.Windows.Forms.RadioButton();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.btnAzurirajLigu = new System.Windows.Forms.Button();
       this.cmsMapTeam.SuspendLayout();
       this.cmsTop.SuspendLayout();
       this.cmLineupstatus.SuspendLayout();
@@ -540,7 +541,7 @@ namespace TMS
       this.btnAzurirajArhivu.Enabled = false;
       this.btnAzurirajArhivu.Location = new System.Drawing.Point(211, 474);
       this.btnAzurirajArhivu.Name = "btnAzurirajArhivu";
-      this.btnAzurirajArhivu.Size = new System.Drawing.Size(127, 23);
+      this.btnAzurirajArhivu.Size = new System.Drawing.Size(114, 23);
       this.btnAzurirajArhivu.TabIndex = 46;
       this.btnAzurirajArhivu.Text = "Azuriraj arhivu";
       this.btnAzurirajArhivu.UseVisualStyleBackColor = true;
@@ -580,12 +581,23 @@ namespace TMS
       this.groupBox1.TabIndex = 49;
       this.groupBox1.TabStop = false;
       // 
+      // btnAzurirajLigu
+      // 
+      this.btnAzurirajLigu.Location = new System.Drawing.Point(331, 474);
+      this.btnAzurirajLigu.Name = "btnAzurirajLigu";
+      this.btnAzurirajLigu.Size = new System.Drawing.Size(114, 23);
+      this.btnAzurirajLigu.TabIndex = 50;
+      this.btnAzurirajLigu.Text = "Azuriraj ligu";
+      this.btnAzurirajLigu.UseVisualStyleBackColor = true;
+      this.btnAzurirajLigu.Click += new System.EventHandler(this.btnAzurirajLigu_Click);
+      // 
       // frmMain
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.LightSteelBlue;
       this.ClientSize = new System.Drawing.Size(1123, 702);
+      this.Controls.Add(this.btnAzurirajLigu);
       this.Controls.Add(this.groupBox1);
       this.Controls.Add(this.btnAzurirajArhivu);
       this.Controls.Add(this.lbArhiva);
@@ -655,6 +667,7 @@ namespace TMS
         private RadioButton rbIzabranaLiga;
         private RadioButton rbSve;
         private GroupBox groupBox1;
-    }
+    private Button btnAzurirajLigu;
+  }
 }
 
