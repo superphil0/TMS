@@ -9,6 +9,8 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace TMS
 {
@@ -599,7 +601,11 @@ namespace TMS
           HtmlNodeCollection htmlNodeCollection3 = htmlNode.SelectNodes("tr/td");
           if (htmlNodeCollection3 != null)
           {
-            text = htmlNodeCollection3.ElementAt(5).InnerText;
+            if (htmlNodeCollection3.Count > 5)
+              text = htmlNodeCollection3.ElementAt(5).InnerText;                         
+            else
+              text = htmlNodeCollection3.ElementAt(4).InnerText;
+
             text = text.Replace("\r\n", "").Replace("\t", "");
           }
           HtmlNode htmlNode2 = htmlDocument.DocumentNode.SelectNodes("//table[@class='profilheader']").ElementAt(1);
@@ -884,7 +890,56 @@ namespace TMS
 
       return schedule;
 
-      //
+
+    }
+
+    public static async Task<string> GetStream(string home, string away)
+    {
+      string url = null;
+      try
+      {
+        HttpClient httpClient = new HttpClient();
+        HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://www.realstreamunited.com/search.php?option=com_search&tmpl=raw&type=json&ordering=&searchphrase=all&Itemid=207&areas[]=event&searchword=" + home + "&sef=1&limitstart=0");
+        requestMessage.Headers.Add("User-Agent", "Mozilla/5.0");
+
+        HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
+        HtmlDocument htmlDocument = new HtmlDocument();
+        string ss = await response.Content.ReadAsStringAsync();
+        htmlDocument.LoadHtml(ss);
+
+        dynamic data = JsonConvert.DeserializeObject(ss);
+        dynamic results = data.results;
+        JArray arr = JArray.FromObject(results);
+        if (arr.Count > 0)
+        {
+          dynamic link = arr[0];
+          url = "http://www.realstreamunited.com/" + link.url;
+          httpClient = new HttpClient();
+          requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+          requestMessage.Headers.Add("User-Agent", "Mozilla/5.0");
+
+          response = await httpClient.SendAsync(requestMessage);
+          htmlDocument = new HtmlDocument();
+          ss = await response.Content.ReadAsStringAsync();
+          htmlDocument.LoadHtml(ss);
+
+          var recom = htmlDocument.DocumentNode.SelectNodes("//table/tbody/tr/td");
+          foreach(var td in recom)
+          {
+            if (td.InnerText.Contains("Recommended"))
+              {
+              url = td.SelectNodes("a")[0].GetAttributeValue("href", "");
+              break;
+            }
+          }
+
+        }
+      }
+      catch (Exception e)
+      {
+        Logger.Exception(e);
+      }
+      return url;
     }
   }
 }

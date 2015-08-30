@@ -386,7 +386,8 @@ namespace TMS
       foreach (Team t in c.Teams)
       {
         string fileName = "cache\\arhiva\\" + c.CompetitionCountry + "\\" + c.CompetitionName + "\\" + t.TeamName + ".xlsx";
-        CreateCXMLDocument(fileName, t);
+        if(File.Exists(fileName)==false)
+          CreateCXMLDocument(fileName, t);
       }
 
       XLWorkbook xLWorkbook = new XLWorkbook();
@@ -558,8 +559,11 @@ namespace TMS
                       scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
                     else
                     {
-                      scr.Value = scr.ValueCached;
-                      scr.FormulaA1 = null;
+                      if (scr.FormulaA1 != "")
+                      {
+                        scr.Value = scr.ValueCached;
+                        scr.FormulaA1 = null;
+                      }
                     }
                   }
                   else
@@ -584,8 +588,11 @@ namespace TMS
                       scr.FormulaA1 = "DB!" + dbWorksheet.Cell(dbrow * 8 + 3 + j, dbcolumn * 11 + 2 + k).Address.ToString();
                     else
                     {
-                      scr.Value = scr.ValueCached;
-                      scr.FormulaA1 = null;
+                      if (scr.FormulaA1 != "")
+                      {
+                        scr.Value = scr.ValueCached;
+                        scr.FormulaA1 = null;
+                      }
                       
                     }
                   }
@@ -694,6 +701,13 @@ namespace TMS
                   agCell.Style.Font.FontColor = XLColor.White;
                 }
               }
+            }
+            else
+            {
+              hgCell.Style.Fill.BackgroundColor = XLColor.LightGray;
+              agCell.Style.Fill.BackgroundColor = XLColor.LightGray;
+              hgCell.Style.Font.FontColor = XLColor.Black;
+              agCell.Style.Font.FontColor = XLColor.Black;
             }
 
 

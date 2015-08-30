@@ -93,6 +93,7 @@ namespace TMS
       this.rbSve = new System.Windows.Forms.RadioButton();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
       this.btnAzurirajLigu = new System.Windows.Forms.Button();
+      this.gledajToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.cmsMapTeam.SuspendLayout();
       this.cmsTop.SuspendLayout();
       this.cmLineupstatus.SuspendLayout();
@@ -181,6 +182,7 @@ namespace TMS
       this.btnDeleteFile.TabIndex = 17;
       this.btnDeleteFile.Text = "Obriši";
       this.btnDeleteFile.UseVisualStyleBackColor = true;
+      this.btnDeleteFile.Visible = false;
       this.btnDeleteFile.Click += new System.EventHandler(this.btnDeleteFile_Click);
       // 
       // lbCountries
@@ -444,18 +446,20 @@ namespace TMS
       this.lbMatches.Size = new System.Drawing.Size(370, 392);
       this.lbMatches.TabIndex = 40;
       this.lbMatches.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.lbMatches_CellClick);
+     
       // 
       // cmMapCompetition
       // 
       this.cmMapCompetition.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mapirajToolStripMenuItem});
+            this.mapirajToolStripMenuItem,
+            this.gledajToolStripMenuItem});
       this.cmMapCompetition.Name = "cmMapCompetition";
-      this.cmMapCompetition.Size = new System.Drawing.Size(115, 26);
+      this.cmMapCompetition.Size = new System.Drawing.Size(153, 70);
       // 
       // mapirajToolStripMenuItem
       // 
       this.mapirajToolStripMenuItem.Name = "mapirajToolStripMenuItem";
-      this.mapirajToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
+      this.mapirajToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.mapirajToolStripMenuItem.Text = "Mapiraj";
       this.mapirajToolStripMenuItem.Click += new System.EventHandler(this.mapirajToolStripMenuItem_Click);
       // 
@@ -591,6 +595,13 @@ namespace TMS
       this.btnAzurirajLigu.UseVisualStyleBackColor = true;
       this.btnAzurirajLigu.Click += new System.EventHandler(this.btnAzurirajLigu_Click);
       // 
+      // gledajToolStripMenuItem
+      // 
+      this.gledajToolStripMenuItem.Name = "gledajToolStripMenuItem";
+      this.gledajToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.gledajToolStripMenuItem.Text = "Gledaj";
+      this.gledajToolStripMenuItem.Click += new System.EventHandler(this.gledajToolStripMenuItem_Click);
+      // 
       // frmMain
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -668,6 +679,7 @@ namespace TMS
         private RadioButton rbSve;
         private GroupBox groupBox1;
     private Button btnAzurirajLigu;
+    private ToolStripMenuItem gledajToolStripMenuItem;
   }
 }
 
