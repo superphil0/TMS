@@ -27,18 +27,6 @@ namespace TMS
       XLWorkbook xLWorkbook = new XLWorkbook();
       IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add(t.TeamName);
 
-      //var iXLWorksheet = xLWorkbook.Worksheets.Where(ws => ws.Name == t.TeamName).FirstOrDefault();
-      //var existing = xLWorkbook.Worksheets.Where(ws => ws.Name == t.TeamName).FirstOrDefault();
-      //int index;
-      //if (existing == null)
-      //  index = 2;
-      //else
-      //  index = existing.Position;
-      //if (existing != null)
-      //  existing.Delete();
-      //IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add(t.TeamName);
-      //iXLWorksheet.Position = index;
-
       iXLWorksheet.Cell("A1").Value = (t.TeamName);
       iXLWorksheet.Cell("A1").Style.Font.FontSize = (16.0);
       iXLWorksheet.Cell("A1").Style.Font.FontColor = (XLColor.DarkBlue);
@@ -91,9 +79,6 @@ namespace TMS
           lineupPlayers.Add(attackers.ElementAt(i));
         else
           lineupPlayers.Add(emptyAttacker);
-
-
-
 
       try
       {
@@ -361,13 +346,6 @@ namespace TMS
 
         CreateSummaryTable(iXLWorksheet.Cell("H237"));
 
-        //xLWorkbook.SaveAs(excelFilename);
-
-        //var test = new XLWorkbook(excelFilename);
-        //test.Save();
-        //xLWorkbook.Save();
-        //xLWorkbook.Dispose();
-
         MemoryStream ms = new MemoryStream();
         xLWorkbook.SaveAs(ms);       
         FileStream file = new FileStream(excelFilename, FileMode.Create, FileAccess.Write);
@@ -378,6 +356,7 @@ namespace TMS
       catch (Exception ex)
       {
         Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
     }
 
@@ -385,7 +364,7 @@ namespace TMS
     {
       foreach (Team t in c.Teams)
       {
-        string fileName = "cache\\arhiva\\" + c.CompetitionCountry + "\\" + c.CompetitionName + "\\" + t.TeamName + ".xlsx";
+        string fileName = Helper.GetTeamArchiveFileName(c, t);
         if(File.Exists(fileName)==false)
           CreateCXMLDocument(fileName, t);
       }
@@ -393,7 +372,6 @@ namespace TMS
       XLWorkbook xLWorkbook = new XLWorkbook();
       CreateDbStylesheet(c, xLWorkbook);
       CreateScheduleStylesheet(c, xLWorkbook, false);
-      //xLWorkbook.SaveAs(excelFileName);
       MemoryStream ms = new MemoryStream();
       xLWorkbook.SaveAs(ms);
       FileStream file = new FileStream(excelFileName, FileMode.Create, FileAccess.Write);
@@ -407,22 +385,15 @@ namespace TMS
       try
       {
         XLWorkbook xLWorkbook = new XLWorkbook(excelFileName);
-        //var scheduleWorksheet = xLWorkbook.Worksheets.Where(w => w.Name == "Schedule").FirstOrDefault();
-        //if (scheduleWorksheet != null)
-        //  scheduleWorksheet.Delete();
         CreateScheduleStylesheet(c, xLWorkbook, true);
         xLWorkbook.Save();
       }
       catch (Exception ex)
       {
         if (ex.Message.Contains("being used"))
-        {
           MessageBox.Show("Zatvori arhivu pa pokusaj opet!");
-        }
         else
-        {
           MessageBox.Show("Greska!");
-        }
       }
     }
 
@@ -430,11 +401,8 @@ namespace TMS
     {
       XLWorkbook template = new XLWorkbook("cache\\arhiva\\Template.xlsx");
       var sheet = template.Worksheet("Template");
-
       var summaryTableRange = sheet.Range(237, 8, 242, 17);
-
       summaryTableRange.CopyTo(scr);
-
       template.Dispose();
     }
 
@@ -719,9 +687,10 @@ namespace TMS
         }
 
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
 
     }
@@ -779,14 +748,13 @@ namespace TMS
 
       for (int i = 0; i < c.Teams.Count; i++)
       {
-        //xLWorkbook.Worksheets.Add(c.Teams[i].TeamName.ToString());
         int row = i / 6;
         int column = i % 6;
         KeyValuePair<string, string> kvp = ranges.ElementAt(column);
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Merge().Value = c.Teams[i].TeamName;
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
         iXLWorksheet.Row(1 + row * 8).Height = 24.75 * 0.75;
-        iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString()).Hyperlink = new XLHyperlink(c.Teams[i].Url);
+        iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString()).Hyperlink = new XLHyperlink(c.Teams[i].Url);// URL??
         iXLWorksheet.Cell(kvp.Key + (1 + row * 8).ToString()).Style.Font.SetFontSize(12);
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Font.Bold = true;
         iXLWorksheet.Range(kvp.Key + (1 + row * 8).ToString(), kvp.Value + (1 + row * 8).ToString()).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
@@ -813,9 +781,7 @@ namespace TMS
             scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
             scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
             scr.Value = 0;
-            //scr.FormulaA1 = "'" + c.Teams[i].TeamName + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();
-            scr.FormulaA1 = "'" + Application.StartupPath + "\\cache\\arhiva\\" + c.CompetitionCountry+"\\"+c.CompetitionName + "\\[" + c.Teams[i].TeamName + ".xlsx]" + c.Teams[i].TeamName + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();
-            //'C:\TMS\TMS\bin\Debug\cache\arhiva\Austria\[Austria Vienna.xlsx]Austria Vienna'!H238
+            scr.FormulaA1 = "'" + Application.StartupPath + "\\cache\\arhiva\\" + c.CompetitionCountry+"\\"+c.CompetitionName + "\\[" + c.Teams[i].TeamName + ".xlsx]" + c.Teams[i].TeamName + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();            
             scr = scr.CellRight();
           }
         }

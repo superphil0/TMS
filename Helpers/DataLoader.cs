@@ -64,9 +64,10 @@ namespace TMS
                 dt = dt.Value.AddHours(1);
                 time = dt.Value.ToString("HH:mm");
               }
-              catch (Exception e)
+              catch (Exception ex)
               {
-                Logger.Exception(e);
+                Logger.Exception(ex);
+                //MessageBox.Show(ex.Message);
               }
             }
             string home = WebUtility.HtmlDecode(nodeColl.ElementAt(1).InnerText.Trim());
@@ -86,9 +87,10 @@ namespace TMS
           }
         }
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
       }
 
       return games;
@@ -130,9 +132,10 @@ namespace TMS
           }
         }
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
         return null;
       }
       return gl;
@@ -173,6 +176,7 @@ namespace TMS
       catch (Exception ex)
       {
         Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
         result = null;
       }
       return result;
@@ -247,6 +251,7 @@ namespace TMS
       catch (Exception ex)
       {
         Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
         result = null;
       }
       return result;
@@ -283,9 +288,10 @@ namespace TMS
           }
         }
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
         result = null;
       }
       return result;
@@ -322,9 +328,10 @@ namespace TMS
           }
         }
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
         result = null;
       }
       return result;
@@ -369,6 +376,7 @@ namespace TMS
       catch (Exception ex)
       {
         Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
         result = null;
       }
       return result;
@@ -417,6 +425,7 @@ namespace TMS
       catch (Exception ex)
       {
         Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
         result = null;
       }
       return result;
@@ -509,9 +518,10 @@ namespace TMS
         }
 
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
       }
       return result;
     }
@@ -702,6 +712,7 @@ namespace TMS
       catch (Exception ex)
       {
         Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
         result = null;
       }
       return result;
@@ -741,6 +752,7 @@ namespace TMS
       catch (Exception ex)
       {
         Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
       }
       return adp;
     }
@@ -881,16 +893,12 @@ namespace TMS
           }
         }
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
       }
-
-
-
       return schedule;
-
-
     }
 
     public static async Task<string> GetFootage(string home, string away, DateTime date)
@@ -926,9 +934,10 @@ namespace TMS
           }
         }
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
       }
       return url;
     }
@@ -976,9 +985,10 @@ namespace TMS
 
         }
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
       }
       return url;
     }

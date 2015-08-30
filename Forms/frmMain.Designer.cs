@@ -47,8 +47,8 @@ namespace TMS
         private void InitializeComponent()
         {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.btnGenerateExcel = new System.Windows.Forms.Button();
       this.lbCompetition = new System.Windows.Forms.ListBox();
       this.lbTeams = new System.Windows.Forms.ListBox();
@@ -83,6 +83,7 @@ namespace TMS
       this.cmMapCompetition = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.mapirajToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.gledajToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.pogledajGoloveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dgvPlayers = new System.Windows.Forms.DataGridView();
       this.btnStop = new System.Windows.Forms.Button();
       this.cbCurrentSeason = new System.Windows.Forms.ComboBox();
@@ -94,7 +95,6 @@ namespace TMS
       this.rbSve = new System.Windows.Forms.RadioButton();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
       this.btnAzurirajLigu = new System.Windows.Forms.Button();
-      this.pogledajGoloveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.cmsMapTeam.SuspendLayout();
       this.cmsTop.SuspendLayout();
       this.cmLineupstatus.SuspendLayout();
@@ -125,7 +125,7 @@ namespace TMS
       // 
       this.lbCompetition.FormattingEnabled = true;
       this.lbCompetition.ItemHeight = 16;
-      this.lbCompetition.Location = new System.Drawing.Point(10, 258);
+      this.lbCompetition.Location = new System.Drawing.Point(9, 389);
       this.lbCompetition.Margin = new System.Windows.Forms.Padding(4);
       this.lbCompetition.Name = "lbCompetition";
       this.lbCompetition.ScrollAlwaysVisible = true;
@@ -167,7 +167,7 @@ namespace TMS
       // 
       this.lblLige.AutoSize = true;
       this.lblLige.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-      this.lblLige.Location = new System.Drawing.Point(6, 241);
+      this.lblLige.Location = new System.Drawing.Point(5, 372);
       this.lblLige.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
       this.lblLige.Name = "lblLige";
       this.lblLige.Size = new System.Drawing.Size(93, 16);
@@ -176,7 +176,7 @@ namespace TMS
       // 
       // btnDeleteFile
       // 
-      this.btnDeleteFile.Location = new System.Drawing.Point(459, 473);
+      this.btnDeleteFile.Location = new System.Drawing.Point(460, 615);
       this.btnDeleteFile.Margin = new System.Windows.Forms.Padding(4);
       this.btnDeleteFile.Name = "btnDeleteFile";
       this.btnDeleteFile.Size = new System.Drawing.Size(120, 24);
@@ -195,7 +195,7 @@ namespace TMS
       this.lbCountries.Margin = new System.Windows.Forms.Padding(4);
       this.lbCountries.Name = "lbCountries";
       this.lbCountries.ScrollAlwaysVisible = true;
-      this.lbCountries.Size = new System.Drawing.Size(193, 196);
+      this.lbCountries.Size = new System.Drawing.Size(193, 324);
       this.lbCountries.TabIndex = 20;
       this.lbCountries.Click += new System.EventHandler(this.lbCountries_Click);
       // 
@@ -242,11 +242,11 @@ namespace TMS
             | System.Windows.Forms.AnchorStyles.Left)));
       this.lbLatest.FormattingEnabled = true;
       this.lbLatest.ItemHeight = 16;
-      this.lbLatest.Location = new System.Drawing.Point(10, 610);
+      this.lbLatest.Location = new System.Drawing.Point(10, 674);
       this.lbLatest.Margin = new System.Windows.Forms.Padding(4);
       this.lbLatest.Name = "lbLatest";
       this.lbLatest.ScrollAlwaysVisible = true;
-      this.lbLatest.Size = new System.Drawing.Size(570, 84);
+      this.lbLatest.Size = new System.Drawing.Size(570, 20);
       this.lbLatest.TabIndex = 26;
       this.lbLatest.DoubleClick += new System.EventHandler(this.lbLatest_DoubleClick);
       // 
@@ -360,7 +360,7 @@ namespace TMS
       // 
       this.pbLoadingCountries.BackColor = System.Drawing.Color.White;
       this.pbLoadingCountries.Image = global::TMS.Properties.Resources.loading4;
-      this.pbLoadingCountries.Location = new System.Drawing.Point(60, 65);
+      this.pbLoadingCountries.Location = new System.Drawing.Point(59, 145);
       this.pbLoadingCountries.Margin = new System.Windows.Forms.Padding(4);
       this.pbLoadingCountries.Name = "pbLoadingCountries";
       this.pbLoadingCountries.Size = new System.Drawing.Size(90, 110);
@@ -373,7 +373,7 @@ namespace TMS
       // 
       this.pbLoadingCompetitions.BackColor = System.Drawing.Color.White;
       this.pbLoadingCompetitions.Image = global::TMS.Properties.Resources.loading4;
-      this.pbLoadingCompetitions.Location = new System.Drawing.Point(60, 297);
+      this.pbLoadingCompetitions.Location = new System.Drawing.Point(59, 428);
       this.pbLoadingCompetitions.Margin = new System.Windows.Forms.Padding(4);
       this.pbLoadingCompetitions.Name = "pbLoadingCompetitions";
       this.pbLoadingCompetitions.Size = new System.Drawing.Size(90, 110);
@@ -441,10 +441,10 @@ namespace TMS
       this.lbMatches.Name = "lbMatches";
       this.lbMatches.ReadOnly = true;
       this.lbMatches.RowHeadersVisible = false;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle1;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle2;
       this.lbMatches.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.lbMatches.Size = new System.Drawing.Size(370, 392);
+      this.lbMatches.Size = new System.Drawing.Size(370, 546);
       this.lbMatches.TabIndex = 40;
       this.lbMatches.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.lbMatches_CellClick);
       // 
@@ -455,7 +455,7 @@ namespace TMS
             this.gledajToolStripMenuItem,
             this.pogledajGoloveToolStripMenuItem});
       this.cmMapCompetition.Name = "cmMapCompetition";
-      this.cmMapCompetition.Size = new System.Drawing.Size(160, 92);
+      this.cmMapCompetition.Size = new System.Drawing.Size(160, 70);
       // 
       // mapirajToolStripMenuItem
       // 
@@ -470,6 +470,13 @@ namespace TMS
       this.gledajToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
       this.gledajToolStripMenuItem.Text = "Gledaj uzivo";
       this.gledajToolStripMenuItem.Click += new System.EventHandler(this.gledajToolStripMenuItem_Click);
+      // 
+      // pogledajGoloveToolStripMenuItem
+      // 
+      this.pogledajGoloveToolStripMenuItem.Name = "pogledajGoloveToolStripMenuItem";
+      this.pogledajGoloveToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+      this.pogledajGoloveToolStripMenuItem.Text = "Pogledaj golove";
+      this.pogledajGoloveToolStripMenuItem.Click += new System.EventHandler(this.pogledajGoloveToolStripMenuItem_Click);
       // 
       // dgvPlayers
       // 
@@ -486,8 +493,8 @@ namespace TMS
       this.dgvPlayers.Name = "dgvPlayers";
       this.dgvPlayers.ReadOnly = true;
       this.dgvPlayers.RowHeadersWidth = 30;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle2;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle3;
       this.dgvPlayers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
       this.dgvPlayers.Size = new System.Drawing.Size(255, 684);
       this.dgvPlayers.TabIndex = 32;
@@ -526,7 +533,7 @@ namespace TMS
       // btnArhiva
       // 
       this.btnArhiva.Enabled = false;
-      this.btnArhiva.Location = new System.Drawing.Point(10, 474);
+      this.btnArhiva.Location = new System.Drawing.Point(8, 616);
       this.btnArhiva.Name = "btnArhiva";
       this.btnArhiva.Size = new System.Drawing.Size(194, 23);
       this.btnArhiva.TabIndex = 44;
@@ -540,18 +547,18 @@ namespace TMS
             | System.Windows.Forms.AnchorStyles.Left)));
       this.lbArhiva.FormattingEnabled = true;
       this.lbArhiva.ItemHeight = 16;
-      this.lbArhiva.Location = new System.Drawing.Point(10, 504);
+      this.lbArhiva.Location = new System.Drawing.Point(10, 648);
       this.lbArhiva.Margin = new System.Windows.Forms.Padding(4);
       this.lbArhiva.Name = "lbArhiva";
       this.lbArhiva.ScrollAlwaysVisible = true;
-      this.lbArhiva.Size = new System.Drawing.Size(570, 100);
+      this.lbArhiva.Size = new System.Drawing.Size(570, 52);
       this.lbArhiva.TabIndex = 45;
       this.lbArhiva.DoubleClick += new System.EventHandler(this.lbArhiva_DoubleClick);
       // 
       // btnAzurirajArhivu
       // 
       this.btnAzurirajArhivu.Enabled = false;
-      this.btnAzurirajArhivu.Location = new System.Drawing.Point(211, 474);
+      this.btnAzurirajArhivu.Location = new System.Drawing.Point(212, 616);
       this.btnAzurirajArhivu.Name = "btnAzurirajArhivu";
       this.btnAzurirajArhivu.Size = new System.Drawing.Size(114, 23);
       this.btnAzurirajArhivu.TabIndex = 46;
@@ -587,7 +594,7 @@ namespace TMS
       // 
       this.groupBox1.Controls.Add(this.rbIzabranaLiga);
       this.groupBox1.Controls.Add(this.rbSve);
-      this.groupBox1.Location = new System.Drawing.Point(9, 436);
+      this.groupBox1.Location = new System.Drawing.Point(8, 567);
       this.groupBox1.Name = "groupBox1";
       this.groupBox1.Size = new System.Drawing.Size(195, 38);
       this.groupBox1.TabIndex = 49;
@@ -595,20 +602,13 @@ namespace TMS
       // 
       // btnAzurirajLigu
       // 
-      this.btnAzurirajLigu.Location = new System.Drawing.Point(331, 474);
+      this.btnAzurirajLigu.Location = new System.Drawing.Point(332, 616);
       this.btnAzurirajLigu.Name = "btnAzurirajLigu";
       this.btnAzurirajLigu.Size = new System.Drawing.Size(114, 23);
       this.btnAzurirajLigu.TabIndex = 50;
       this.btnAzurirajLigu.Text = "Azuriraj ligu";
       this.btnAzurirajLigu.UseVisualStyleBackColor = true;
       this.btnAzurirajLigu.Click += new System.EventHandler(this.btnAzurirajLigu_Click);
-      // 
-      // pogledajGoloveToolStripMenuItem
-      // 
-      this.pogledajGoloveToolStripMenuItem.Name = "pogledajGoloveToolStripMenuItem";
-      this.pogledajGoloveToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-      this.pogledajGoloveToolStripMenuItem.Text = "Pogledaj golove";
-      this.pogledajGoloveToolStripMenuItem.Click += new System.EventHandler(this.pogledajGoloveToolStripMenuItem_Click);
       // 
       // frmMain
       // 

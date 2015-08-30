@@ -65,7 +65,6 @@ namespace TMS
       this.cbTeams.ValueMember = "TeamId";
       this.cbTeams.SelectedIndex = -1;
       LoadCountriesAsync();
-      LoadDocuments();
 
       StartLivescoreFeedAsync();
       tmrReload.Start();
@@ -133,10 +132,7 @@ namespace TMS
           while (!streamReader.EndOfStream)
           {
             string text = streamReader.ReadLine();
-            string[] array = text.Split(new char[]
-    {
-                  '|'
-    });
+            string[] array = text.Split('|');
             list.Add(new Country
             {
               CountryId = int.Parse(array[0]),
@@ -168,10 +164,7 @@ namespace TMS
           while (!streamReader.EndOfStream)
           {
             string text = streamReader.ReadLine();
-            string[] array = text.Split(new char[]
-{
-              '|'
-});
+            string[] array = text.Split('|');
 
             var c = new Competition
             {
@@ -369,21 +362,8 @@ namespace TMS
                   where cc.CompetitionId == t.CompetitionId && cc.TeamId == t.TeamId
                   select cc).ToList<Team>().Count == 0)
                 {
-
                   this._cachedTeams.Add(t);
-                  sw.WriteLine(string.Concat(new string[]
-      {
-                         t.CompetitionId.ToString(),
-                          "|",
-                         t.CompetitionName,
-                          "|",
-                          t.TeamId.ToString(),
-                          "|",
-                          t.TeamName,
-                          "|",
-                          t.UrlName
-      }));
-
+                  sw.WriteLine(t.CompetitionId.ToString()+"|"+t.CompetitionName+"|"+t.TeamId.ToString()+"|"+t.TeamName+"|"+t.UrlName);
                 }
               }
               sw.Close();
@@ -396,16 +376,7 @@ namespace TMS
             {
               list.Add(c);
               this._cachedCompetitions.Add(c);
-              streamWriter.WriteLine(string.Concat(new string[]
-      {
-                      this._selectedCountry.CountryId.ToString(),
-                      "|",
-                      this._selectedCountry.CountryName,
-                      "|",
-                      c.CompetitionId.ToString(),
-                      "|",
-                      c.CompetitionName
-      }));
+              streamWriter.WriteLine(_selectedCountry.CountryId.ToString()+"|"+_selectedCountry.CountryName+"|"+c.CompetitionId.ToString()+"|"+c.CompetitionName);
             }
           }
           streamWriter.Close();
@@ -447,12 +418,13 @@ namespace TMS
 
     #region Teams
 
-    private async Task LoadTeamsAsync(bool changeCompetition = true)
+    private async Task<List<Team>> LoadTeamsAsync(bool changeCompetition = true)
     {
+      List<Team> teamList = new List<Team>();
       try
       {
-        if (_competitionUpdateInProgress == true)
-          return;
+        //if (_competitionUpdateInProgress == true)
+        //  return teamList;
         if (changeCompetition == true)
           this._selectedCompetition = (Competition)this.lbCompetition.SelectedItem;
         this.lbTeams.DataSource = null;
@@ -461,18 +433,18 @@ namespace TMS
         this.pbLoadingTeams.Visible = true;
         lbCompetition.Enabled = false;
 
-        List<Team> list = (
+        teamList = (
           from cc in this._cachedTeams
           where cc.CompetitionId == this._selectedCompetition.CompetitionId
           select cc).ToList<Team>();
-        if (list.Count == 0)
+        if (teamList.Count == 0)
         {
-          List<Team> competitions = null;
+          List<Team> teams = null;
           if (_selectedCompetition.CompetitionCountryId < 0)//KUP TAKMICENJA
-            competitions = await DataLoader.LoadTeamsAsync(this._selectedCompetition.CompetitionId);
+            teams = await DataLoader.LoadTeamsAsync(this._selectedCompetition.CompetitionId);
           else
-            competitions = await DataLoader.LoadTeamsAlternativeAsync(this._selectedCompetition.CompetitionId);
-          this._selectedCompetition.Teams = competitions;
+            teams = await DataLoader.LoadTeamsAlternativeAsync(this._selectedCompetition.CompetitionId);
+          this._selectedCompetition.Teams = teams;
 
           DirectoryInfo directoryInfo = new DirectoryInfo("cache");
           if (!directoryInfo.Exists)
@@ -490,30 +462,19 @@ namespace TMS
                 where cc.CompetitionId == t.CompetitionId && cc.TeamId == t.TeamId
                 select cc).ToList<Team>().Count == 0)
               {
-                list.Add(t);
+                teamList.Add(t);
                 this._cachedTeams.Add(t);
-                streamWriter.WriteLine(string.Concat(new string[]
-        {
-                      this._selectedCompetition.CompetitionId.ToString(),
-                      "|",
-                      this._selectedCompetition.CompetitionName,
-                      "|",
-                      t.TeamId.ToString(),
-                      "|",
-                      t.TeamName,
-                      "|",
-                      t.UrlName
-        }));
+                streamWriter.WriteLine(_selectedCompetition.CompetitionId.ToString() + "|" + _selectedCompetition.CompetitionName + "|" + t.TeamId.ToString() + "|" + t.TeamName + "|" + t.UrlName);
               }
             }
           }
           streamWriter.Close();
         }
-        foreach (var el in list)
+        foreach (var el in teamList)
         {
           el.Url = "http://www.transfermarkt.de/jumplist/startseite/verein/" + el.TeamId;
         }
-        this._selectedCompetition.Teams = list;
+        this._selectedCompetition.Teams = teamList;
         lbCompetition.Enabled = true;
         this.pbLoadingTeams.Visible = false;
         this.lbTeams.DataSource = this._selectedCompetition.Teams;
@@ -525,11 +486,12 @@ namespace TMS
 
         LoadArchive(_selectedCompetition);
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
-        MessageBox.Show(e.Message);
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
+      return teamList;
     }
 
     private void lbTeams_KeyDown(object sender, KeyEventArgs e)
@@ -607,10 +569,10 @@ namespace TMS
         }
         sw.Close();
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
-        MessageBox.Show(e.Message);
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
     }
 
@@ -643,10 +605,10 @@ namespace TMS
         }
         sw.Close();
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
-        MessageBox.Show(e.Message);
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
     }
 
@@ -676,10 +638,10 @@ namespace TMS
         }
         sw.Close();
       }
-      catch (Exception e)
+      catch (Exception ex)
       {
-        Logger.Exception(e);
-        MessageBox.Show(e.Message);
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
     }
 
@@ -1241,9 +1203,10 @@ namespace TMS
           games = gamesLive;
         }
       }
-      catch (Exception ee)
+      catch (Exception ex)
       {
-        Logger.Exception(ee);
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
 
       lbMatches.AutoGenerateColumns = false;
@@ -1318,9 +1281,10 @@ namespace TMS
                 cell.Value = Image.FromFile("cache/img/competitions/" + competition.CompetitionId + ".png");
                 cell.ToolTipText = competition.CompetitionName;
               }
-              catch (Exception e)
+              catch (Exception ex)
               {
-                Logger.Exception(e);
+                Logger.Exception(ex);
+                MessageBox.Show(ex.Message);
               }
             }
           }
@@ -1353,9 +1317,10 @@ namespace TMS
                   if (country != null)
                     c.ToolTipText = country.CountryName;
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                  Logger.Exception(e);
+                  Logger.Exception(ex);
+                  MessageBox.Show(ex.Message);
                 }
               }
             }
@@ -1630,22 +1595,19 @@ namespace TMS
 
     #region Documents
 
-    private void btnGenerateExcel_Click(object sender, EventArgs e)
+    private async void btnGenerateExcel_Click(object sender, EventArgs e)
     {
-      GenerateExcel();
+      _generatingInProgress = true;
+      AllowControls(false);
+      await GenerateExcel();
+      AllowControls(true);
+      _generatingInProgress = false;
     }
 
     private async Task GenerateExcel()
     {
       try
       {
-
-        //if (lbArhiva.SelectedItem == null)
-        //{
-        //  MessageBox.Show("Nije izabrana arhiva lige u kojoj se klub takmiči!");
-        //  return;
-        //}
-
         var comp = _cachedCompetitions.Where(cc => cc.CompetitionId == _selectedTeam.CompetitionId).FirstOrDefault();
 
         if (comp == null)
@@ -1654,24 +1616,25 @@ namespace TMS
           return;
         }
 
-
-        var fileName = "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + comp.CompetitionName + "\\" + _selectedTeam.TeamName + ".xlsx";
+        var fileName = Helper.GetTeamArchiveFileName(comp,_selectedTeam);
 
         if (File.Exists(fileName))
         {
-          if (IsFileLocked(new FileInfo(fileName)))
+          if (Helper.IsFileLocked(new FileInfo(fileName)))
           {
             MessageBox.Show("Arhiva '" + fileName + "' je otvorena. Zatvori je pa pokusaj opet.");
             return;
           }
         }
 
-
         if (_selectedTeam == null)
           return;
-        _generatingInProgress = true;
+
         if (_selectedTeam.Players == null)
           return;
+
+
+
         foreach (DataGridViewRow r in dgvPlayers.Rows)
         {
           Player p = (Player)r.DataBoundItem;
@@ -1687,9 +1650,7 @@ namespace TMS
           if (dr != DialogResult.Yes)
             return;
         }
-        DirectoryInfo directoryInfo = new DirectoryInfo(Application.StartupPath + "\\cache\\xls\\");
-        if (!directoryInfo.Exists)
-          directoryInfo.Create();
+ 
 
         this.btnGenerateExcel.Enabled = false;
         btnStop.Visible = true;
@@ -1724,23 +1685,7 @@ namespace TMS
           UpdatePlayersGrid(p.PlayerId);
         }
 
-        lbMatches.Enabled = true;
-        dtpDatum.Enabled = true;
-        this.lbTeams.Enabled = true;
-        this.lbCompetition.Enabled = true;
-        this.btnGenerateExcel.Enabled = true;
-        btnAzurirajLigu.Enabled = true;
-        btnStop.Visible = false;
-        this.tbStatus.Visible = false;
-        this.cbTeams.Enabled = true;
-        this.cbCountries.Enabled = true;
-        this.lbCountries.Enabled = true;
-        btnArhiva.Enabled = true;
-        btnAzurirajArhivu.Enabled = true;
-        Guid.NewGuid();
-
-        //fileName = archiveFileName;
-        //fileName = "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + comp.CompetitionName + "\\" + _selectedTeam.TeamName + ".xlsx";
+     
         DocumentBuilder.CreateCXMLDocument(fileName, this._selectedTeam);
 
         Process.Start(fileName);
@@ -1750,9 +1695,6 @@ namespace TMS
         Logger.Exception(ex);
         MessageBox.Show(ex.Message);
       }
-      _generatingInProgress = false;
-
-
     }
 
     private void UpdatePlayersGrid(int playerId)
@@ -1770,34 +1712,7 @@ namespace TMS
       }
     }
 
-    private void LoadDocuments()
-    {
-      try
-      {
-        List<FileInfo> allFiles = new List<FileInfo>();
-
-        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//cache//xls//");
-        if (di.Exists == false)
-          di.Create();
-
-        foreach (DirectoryInfo diTeam in di.GetDirectories())
-        {
-          FileInfo[] files = diTeam.GetFiles();
-          foreach (FileInfo fi in files)
-            allFiles.Add(fi);
-        }
-
-        lbLatest.DataSource = allFiles.OrderByDescending(f => f.LastWriteTime).ToList();
-        lbLatest.ValueMember = "Name";
-        lbLatest.DisplayMember = "Name";
-      }
-      catch (Exception ex)
-      {
-        Logger.Exception(ex);
-        MessageBox.Show(ex.Message);
-      }
-
-    }
+   
 
     private void LoadArchive(Competition c)
     {
@@ -1811,7 +1726,7 @@ namespace TMS
         if (di.Exists == false)
           di.Create();
 
-        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name.StartsWith("~") == false && f.Name.Contains("[" + c.CompetitionId + "]")))
+        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name=="_"+c.CompetitionName.ToUpper()+".xlsx"))
           allFiles.Add(fi);
 
         lbArhiva.DataSource = allFiles.OrderByDescending(f => f.LastWriteTime).ToList();
@@ -1838,22 +1753,18 @@ namespace TMS
 
     private async void btnArhiva_Click(object sender, EventArgs e)
     {
+      _scheduleUpdateInProgress = true;
+      AllowControls(false);
+      await KreirajArhivu(_selectedCompetition);
+      _scheduleUpdateInProgress = false;
+      AllowControls(true);
+    }
+
+    private async Task KreirajArhivu(Competition c)
+    {
       try
       {
-        btnGenerateExcel.Enabled = false;
-        cbTeams.Enabled = false;
-        lbTeams.Enabled = false;
-        lbCompetition.Enabled = false;
-        cbCountries.Enabled = false;
-        lbCountries.Enabled = false;
-        btnArhiva.Enabled = false;
-        btnAzurirajArhivu.Enabled = false;
-        _scheduleUpdateInProgress = true;
-        btnDeleteFile.Enabled = false;
-
-        string text = "cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + _selectedCompetition.CompetitionName + "\\" + "[" + this._selectedCompetition.CompetitionId.ToString() + "] " + this._selectedCompetition.CompetitionName + " " + DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss") + ".xlsx";
-
-        foreach (Team t in _selectedCompetition.Teams)
+        foreach (Team t in c.Teams)
         {
           List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
           var season = cbCurrentSeason.SelectedItem;
@@ -1861,31 +1772,19 @@ namespace TMS
           cbCurrentSeason.SelectedItem = season;
           t.Schedule = schedule;
         }
-
-        DocumentBuilder.CreateCompetitionArchive(text, _selectedCompetition);
-        if (File.Exists(text))
+        var archiveFileName = Helper.GetCompetitionArchiveFileName(c);
+        DocumentBuilder.CreateCompetitionArchive(archiveFileName, c);
+        if (File.Exists(archiveFileName))
         {
-          Process.Start(text);
-          LoadArchive(_selectedCompetition);
+          Process.Start(archiveFileName);
+          LoadArchive(c);
         }
       }
       catch (Exception ex)
       {
+        MessageBox.Show(ex.Message);
         Logger.Exception(ex);
       }
-
-      btnDeleteFile.Enabled = true;
-      _scheduleUpdateInProgress = false;
-      cbTeams.Enabled = true;
-      lbTeams.Enabled = true;
-      lbCompetition.Enabled = true;
-      cbCountries.Enabled = true;
-      lbCountries.Enabled = true;
-      btnArhiva.Enabled = true;
-      btnAzurirajArhivu.Enabled = true;
-      _scheduleUpdateInProgress = false;
-      btnGenerateExcel.Enabled = true;
-      btnAzurirajLigu.Enabled = true;
     }
 
     private void lbArhiva_DoubleClick(object sender, EventArgs e)
@@ -1901,35 +1800,13 @@ namespace TMS
       }
     }
 
-    protected bool IsFileLocked(FileInfo file)
-    {
-      FileStream stream = null;
-
-      try
-      {
-        stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-      }
-      catch (IOException)
-      {
-        //the file is unavailable because it is:
-        //still being written to
-        //or being processed by another thread
-        //or does not exist (has already been processed)
-        return true;
-      }
-      finally
-      {
-        if (stream != null)
-          stream.Close();
-      }
-
-      //file is not locked
-      return false;
-    }
-
     private async void btnAzurirajArhivu_Click(object sender, EventArgs e)
     {
+      _scheduleUpdateInProgress = true;
+      AllowControls(false);
       await AzurirajArhivu();
+      _scheduleUpdateInProgress = false;
+      AllowControls(true);
     }
 
     private async Task<bool> AzurirajArhivu()
@@ -1938,81 +1815,65 @@ namespace TMS
       {
         string templateFileName = "cache\\arhiva\\Template.xlsx";
 
-        if (IsFileLocked(new FileInfo(templateFileName)))
+        if (Helper.IsFileLocked(new FileInfo(templateFileName)))
         {
           MessageBox.Show("Template.xlsx je otvoren. Zatvori ga pa pokusaj opet.");
           return false;
         }
 
+        Competition competition = _cachedCompetitions.Where(cc => cc.CompetitionId == _selectedTeam.CompetitionId).FirstOrDefault();
 
+        if (competition == null)
+          return false;
 
+        string archiveFileName = Helper.GetCompetitionArchiveFileName(competition);
 
-
-        if (lbArhiva.SelectedItem != null)
+        if (File.Exists(archiveFileName) == false)
         {
-          string a = lbArhiva.SelectedItem.ToString();
-          string competitionId = a.Substring(a.IndexOf("[") + 1);
-          competitionId = competitionId.Substring(0, competitionId.IndexOf("]"));
-          var competition = _cachedCompetitions.Where(cc => cc.CompetitionId == competitionId).FirstOrDefault();
-
-          string archiveFileName = "cache\\arhiva\\" + competition.CompetitionCountry + "\\" + competition.CompetitionName + "\\" + lbArhiva.SelectedItem;
-
-          if (IsFileLocked(new FileInfo(archiveFileName)))
+          DialogResult dr =
+          MessageBox.Show(
+            "Ne postoji arhiva " + archiveFileName + "! Da li je treba napraviti ?",
+            "Pitanje", MessageBoxButtons.YesNo);
+          if (dr == DialogResult.Yes)
           {
-            MessageBox.Show("Arhiva '" + archiveFileName + "' je otvorena. Zatvori je pa pokusaj opet.");
-            return false;
-          }
-
-          btnGenerateExcel.Enabled = false;
-          btnAzurirajLigu.Enabled = false;
-          _scheduleUpdateInProgress = true;
-          cbTeams.Enabled = false;
-          lbTeams.Enabled = false;
-          lbCompetition.Enabled = false;
-          cbCountries.Enabled = false;
-          lbCountries.Enabled = false;
-          btnArhiva.Enabled = false;
-          btnAzurirajArhivu.Enabled = false;
-          btnDeleteFile.Enabled = false;
-
-          if (competition != null)
-          {
-            lbCompetition.SelectedItem = competition;
+            _scheduleUpdateInProgress = true;
             await LoadTeamsAsync(false);
-            lbCompetition.Enabled = false;
-            var teams = _cachedTeams.Where(ct => ct.CompetitionId == competitionId).ToList();
-            //var selectedTeams = (List<Team>)lbTeams.DataSource;
-            foreach (var t in teams)
-            {
-              List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
-              //var team = teams.Where(tt => tt.TeamId == t.TeamId).FirstOrDefault();
-              t.Schedule = schedule;
-              lbTeams.SelectedItem = t;
-            }
-            competition.Teams = teams;
-
-            DocumentBuilder.UpdateCompetitionArchive("cache\\arhiva\\" + competition.CompetitionCountry + "\\" + competition.CompetitionName + "\\" + a, competition);
-
-            Process.Start("cache\\arhiva\\" + competition.CompetitionCountry + "\\" + competition.CompetitionName + "\\" + a);
+            await KreirajArhivu(competition);
+            _scheduleUpdateInProgress = false;
           }
+          return true;
+        }
+
+        if (Helper.IsFileLocked(new FileInfo(archiveFileName)))
+        {
+          MessageBox.Show("Arhiva '" + archiveFileName + "' je otvorena. Zatvori je pa pokusaj opet.");
+          return false;
+        }
+
+        if (competition != null)
+        {
+          lbCompetition.SelectedItem = competition;
+          await LoadTeamsAsync(false);
+          lbCompetition.Enabled = false;
+          var teams = _cachedTeams.Where(ct => ct.CompetitionId == competition.CompetitionId).ToList();
+          foreach (var t in teams)
+          {
+            List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
+            t.Schedule = schedule;
+            lbTeams.SelectedItem = t;
+          }
+          competition.Teams = teams;
+
+          DocumentBuilder.UpdateCompetitionArchive(archiveFileName, competition);
+          Process.Start(archiveFileName);
         }
       }
       catch (Exception ex)
       {
         Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
 
-      btnGenerateExcel.Enabled = true;
-      btnAzurirajLigu.Enabled = true;
-      btnDeleteFile.Enabled = true;
-      cbTeams.Enabled = true;
-      lbTeams.Enabled = true;
-      lbCompetition.Enabled = true;
-      cbCountries.Enabled = true;
-      lbCountries.Enabled = true;
-      btnArhiva.Enabled = true;
-      btnAzurirajArhivu.Enabled = true;
-      _scheduleUpdateInProgress = false;
       return true;
     }
 
@@ -2074,15 +1935,8 @@ namespace TMS
         Competition mappedCompetition = frm.MappedComeptition;
         mappedCompetition.AlternativeName = competitionShortName;
         UpdateCompetitionAlternativeName(mappedCompetition);
-        //this._cachedCompetitions = this.GetCachedCompetitions();
-        //lbCompetition.DataSource = _cachedCompetitions;
-        //this.lbCompetition.DisplayMember = "CompetitionName";
-        //this.lbCompetition.ValueMember = "CompetitionId";
       }
-
     }
-
-
 
     private void rbIzabranaLiga_Click(object sender, EventArgs e)
     {
@@ -2113,55 +1967,50 @@ namespace TMS
       }
     }
 
+    private void AllowControls(bool allow)
+    {
+      btnAzurirajArhivu.Enabled = allow;
+      btnArhiva.Enabled = allow;
+      btnAzurirajLigu.Enabled = allow;
+      lbTeams.Enabled = allow;
+      btnGenerateExcel.Enabled = allow;
+      cbTeams.Enabled = allow;
+      lbCompetition.Enabled = allow;
+      cbCountries.Enabled = allow;
+      lbCountries.Enabled = allow;
+      btnDeleteFile.Enabled = allow;
+    }
+
     private async void btnAzurirajLigu_Click(object sender, EventArgs e)
     {
       var existingTeams = (List<Team>)lbTeams.DataSource;
 
-      bool status = await AzurirajArhivu();
-      if (status == false)
-        return;
-      btnAzurirajArhivu.Enabled = false;
-      btnArhiva.Enabled = false;
-      btnAzurirajLigu.Enabled = false;
-      lbTeams.Enabled = false;
       _competitionUpdateInProgress = true;
+      AllowControls(false);
 
-      btnGenerateExcel.Enabled = false;
-      cbTeams.Enabled = false;
-      lbTeams.Enabled = false;
-      lbCompetition.Enabled = false;
-      cbCountries.Enabled = false;
-      lbCountries.Enabled = false;
+      bool status = await AzurirajArhivu();
 
-      lbTeams.DataSource = existingTeams;
-
-      for (int i = 0; i < lbTeams.Items.Count; i++)
+      if (status == true)
       {
-        lbTeams.SelectedIndex = i;
-        await LoadPlayers();
-        if (_competitionUpdateInProgress == false)
-          break;
-        await GenerateExcel();
-        if (_competitionUpdateInProgress == false)
-          break;
+        lbTeams.DataSource = existingTeams;
+
+        for (int i = 0; i < lbTeams.Items.Count; i++)
+        {
+          lbTeams.SelectedIndex = i;
+          await LoadPlayers();
+          if (_competitionUpdateInProgress == false)
+            break;
+          _generatingInProgress = true;
+          await GenerateExcel();
+          _generatingInProgress = false;
+          if (_competitionUpdateInProgress == false)
+            break;
+        }
       }
 
-      btnAzurirajArhivu.Enabled = true;
-      btnArhiva.Enabled = true;
-      btnAzurirajLigu.Enabled = true;
-      lbTeams.Enabled = true;
       _competitionUpdateInProgress = false;
-
-      btnGenerateExcel.Enabled = true ;
-      cbTeams.Enabled = true;
-      lbTeams.Enabled = true;
-      lbCompetition.Enabled = true;
-      cbCountries.Enabled = true;
-      lbCountries.Enabled = true;
-
+      AllowControls(true);
     }
-
-
 
     private async void gledajToolStripMenuItem_Click(object sender, EventArgs e)
     {
