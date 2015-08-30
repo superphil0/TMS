@@ -1655,10 +1655,13 @@ namespace TMS
 
         var fileName = "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + comp.CompetitionName + "\\" + _selectedTeam.TeamName + ".xlsx";
 
-        if (IsFileLocked(new FileInfo(fileName)))
+        if (File.Exists(fileName))
         {
-          MessageBox.Show("Arhiva '" + fileName + "' je otvorena. Zatvori je pa pokusaj opet.");
-          return;
+          if (IsFileLocked(new FileInfo(fileName)))
+          {
+            MessageBox.Show("Arhiva '" + fileName + "' je otvorena. Zatvori je pa pokusaj opet.");
+            return;
+          }
         }
 
 
@@ -1898,7 +1901,7 @@ namespace TMS
 
     protected bool IsFileLocked(FileInfo file)
     {
-      FileStream stream = null;
+      FileStream stream = null;     
 
       try
       {
@@ -1973,13 +1976,14 @@ namespace TMS
           if (competition != null)
           {
             lbCompetition.SelectedItem = competition;
-            //await LoadTeamsAsync(false);
+            await LoadTeamsAsync(false);
             lbCompetition.Enabled = false;
-            //var teams = _cachedTeams.Where(ct => ct.CompetitionId == competitionId).ToList();
-            var teams = (List<Team>)lbTeams.DataSource;
+            var teams = _cachedTeams.Where(ct => ct.CompetitionId == competitionId).ToList();
+            //var selectedTeams = (List<Team>)lbTeams.DataSource;
             foreach (var t in teams)
             {
               List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
+              //var team = teams.Where(tt => tt.TeamId == t.TeamId).FirstOrDefault();
               t.Schedule = schedule;
               lbTeams.SelectedItem = t;
             }
@@ -2109,6 +2113,8 @@ namespace TMS
 
     private async void btnAzurirajLigu_Click(object sender, EventArgs e)
     {
+      var existingTeams = (List<Team>)lbTeams.DataSource;
+
       bool status = await AzurirajArhivu();
       if (status == false)
         return;
@@ -2117,6 +2123,8 @@ namespace TMS
       btnAzurirajLigu.Enabled = false;
       lbTeams.Enabled = false;
       _competitionUpdateInProgress = true;
+
+      lbTeams.DataSource = existingTeams;
 
       for (int i = 0; i < lbTeams.Items.Count; i++)
       {
