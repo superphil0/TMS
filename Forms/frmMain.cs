@@ -447,13 +447,13 @@ namespace TMS
 
     #region Teams
 
-    private async Task LoadTeamsAsync(bool changeCompetition=true)
+    private async Task LoadTeamsAsync(bool changeCompetition = true)
     {
       try
       {
         if (_competitionUpdateInProgress == true)
           return;
-        if(changeCompetition==true)
+        if (changeCompetition == true)
           this._selectedCompetition = (Competition)this.lbCompetition.SelectedItem;
         this.lbTeams.DataSource = null;
         this.lbTeams.DisplayMember = "TeamName";
@@ -1283,6 +1283,8 @@ namespace TMS
       {
         Game g = (Game)r.DataBoundItem;
 
+
+
         var competition = _cachedCompetitions.Where(cc => cc.CompetitionId == g.CompetitionId).FirstOrDefault();
         if (DateTime.Now.Subtract(g.LastChange).TotalSeconds < 60)
           r.Cells[2].Style.BackColor = Color.LightGreen;
@@ -1901,7 +1903,7 @@ namespace TMS
 
     protected bool IsFileLocked(FileInfo file)
     {
-      FileStream stream = null;     
+      FileStream stream = null;
 
       try
       {
@@ -1942,9 +1944,9 @@ namespace TMS
           return false;
         }
 
-       
 
-    
+
+
 
         if (lbArhiva.SelectedItem != null)
         {
@@ -2124,6 +2126,13 @@ namespace TMS
       lbTeams.Enabled = false;
       _competitionUpdateInProgress = true;
 
+      btnGenerateExcel.Enabled = false;
+      cbTeams.Enabled = false;
+      lbTeams.Enabled = false;
+      lbCompetition.Enabled = false;
+      cbCountries.Enabled = false;
+      lbCountries.Enabled = false;
+
       lbTeams.DataSource = existingTeams;
 
       for (int i = 0; i < lbTeams.Items.Count; i++)
@@ -2143,17 +2152,43 @@ namespace TMS
       lbTeams.Enabled = true;
       _competitionUpdateInProgress = false;
 
+      btnGenerateExcel.Enabled = true ;
+      cbTeams.Enabled = true;
+      lbTeams.Enabled = true;
+      lbCompetition.Enabled = true;
+      cbCountries.Enabled = true;
+      lbCountries.Enabled = true;
+
     }
 
-  
+
 
     private async void gledajToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      var url = await DataLoader.GetStream(SelectedGame.Home, SelectedGame.Away);
-      if (url != null)
-        Process.Start(url);
-      else
-        MessageBox.Show("Nije pronadjen stream!");
+      if (lbMatches.SelectedRows.Count > 0)
+      {
+        Game g = (Game)lbMatches.SelectedRows[0].DataBoundItem;
+
+        var url = await DataLoader.GetStream(g.Home, g.Away);
+        if (url != null)
+          Process.Start(url);
+        else
+          MessageBox.Show("Nije pronadjen stream!");
+      }
+    }
+
+    private async void pogledajGoloveToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (lbMatches.SelectedRows.Count > 0)
+      {
+        Game g = (Game)lbMatches.SelectedRows[0].DataBoundItem;
+
+        var url = await DataLoader.GetFootage(g.Home, g.Away, dtpDatum.Value);
+        if (url != null)
+          Process.Start(url);
+        else
+          MessageBox.Show("Nije pronadjen link!");
+      }
     }
   }
 }

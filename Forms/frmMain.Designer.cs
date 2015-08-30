@@ -82,6 +82,7 @@ namespace TMS
       this.lbMatches = new System.Windows.Forms.DataGridView();
       this.cmMapCompetition = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.mapirajToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.gledajToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.dgvPlayers = new System.Windows.Forms.DataGridView();
       this.btnStop = new System.Windows.Forms.Button();
       this.cbCurrentSeason = new System.Windows.Forms.ComboBox();
@@ -93,7 +94,7 @@ namespace TMS
       this.rbSve = new System.Windows.Forms.RadioButton();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
       this.btnAzurirajLigu = new System.Windows.Forms.Button();
-      this.gledajToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.pogledajGoloveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.cmsMapTeam.SuspendLayout();
       this.cmsTop.SuspendLayout();
       this.cmLineupstatus.SuspendLayout();
@@ -446,22 +447,29 @@ namespace TMS
       this.lbMatches.Size = new System.Drawing.Size(370, 392);
       this.lbMatches.TabIndex = 40;
       this.lbMatches.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.lbMatches_CellClick);
-     
       // 
       // cmMapCompetition
       // 
       this.cmMapCompetition.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mapirajToolStripMenuItem,
-            this.gledajToolStripMenuItem});
+            this.gledajToolStripMenuItem,
+            this.pogledajGoloveToolStripMenuItem});
       this.cmMapCompetition.Name = "cmMapCompetition";
-      this.cmMapCompetition.Size = new System.Drawing.Size(153, 70);
+      this.cmMapCompetition.Size = new System.Drawing.Size(160, 92);
       // 
       // mapirajToolStripMenuItem
       // 
       this.mapirajToolStripMenuItem.Name = "mapirajToolStripMenuItem";
-      this.mapirajToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.mapirajToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
       this.mapirajToolStripMenuItem.Text = "Mapiraj";
       this.mapirajToolStripMenuItem.Click += new System.EventHandler(this.mapirajToolStripMenuItem_Click);
+      // 
+      // gledajToolStripMenuItem
+      // 
+      this.gledajToolStripMenuItem.Name = "gledajToolStripMenuItem";
+      this.gledajToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+      this.gledajToolStripMenuItem.Text = "Gledaj uzivo";
+      this.gledajToolStripMenuItem.Click += new System.EventHandler(this.gledajToolStripMenuItem_Click);
       // 
       // dgvPlayers
       // 
@@ -595,12 +603,12 @@ namespace TMS
       this.btnAzurirajLigu.UseVisualStyleBackColor = true;
       this.btnAzurirajLigu.Click += new System.EventHandler(this.btnAzurirajLigu_Click);
       // 
-      // gledajToolStripMenuItem
+      // pogledajGoloveToolStripMenuItem
       // 
-      this.gledajToolStripMenuItem.Name = "gledajToolStripMenuItem";
-      this.gledajToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-      this.gledajToolStripMenuItem.Text = "Gledaj";
-      this.gledajToolStripMenuItem.Click += new System.EventHandler(this.gledajToolStripMenuItem_Click);
+      this.pogledajGoloveToolStripMenuItem.Name = "pogledajGoloveToolStripMenuItem";
+      this.pogledajGoloveToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+      this.pogledajGoloveToolStripMenuItem.Text = "Pogledaj golove";
+      this.pogledajGoloveToolStripMenuItem.Click += new System.EventHandler(this.pogledajGoloveToolStripMenuItem_Click);
       // 
       // frmMain
       // 
@@ -680,6 +688,7 @@ namespace TMS
         private GroupBox groupBox1;
     private Button btnAzurirajLigu;
     private ToolStripMenuItem gledajToolStripMenuItem;
+    private ToolStripMenuItem pogledajGoloveToolStripMenuItem;
   }
 }
 

@@ -602,7 +602,7 @@ namespace TMS
           if (htmlNodeCollection3 != null)
           {
             if (htmlNodeCollection3.Count > 5)
-              text = htmlNodeCollection3.ElementAt(5).InnerText;                         
+              text = htmlNodeCollection3.ElementAt(5).InnerText;
             else
               text = htmlNodeCollection3.ElementAt(4).InnerText;
 
@@ -893,6 +893,47 @@ namespace TMS
 
     }
 
+    public static async Task<string> GetFootage(string home, string away, DateTime date)
+    {
+      string url = null;
+      try
+      {
+        HttpClient httpClient = new HttpClient();
+        HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://footyroom.com/do/search.php?q=" + home);
+        requestMessage.Headers.Add("User-Agent", "Mozilla/5.0");
+
+        HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
+        HtmlDocument htmlDocument = new HtmlDocument();
+        string ss = await response.Content.ReadAsStringAsync();
+        htmlDocument.LoadHtml(ss);
+
+        dynamic data = JsonConvert.DeserializeObject(ss);
+        dynamic results = data.matches;
+        JArray arr = JArray.FromObject(results);
+        if (arr.Count > 0)
+        {
+          foreach (dynamic el in arr)
+          {
+            string dt = el.datetime;
+            DateTime dtr;
+            bool s = DateTime.TryParse(dt, out dtr);
+            if (s == true)
+              if (dtr.Date == date.Date)
+              {
+                url = "http://www.footyroom.com?p=" + el.postId;
+                break;
+              }
+          }
+        }
+      }
+      catch (Exception e)
+      {
+        Logger.Exception(e);
+      }
+      return url;
+    }
+
+
     public static async Task<string> GetStream(string home, string away)
     {
       string url = null;
@@ -924,10 +965,10 @@ namespace TMS
           htmlDocument.LoadHtml(ss);
 
           var recom = htmlDocument.DocumentNode.SelectNodes("//table/tbody/tr/td");
-          foreach(var td in recom)
+          foreach (var td in recom)
           {
             if (td.InnerText.Contains("Recommended"))
-              {
+            {
               url = td.SelectNodes("a")[0].GetAttributeValue("href", "");
               break;
             }
