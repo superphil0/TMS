@@ -1653,13 +1653,13 @@ namespace TMS
         }
 
 
-        string archiveFileName = "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + comp.CompetitionName + "\\" + lbArhiva.SelectedItem;
+        var fileName = "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + comp.CompetitionName + "\\" + _selectedTeam.TeamName + ".xlsx";
 
-        //if (IsFileLocked(new FileInfo(archiveFileName)))
-        //{
-        //  MessageBox.Show("Arhiva '" + archiveFileName + "' je otvorena. Zatvori je pa pokusaj opet.");
-        //  return;
-        //}
+        if (IsFileLocked(new FileInfo(fileName)))
+        {
+          MessageBox.Show("Arhiva '" + fileName + "' je otvorena. Zatvori je pa pokusaj opet.");
+          return;
+        }
 
 
         if (_selectedTeam == null)
@@ -1734,8 +1734,8 @@ namespace TMS
         btnAzurirajArhivu.Enabled = true;
         Guid.NewGuid();
 
-        var fileName = archiveFileName;
-        fileName = "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + comp.CompetitionName + "\\" + _selectedTeam.TeamName + ".xlsx";
+        //fileName = archiveFileName;
+        //fileName = "cache\\arhiva\\" + comp.CompetitionCountry + "\\" + comp.CompetitionName + "\\" + _selectedTeam.TeamName + ".xlsx";
         DocumentBuilder.CreateCXMLDocument(fileName, this._selectedTeam);
 
         Process.Start(fileName);
