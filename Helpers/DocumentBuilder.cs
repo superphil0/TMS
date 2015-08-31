@@ -25,7 +25,7 @@ namespace TMS
         File.Delete(excelFilename);
       }
       XLWorkbook xLWorkbook = new XLWorkbook();
-      IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add(t.TeamName);
+      IXLWorksheet iXLWorksheet = xLWorkbook.Worksheets.Add(t.TeamName.NormalizeString().Left(31));
 
       iXLWorksheet.Cell("A1").Value = (t.TeamName);
       iXLWorksheet.Cell("A1").Style.Font.FontSize = (16.0);
@@ -781,7 +781,7 @@ namespace TMS
             scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
             scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
             scr.Value = 0;
-            scr.FormulaA1 = "'" + Application.StartupPath + "\\cache\\arhiva\\" + c.CompetitionCountry+"\\"+c.CompetitionName + "\\[" + c.Teams[i].TeamName + ".xlsx]" + c.Teams[i].TeamName + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();            
+            scr.FormulaA1 = "'" + Application.StartupPath + "\\cache\\arhiva\\" + c.CompetitionCountry.NormalizeString()+"\\"+c.CompetitionName.NormalizeString() + "\\[" + c.Teams[i].TeamName.NormalizeString() + ".xlsx]" + c.Teams[i].TeamName.NormalizeString().Left(31) + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();            
             scr = scr.CellRight();
           }
         }

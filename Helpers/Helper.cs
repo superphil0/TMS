@@ -9,17 +9,37 @@ using System.Threading.Tasks;
 
 namespace TMS
 {
+  public static class StringExtensions
+  {
+    public static string NormalizeString(this string str)
+    {
+      return str.Replace("\\", "").Replace("/", "").Replace("?", "").Replace("*", "").Replace("[", "").Replace("]", "").Replace(":", "").Replace("<", "").Replace(">", "").Replace("\"", "").Replace("|","");      
+    }
+
+    public static string Left(this string value, int maxLength)
+    {
+      if (string.IsNullOrEmpty(value)) return value;
+      maxLength = Math.Abs(maxLength);
+
+      return (value.Length <= maxLength
+             ? value
+             : value.Substring(0, maxLength)
+             );
+    }
+  }
+
   public class Helper
   {
 
     public static string GetCompetitionArchiveFileName(Competition c)
     {
-      return "cache\\arhiva\\" + c.CompetitionCountry + "\\" + c.CompetitionName + "\\" + "_" + c.CompetitionName.ToUpper() + ".xlsx";
+      return "cache\\arhiva\\" + c.CompetitionCountry.NormalizeString() + "\\" + c.CompetitionName.NormalizeString() + "\\" + "_" + c.CompetitionName.NormalizeString().ToUpper() + ".xlsx";
     }
+
 
     public static string GetTeamArchiveFileName(Competition c,Team t)
     {
-      return "cache\\arhiva\\" + c.CompetitionCountry + "\\" + c.CompetitionName + "\\" + t.TeamName + ".xlsx";
+      return "cache\\arhiva\\" + c.CompetitionCountry.NormalizeString()+ "\\" + c.CompetitionName.NormalizeString()+ "\\" + t.TeamName.NormalizeString()+ ".xlsx";
     }
 
     public static bool IsFileLocked(FileInfo file)

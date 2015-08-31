@@ -431,7 +431,7 @@ namespace TMS
         this.lbTeams.DisplayMember = "TeamName";
         this.lbTeams.ValueMember = "TeamId";
         this.pbLoadingTeams.Visible = true;
-        lbCompetition.Enabled = false;
+        //lbCompetition.Enabled = false;
 
         teamList = (
           from cc in this._cachedTeams
@@ -475,7 +475,7 @@ namespace TMS
           el.Url = "http://www.transfermarkt.de/jumplist/startseite/verein/" + el.TeamId;
         }
         this._selectedCompetition.Teams = teamList;
-        lbCompetition.Enabled = true;
+        //lbCompetition.Enabled = true;
         this.pbLoadingTeams.Visible = false;
         this.lbTeams.DataSource = this._selectedCompetition.Teams;
         if (this._selectedCompetition.Teams.Count > 0)
@@ -530,7 +530,7 @@ namespace TMS
 
     private void lbTeams_SelectedIndexChanged(object sender, EventArgs e)
     {
-      if (_generatingInProgress == false && _playerLoadingInProgress == false)
+      if (_generatingInProgress == false && _playerLoadingInProgress == false && _scheduleUpdateInProgress==false && _competitionUpdateInProgress==false)
       {
         cbCurrentSeason.SelectedIndex = 0;
 
@@ -1374,9 +1374,8 @@ namespace TMS
       }
       else
       {
-        if (_scheduleUpdateInProgress == true || _competitionUpdateInProgress == true)
-          return;
-        //if (_generatingInProgress == false)
+        if (_scheduleUpdateInProgress == true || _competitionUpdateInProgress == true || _generatingInProgress==true || _playerLoadingInProgress==true)
+          return;       
         LoadLineups();
       }
     }
@@ -1722,7 +1721,7 @@ namespace TMS
           return;
         List<FileInfo> allFiles = new List<FileInfo>();
 
-        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//cache//arhiva//" + c.CompetitionCountry + "//" + c.CompetitionName);
+        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//cache//arhiva//" + c.CompetitionCountry.NormalizeString() + "//" + c.CompetitionName.NormalizeString());
         if (di.Exists == false)
           di.Create();
 
@@ -1836,10 +1835,10 @@ namespace TMS
             "Pitanje", MessageBoxButtons.YesNo);
           if (dr == DialogResult.Yes)
           {
-            _scheduleUpdateInProgress = true;
+           // _scheduleUpdateInProgress = true;
             await LoadTeamsAsync(false);
             await KreirajArhivu(competition);
-            _scheduleUpdateInProgress = false;
+           // _scheduleUpdateInProgress = false;
           }
           return true;
         }
@@ -1884,7 +1883,7 @@ namespace TMS
         if (lbArhiva.SelectedItem != null)
         {
           string a = lbArhiva.SelectedItem.ToString();
-          File.Delete("cache\\arhiva\\" + _selectedCountry.CountryName + "\\" + _selectedCompetition.CompetitionName + "\\" + a);
+          File.Delete("cache\\arhiva\\" + _selectedCountry.CountryName.NormalizeString() + "\\" + _selectedCompetition.CompetitionName.NormalizeString() + "\\" + a);
           LoadArchive(_selectedCompetition);
         }
       }
@@ -1979,6 +1978,7 @@ namespace TMS
       cbCountries.Enabled = allow;
       lbCountries.Enabled = allow;
       btnDeleteFile.Enabled = allow;
+      cbCurrentSeason.Enabled = allow;
     }
 
     private async void btnAzurirajLigu_Click(object sender, EventArgs e)
