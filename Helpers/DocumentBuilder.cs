@@ -364,7 +364,7 @@ namespace TMS
     {
       foreach (Team t in c.Teams)
       {
-        string fileName = Helper.GetTeamArchiveFileName(c, t);
+        string fileName = Application.StartupPath + Helper.GetTeamArchiveFileName(c, t);
         if(File.Exists(fileName)==false)
           CreateCXMLDocument(fileName, t);
       }
@@ -399,7 +399,7 @@ namespace TMS
 
     private static void CreateSummaryTable(IXLCell scr)
     {
-      XLWorkbook template = new XLWorkbook("cache\\arhiva\\Template.xlsx");
+      XLWorkbook template = new XLWorkbook(Application.StartupPath + Helper.GetTemplateFileName());
       var sheet = template.Worksheet("Template");
       var summaryTableRange = sheet.Range(237, 8, 242, 17);
       summaryTableRange.CopyTo(scr);
@@ -415,7 +415,7 @@ namespace TMS
       List<Match> teamSchedule;
       try
       {
-        var templateWorksheet = new XLWorkbook("cache\\arhiva\\Template.xlsx");
+        var templateWorksheet = new XLWorkbook(Application.StartupPath+Helper.GetTemplateFileName());
         var matchWorksheet = templateWorksheet.Worksheet("Match");
         var matchHomeRange = matchWorksheet.Range("A1", "Y8");
         IXLWorksheet iXLWorksheet;
@@ -781,7 +781,7 @@ namespace TMS
             scr.Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
             scr.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
             scr.Value = 0;
-            scr.FormulaA1 = "'" + Application.StartupPath + "\\cache\\arhiva\\" + c.CompetitionCountry.NormalizeString()+"\\"+c.CompetitionName.NormalizeString() + "\\[" + c.Teams[i].TeamName.NormalizeString() + ".xlsx]" + c.Teams[i].TeamName.NormalizeString().Left(31) + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();            
+            scr.FormulaA1 = "'" + Application.StartupPath +Helper.GetCompetitionArchiveDirectoryName(c) + "\\[" + c.Teams[i].TeamName.NormalizeString() + ".xlsx]" + c.Teams[i].TeamName.NormalizeString().Left(31) + "'!" + iXLWorksheet.Cell(237 + j, 8 + k).Address.ToString();            
             scr = scr.CellRight();
           }
         }

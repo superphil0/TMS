@@ -31,15 +31,50 @@ namespace TMS
   public class Helper
   {
 
+    public static string GetTeamListFileName()
+    {
+      return "\\cache\\teams.txt";
+    }
+
+    public static string GetCompetitionListFileName()
+    {
+      return "\\cache\\competitions.txt";
+    }
+
+    public static string GetCountryListFileName()
+    {
+      return "\\cache\\countries.txt";
+    }
+
+    public static string GetTemplateFileName()
+    {
+      return "\\cache\\arhiva\\Template.xlsx";
+    }
+
+    public static string GetTeamTempDataFileName(Team t)
+    {
+      return "\\cache\\" + t.TeamId.ToString() + "_tmp.txt";
+    }
+
+    public static string GetTeamDataFileName(Team t)
+    {
+      return "\\cache\\" + t.TeamId.ToString() + ".txt";
+    }
+
+    public static string GetCompetitionArchiveDirectoryName(Competition c)
+    {
+      return "\\cache\\arhiva\\" + c.CompetitionCountry.NormalizeString() + "\\" + c.CompetitionName.NormalizeString();
+    }
+
     public static string GetCompetitionArchiveFileName(Competition c)
     {
-      return "cache\\arhiva\\" + c.CompetitionCountry.NormalizeString() + "\\" + c.CompetitionName.NormalizeString() + "\\" + "_" + c.CompetitionName.NormalizeString().ToUpper() + ".xlsx";
+      return "\\cache\\arhiva\\" + c.CompetitionCountry.NormalizeString() + "\\" + c.CompetitionName.NormalizeString() + "\\" + "_" + c.CompetitionName.NormalizeString().ToUpper() + ".xlsx";
     }
 
 
     public static string GetTeamArchiveFileName(Competition c,Team t)
     {
-      return "cache\\arhiva\\" + c.CompetitionCountry.NormalizeString()+ "\\" + c.CompetitionName.NormalizeString()+ "\\" + t.TeamName.NormalizeString()+ ".xlsx";
+      return "\\cache\\arhiva\\" + c.CompetitionCountry.NormalizeString()+ "\\" + c.CompetitionName.NormalizeString()+ "\\" + t.TeamName.NormalizeString()+ ".xlsx";
     }
 
     public static bool IsFileLocked(FileInfo file)

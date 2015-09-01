@@ -84,16 +84,13 @@ namespace TMS
       string text = "";
       try
       {
-        if (File.Exists("cache\\teams.txt"))
+        if (File.Exists(Application.StartupPath + Helper.GetTeamListFileName()))
         {
-          StreamReader streamReader = new StreamReader("cache\\teams.txt");
+          StreamReader streamReader = new StreamReader(Application.StartupPath + Helper.GetTeamListFileName());
           while (!streamReader.EndOfStream)
           {
             text = streamReader.ReadLine();
-            string[] array = text.Split(new char[]
-    {
-                  '|'
-    });
+            string[] array = text.Split('|');
 
             string alternativeName = null;
             if (array.Length > 5)
@@ -126,9 +123,9 @@ namespace TMS
 
       try
       {
-        if (File.Exists("cache\\countries.txt"))
+        if (File.Exists(Application.StartupPath+ Helper.GetCountryListFileName()))
         {
-          StreamReader streamReader = new StreamReader("cache\\countries.txt");
+          StreamReader streamReader = new StreamReader(Application.StartupPath + Helper.GetCountryListFileName());
           while (!streamReader.EndOfStream)
           {
             string text = streamReader.ReadLine();
@@ -158,9 +155,9 @@ namespace TMS
       try
       {
 
-        if (File.Exists("cache\\competitions.txt"))
+        if (File.Exists(Application.StartupPath + Helper.GetCompetitionListFileName()))
         {
-          StreamReader streamReader = new StreamReader("cache\\competitions.txt");
+          StreamReader streamReader = new StreamReader(Application.StartupPath + Helper.GetCompetitionListFileName());
           while (!streamReader.EndOfStream)
           {
             string text = streamReader.ReadLine();
@@ -233,7 +230,7 @@ namespace TMS
           {
             directoryInfo.Create();
           }
-          StreamWriter streamWriter = new StreamWriter("cache\\countries.txt", true);
+          StreamWriter streamWriter = new StreamWriter(Application.StartupPath + Helper.GetCountryListFileName(), true);
           foreach (Country c in _countries)
           {
             if ((
@@ -347,13 +344,13 @@ namespace TMS
           {
             directoryInfo.Create();
           }
-          StreamWriter streamWriter = new StreamWriter("cache\\competitions.txt", true);
+          StreamWriter streamWriter = new StreamWriter(Application.StartupPath + Helper.GetCompetitionListFileName(), true);
           foreach (Competition c in _selectedCountry.Competitions)
           {
 
             if (c.CompetitionName.Equals("NATIONAL"))
             {
-              StreamWriter sw = new StreamWriter("cache\\teams.txt", true);
+              StreamWriter sw = new StreamWriter(Application.StartupPath + Helper.GetTeamListFileName(), true);
               foreach (Team t in c.Teams)
               {
                 t.CompetitionName = c.CompetitionName;
@@ -451,7 +448,7 @@ namespace TMS
           {
             directoryInfo.Create();
           }
-          StreamWriter streamWriter = new StreamWriter("cache\\teams.txt", true);
+          StreamWriter streamWriter = new StreamWriter(Application.StartupPath + Helper.GetTeamListFileName(), true);
           if (_selectedCompetition.Teams != null)
           {
             foreach (Team t in _selectedCompetition.Teams)
@@ -549,7 +546,7 @@ namespace TMS
     {
       try
       {
-        StreamReader sr = new StreamReader(Application.StartupPath + "/cache/teams.txt");
+        StreamReader sr = new StreamReader(Application.StartupPath + Helper.GetTeamListFileName());
         List<string> lines = new List<string>();
         while (sr.EndOfStream == false)
         {
@@ -562,7 +559,7 @@ namespace TMS
         }
         sr.Close();
 
-        StreamWriter sw = new StreamWriter(Application.StartupPath + "/cache/teams.txt");
+        StreamWriter sw = new StreamWriter(Application.StartupPath + Helper.GetTeamListFileName());
         foreach (string s in lines)
         {
           sw.WriteLine(s);
@@ -581,7 +578,7 @@ namespace TMS
     {
       try
       {
-        StreamReader sr = new StreamReader(Application.StartupPath + "/cache/competitions.txt");
+        StreamReader sr = new StreamReader(Application.StartupPath + Helper.GetCompetitionListFileName());
         List<string> lines = new List<string>();
         while (sr.EndOfStream == false)
         {
@@ -598,7 +595,7 @@ namespace TMS
         }
         sr.Close();
 
-        StreamWriter sw = new StreamWriter(Application.StartupPath + "/cache/competitions.txt");
+        StreamWriter sw = new StreamWriter(Application.StartupPath + Helper.GetCompetitionListFileName());
         foreach (string s in lines)
         {
           sw.WriteLine(s);
@@ -618,7 +615,7 @@ namespace TMS
     {
       try
       {
-        StreamReader sr = new StreamReader(Application.StartupPath + "/cache/countries.txt");
+        StreamReader sr = new StreamReader(Application.StartupPath + Helper.GetCountryListFileName());
         List<string> lines = new List<string>();
         while (sr.EndOfStream == false)
         {
@@ -631,11 +628,9 @@ namespace TMS
         }
         sr.Close();
 
-        StreamWriter sw = new StreamWriter(Application.StartupPath + "/cache/countries.txt");
+        StreamWriter sw = new StreamWriter(Application.StartupPath + Helper.GetCountryListFileName());
         foreach (string s in lines)
-        {
           sw.WriteLine(s);
-        }
         sw.Close();
       }
       catch (Exception ex)
@@ -890,9 +885,9 @@ namespace TMS
 
           p.Statistics = new List<Statistics>();
           p.Matches = new List<Match>();
-          streamWriter = new StreamWriter("cache\\" + this._selectedTeam.TeamId.ToString() + ".txt", true);
+          streamWriter = new StreamWriter(Application.StartupPath + Helper.GetTeamDataFileName(_selectedTeam), true);
 
-          currentSeasonData = new StreamWriter("cache\\" + this._selectedTeam.TeamId.ToString() + "_tmp.txt", true);
+          currentSeasonData = new StreamWriter(Application.StartupPath + Helper.GetTeamTempDataFileName(_selectedTeam), true);
 
           bool currentSeason = true;
           bool flag2 = false;
@@ -1021,9 +1016,9 @@ namespace TMS
       try
       {
         //LOADING PREVIOUS SEASON DATA
-        if (File.Exists("cache\\" + teamId + ".txt"))
+        if (File.Exists(Application.StartupPath + Helper.GetTeamDataFileName(_selectedTeam)))
         {
-          StreamReader streamReader = new StreamReader("cache\\" + teamId + ".txt");
+          StreamReader streamReader = new StreamReader(Application.StartupPath + Helper.GetTeamDataFileName(_selectedTeam));
           string a = "";
           Player player = new Player();
           player.Statistics = new List<Statistics>();
@@ -1070,9 +1065,9 @@ namespace TMS
         }
 
         //LOADING CURRENT SEASON DATA
-        if (File.Exists("cache\\" + teamId + "_tmp.txt"))
+        if (File.Exists(Application.StartupPath + Helper.GetTeamTempDataFileName(_selectedTeam)))
         {
-          StreamReader streamReader = new StreamReader("cache\\" + teamId + "_tmp.txt");
+          StreamReader streamReader = new StreamReader(Application.StartupPath + Helper.GetTeamTempDataFileName(_selectedTeam));
           while (!streamReader.EndOfStream)
           {
             string input = streamReader.ReadLine();
@@ -1110,9 +1105,6 @@ namespace TMS
       }
       return this._cachedStats;
     }
-
-
-
 
     private void btnStop_Click(object sender, EventArgs e)
     {
@@ -1615,23 +1607,20 @@ namespace TMS
           return;
         }
 
-        var fileName = Helper.GetTeamArchiveFileName(comp,_selectedTeam);
+        var fileName = Application.StartupPath + Helper.GetTeamArchiveFileName(comp,_selectedTeam);
 
         if (File.Exists(fileName))
-        {
           if (Helper.IsFileLocked(new FileInfo(fileName)))
           {
             MessageBox.Show("Arhiva '" + fileName + "' je otvorena. Zatvori je pa pokusaj opet.");
             return;
           }
-        }
 
         if (_selectedTeam == null)
           return;
 
         if (_selectedTeam.Players == null)
           return;
-
 
 
         foreach (DataGridViewRow r in dgvPlayers.Rows)
@@ -1650,9 +1639,6 @@ namespace TMS
             return;
         }
  
-
-        this.btnGenerateExcel.Enabled = false;
-        btnStop.Visible = true;
         this._counter = 0;
         this.tbStatus.Visible = true;
         this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
@@ -1664,7 +1650,7 @@ namespace TMS
           cbCurrentSeason.SelectedItem = maxYear + 1;
         }
 
-        var currentSeasonData = new FileInfo("cache\\" + this._selectedTeam.TeamId.ToString() + "_tmp.txt");
+        var currentSeasonData = new FileInfo(Application.StartupPath + Helper.GetTeamTempDataFileName(_selectedTeam));
         if (currentSeasonData.Exists == true)
           currentSeasonData.Delete();
 
@@ -1711,8 +1697,6 @@ namespace TMS
       }
     }
 
-   
-
     private void LoadArchive(Competition c)
     {
       try
@@ -1721,11 +1705,11 @@ namespace TMS
           return;
         List<FileInfo> allFiles = new List<FileInfo>();
 
-        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + "//cache//arhiva//" + c.CompetitionCountry.NormalizeString() + "//" + c.CompetitionName.NormalizeString());
+        DirectoryInfo di = new DirectoryInfo(Application.StartupPath + Helper.GetCompetitionArchiveDirectoryName(c));
         if (di.Exists == false)
           di.Create();
 
-        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name=="_"+c.CompetitionName.ToUpper()+".xlsx"))
+        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name=="_"+c.CompetitionName.NormalizeString().ToUpper()+".xlsx"))
           allFiles.Add(fi);
 
         lbArhiva.DataSource = allFiles.OrderByDescending(f => f.LastWriteTime).ToList();
@@ -1812,9 +1796,8 @@ namespace TMS
     {
       try
       {
-        string templateFileName = "cache\\arhiva\\Template.xlsx";
 
-        if (Helper.IsFileLocked(new FileInfo(templateFileName)))
+        if (Helper.IsFileLocked(new FileInfo(Application.StartupPath + Helper.GetTemplateFileName())))
         {
           MessageBox.Show("Template.xlsx je otvoren. Zatvori ga pa pokusaj opet.");
           return false;
@@ -1825,7 +1808,7 @@ namespace TMS
         if (competition == null)
           return false;
 
-        string archiveFileName = Helper.GetCompetitionArchiveFileName(competition);
+        string archiveFileName = Application.StartupPath + Helper.GetCompetitionArchiveFileName(competition);
 
         if (File.Exists(archiveFileName) == false)
         {
@@ -1835,10 +1818,8 @@ namespace TMS
             "Pitanje", MessageBoxButtons.YesNo);
           if (dr == DialogResult.Yes)
           {
-           // _scheduleUpdateInProgress = true;
             await LoadTeamsAsync(false);
             await KreirajArhivu(competition);
-           // _scheduleUpdateInProgress = false;
           }
           return true;
         }
@@ -1853,7 +1834,6 @@ namespace TMS
         {
           lbCompetition.SelectedItem = competition;
           await LoadTeamsAsync(false);
-          lbCompetition.Enabled = false;
           var teams = _cachedTeams.Where(ct => ct.CompetitionId == competition.CompetitionId).ToList();
           foreach (var t in teams)
           {
@@ -1883,12 +1863,14 @@ namespace TMS
         if (lbArhiva.SelectedItem != null)
         {
           string a = lbArhiva.SelectedItem.ToString();
-          File.Delete("cache\\arhiva\\" + _selectedCountry.CountryName.NormalizeString() + "\\" + _selectedCompetition.CompetitionName.NormalizeString() + "\\" + a);
+          File.Delete(Helper.GetCompetitionArchiveDirectoryName(_selectedCompetition) + "\\" + a);
           LoadArchive(_selectedCompetition);
         }
       }
       catch (Exception ex)
       {
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
       }
     }
 
@@ -1960,7 +1942,7 @@ namespace TMS
           {
             int maxYear = int.Parse(pcd.Statistics.Max(s => s.Year));
             if (maxYear == (int)cbCurrentSeason.SelectedItem)
-              File.Delete("cache\\" + this._selectedTeam.TeamId.ToString() + ".txt");
+              File.Delete(Application.StartupPath + Helper.GetTeamDataFileName(selectedTeam));
           }
         }
       }
