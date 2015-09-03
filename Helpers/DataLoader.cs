@@ -317,15 +317,23 @@ namespace TMS
 
         if (htmlNodeCollection != null)
         {
+          Competition c;
           foreach (HtmlNode node in htmlNodeCollection)
           {
-            Competition c = new Competition();
+            c = new Competition();
             c.CompetitionName = node.GetAttributeValue("title", "");
             c.CompetitionId = node.GetAttributeValue("href", "").Split('/').LastOrDefault();
-            c.CompetitionCountryId = -2;
-            c.CompetitionCountry = "CUP COMPETITIONS";
+            c.CompetitionCountryId = -3;
+            c.CompetitionCountry = "INT. CUP COMPETITIONS";
             result.Insert(0, c);
           }
+
+          c = new Competition();
+          c.CompetitionName = "EUROPEAN QUALIFIERS";
+          c.CompetitionId = "EMQ";
+          c.CompetitionCountryId = -3;
+          c.CompetitionCountry = "INT. CUP COMPETITIONS";
+          result.Insert(0, c);
         }
       }
       catch (Exception ex)
@@ -418,6 +426,57 @@ namespace TMS
               CompetitionId = competitionid,
               UrlName = urlname
             });
+          }
+        }
+        result = list;
+      }
+      catch (Exception ex)
+      {
+        Logger.Exception(ex);
+        //MessageBox.Show(ex.Message);
+        result = null;
+      }
+      return result;
+    }
+
+    public async static Task<List<Team>> LoadTeamsSearchPageAsync(string competitionid)
+    {
+      List<Team> result;
+      try
+      {
+        List<Team> list = new List<Team>();
+
+        HttpClient httpClient = new HttpClient();
+        HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://www.transfermarkt.com/jumplist/startseite/wettbewerb/" + competitionid);
+        requestMessage.Headers.Add("User-Agent", "Mozilla/5.0");
+
+        HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
+        HtmlDocument htmlDocument = new HtmlDocument();
+        string ss = await response.Content.ReadAsStringAsync();
+        htmlDocument.LoadHtml(ss);
+        
+        HtmlNodeCollection htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes("//div[@class='box']/table/tbody/tr/td/a");
+        if (htmlNodeCollection != null)
+        {       
+          foreach (var a in htmlNodeCollection)
+          {
+            var href = a.GetAttributeValue("href", "");
+            if (href.Split('/').Length>0&& href.Contains("verein"))
+            {
+              var urlname = href.Split('/')[1];
+              var teamid = href.Split('/').ElementAt(4);
+              if (a.InnerText != "")
+              {
+                var title = a.InnerHtml;
+                list.Add(new Team
+                {
+                  TeamId = int.Parse(teamid),
+                  TeamName = title,
+                  CompetitionId = competitionid,
+                  UrlName = urlname
+                });
+              }
+            }
           }
         }
         result = list;

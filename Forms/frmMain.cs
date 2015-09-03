@@ -438,7 +438,11 @@ namespace TMS
         {
           List<Team> teams = null;
           if (_selectedCompetition.CompetitionCountryId < 0)//KUP TAKMICENJA
+          {
             teams = await DataLoader.LoadTeamsAsync(this._selectedCompetition.CompetitionId);
+            if(teams.Count==0)
+              teams = await DataLoader.LoadTeamsSearchPageAsync(this._selectedCompetition.CompetitionId);
+          }
           else
             teams = await DataLoader.LoadTeamsAlternativeAsync(this._selectedCompetition.CompetitionId);
           this._selectedCompetition.Teams = teams;
@@ -1755,7 +1759,7 @@ namespace TMS
           cbCurrentSeason.SelectedItem = season;
           t.Schedule = schedule;
         }
-        var archiveFileName = Helper.GetCompetitionArchiveFileName(c);
+        var archiveFileName = Application.StartupPath+ Helper.GetCompetitionArchiveFileName(c);
         DocumentBuilder.CreateCompetitionArchive(archiveFileName, c);
         if (File.Exists(archiveFileName))
         {

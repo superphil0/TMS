@@ -175,7 +175,7 @@ namespace TMS
           iXLWorksheet.Cell("A" + (i * 5 + 2).ToString()).Value = (text);
           iXLWorksheet.Cell("A" + (i * 5 + 3).ToString()).Value = ("[" + player.PlayerNr + "] " +
                                                                  player.PrefferedFoot);
-          if (player.Statistics[0] != null)
+          if (player.Statistics !=null && player.Statistics[0] != null)
           {
             if (player.Statistics[0].GoalsScoredTopLeague == "0")
             {
