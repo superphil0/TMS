@@ -1867,7 +1867,7 @@ namespace TMS
         if (lbArhiva.SelectedItem != null)
         {
           string a = lbArhiva.SelectedItem.ToString();
-          File.Delete(Helper.GetCompetitionArchiveDirectoryName(_selectedCompetition) + "\\" + a);
+          File.Delete(Application.StartupPath+ Helper.GetCompetitionArchiveDirectoryName(_selectedCompetition) + "\\" + a);
           LoadArchive(_selectedCompetition);
         }
       }
