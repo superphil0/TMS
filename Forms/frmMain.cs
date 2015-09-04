@@ -123,7 +123,7 @@ namespace TMS
 
       try
       {
-        if (File.Exists(Application.StartupPath+ Helper.GetCountryListFileName()))
+        if (File.Exists(Application.StartupPath + Helper.GetCountryListFileName()))
         {
           StreamReader streamReader = new StreamReader(Application.StartupPath + Helper.GetCountryListFileName());
           while (!streamReader.EndOfStream)
@@ -171,7 +171,11 @@ namespace TMS
             };
 
             if (array.Length > 4)
-              c.AlternativeName = array[4];
+            {
+              var anames = array[4].Split(',');
+              foreach (var an in anames)
+                c.AlternativeName.Add(an);
+            }
 
             var country = _cachedCountries.Where(cc => cc.CountryId == c.CompetitionCountryId).FirstOrDefault();
             c.CompetitionCountry = country.CountryName;
@@ -360,7 +364,7 @@ namespace TMS
                   select cc).ToList<Team>().Count == 0)
                 {
                   this._cachedTeams.Add(t);
-                  sw.WriteLine(t.CompetitionId.ToString()+"|"+t.CompetitionName+"|"+t.TeamId.ToString()+"|"+t.TeamName+"|"+t.UrlName);
+                  sw.WriteLine(t.CompetitionId.ToString() + "|" + t.CompetitionName + "|" + t.TeamId.ToString() + "|" + t.TeamName + "|" + t.UrlName);
                 }
               }
               sw.Close();
@@ -373,7 +377,7 @@ namespace TMS
             {
               list.Add(c);
               this._cachedCompetitions.Add(c);
-              streamWriter.WriteLine(_selectedCountry.CountryId.ToString()+"|"+_selectedCountry.CountryName+"|"+c.CompetitionId.ToString()+"|"+c.CompetitionName);
+              streamWriter.WriteLine(_selectedCountry.CountryId.ToString() + "|" + _selectedCountry.CountryName + "|" + c.CompetitionId.ToString() + "|" + c.CompetitionName);
             }
           }
           streamWriter.Close();
@@ -440,7 +444,7 @@ namespace TMS
           if (_selectedCompetition.CompetitionCountryId < 0)//KUP TAKMICENJA
           {
             teams = await DataLoader.LoadTeamsAsync(this._selectedCompetition.CompetitionId);
-            if(teams.Count==0)
+            if (teams.Count == 0)
               teams = await DataLoader.LoadTeamsSearchPageAsync(this._selectedCompetition.CompetitionId);
           }
           else
@@ -531,7 +535,7 @@ namespace TMS
 
     private void lbTeams_SelectedIndexChanged(object sender, EventArgs e)
     {
-      if (_generatingInProgress == false && _playerLoadingInProgress == false && _scheduleUpdateInProgress==false && _competitionUpdateInProgress==false)
+      if (_generatingInProgress == false && _playerLoadingInProgress == false && _scheduleUpdateInProgress == false && _competitionUpdateInProgress == false)
       {
         cbCurrentSeason.SelectedIndex = 0;
 
@@ -590,10 +594,16 @@ namespace TMS
           if (line.Contains(c.CompetitionId + "|" + c.CompetitionName))
           {
             var parts = line.Split('|');
+
+            var anames = "";
+            foreach (var an in c.AlternativeName)
+              anames += "," + an;
+            anames = anames.Substring(1);
+
             if (parts.Count() == 4)
-              line += "|" + c.AlternativeName;
+              line += "|" + anames;
             else
-              line = line.Substring(0, line.LastIndexOf("|") + 1) + c.AlternativeName;
+              line = line.Substring(0, line.LastIndexOf("|") + 1) + anames;
           }
           lines.Add(line);
         }
@@ -1219,7 +1229,13 @@ namespace TMS
 
       foreach (var g in games)
       {
-        var competition = _cachedCompetitions.Where(cc => cc.AlternativeName != null && cc.AlternativeName.Equals(g.LineupUrl.Split('/')[4] + "/" + g.LineupUrl.Split('/')[5])).FirstOrDefault();
+        string lurl = "";
+        if (g.LineupUrl.IndexOf("soccer/") != -1)
+          lurl = g.LineupUrl.Substring(g.LineupUrl.IndexOf("soccer/") + 7);
+        else
+          lurl = g.LineupUrl.Substring(g.LineupUrl.IndexOf(".com/") + 5);
+
+        var competition = _cachedCompetitions.Where(cc => cc.AlternativeName.Count > 0 && cc.AlternativeName.Contains(lurl.Split('/')[0] + "/" + lurl.Split('/')[1])).FirstOrDefault();
         if (competition != null)
           g.CompetitionId = competition.CompetitionId;
       }
@@ -1248,7 +1264,12 @@ namespace TMS
         if (DateTime.Now.Subtract(g.LastChange).TotalSeconds < 60)
           r.Cells[2].Style.BackColor = Color.LightGreen;
 
-        var tt = g.LineupUrl.Split('/')[4].Replace("-", " ").ToUpper() + " - " + g.LineupUrl.Split('/')[5].Replace("-", " ").ToUpper();
+        string lurl = "";
+        if (g.LineupUrl.IndexOf("soccer/") != -1)
+          lurl = g.LineupUrl.Substring(g.LineupUrl.IndexOf("soccer/") + 7);
+        else
+          lurl = g.LineupUrl.Substring(g.LineupUrl.IndexOf(".com/") + 5);
+        var tt = lurl.Split('/')[0].Replace("-", " ").ToUpper() + " - " + lurl.Split('/')[1].Replace("-", " ").ToUpper();
 
         r.Cells[1].ToolTipText = tt;
         r.Cells[2].ToolTipText = tt;
@@ -1370,8 +1391,8 @@ namespace TMS
       }
       else
       {
-        if (_scheduleUpdateInProgress == true || _competitionUpdateInProgress == true || _generatingInProgress==true || _playerLoadingInProgress==true)
-          return;       
+        if (_scheduleUpdateInProgress == true || _competitionUpdateInProgress == true || _generatingInProgress == true || _playerLoadingInProgress == true)
+          return;
         LoadLineups();
       }
     }
@@ -1611,7 +1632,7 @@ namespace TMS
           return;
         }
 
-        var fileName = Application.StartupPath + Helper.GetTeamArchiveFileName(comp,_selectedTeam);
+        var fileName = Application.StartupPath + Helper.GetTeamArchiveFileName(comp, _selectedTeam);
 
         if (File.Exists(fileName))
           if (Helper.IsFileLocked(new FileInfo(fileName)))
@@ -1642,7 +1663,7 @@ namespace TMS
           if (dr != DialogResult.Yes)
             return;
         }
- 
+
         this._counter = 0;
         this.tbStatus.Visible = true;
         this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
@@ -1674,7 +1695,7 @@ namespace TMS
           UpdatePlayersGrid(p.PlayerId);
         }
 
-     
+
         DocumentBuilder.CreateCXMLDocument(fileName, this._selectedTeam);
 
         Process.Start(fileName);
@@ -1713,7 +1734,7 @@ namespace TMS
         if (di.Exists == false)
           di.Create();
 
-        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name=="_"+c.CompetitionName.NormalizeString().ToUpper()+".xlsx"))
+        foreach (FileInfo fi in di.GetFiles().Where(f => f.Name == "_" + c.CompetitionName.NormalizeString().ToUpper() + ".xlsx"))
           allFiles.Add(fi);
 
         lbArhiva.DataSource = allFiles.OrderByDescending(f => f.LastWriteTime).ToList();
@@ -1759,7 +1780,7 @@ namespace TMS
           cbCurrentSeason.SelectedItem = season;
           t.Schedule = schedule;
         }
-        var archiveFileName = Application.StartupPath+ Helper.GetCompetitionArchiveFileName(c);
+        var archiveFileName = Application.StartupPath + Helper.GetCompetitionArchiveFileName(c);
         DocumentBuilder.CreateCompetitionArchive(archiveFileName, c);
         if (File.Exists(archiveFileName))
         {
@@ -1867,7 +1888,7 @@ namespace TMS
         if (lbArhiva.SelectedItem != null)
         {
           string a = lbArhiva.SelectedItem.ToString();
-          File.Delete(Application.StartupPath+ Helper.GetCompetitionArchiveDirectoryName(_selectedCompetition) + "\\" + a);
+          File.Delete(Application.StartupPath + Helper.GetCompetitionArchiveDirectoryName(_selectedCompetition) + "\\" + a);
           LoadArchive(_selectedCompetition);
         }
       }
@@ -1909,7 +1930,14 @@ namespace TMS
     {
       if (SelectedGame == null)
         return;
-      var competitionShortName = SelectedGame.LineupUrl.Split('/')[4] + "/" + SelectedGame.LineupUrl.Split('/')[5];
+
+      string lurl = "";
+      if (SelectedGame.LineupUrl.IndexOf("soccer/") != -1)
+        lurl = SelectedGame.LineupUrl.Substring(SelectedGame.LineupUrl.IndexOf("soccer/") + 7);
+      else
+        lurl = SelectedGame.LineupUrl.Substring(SelectedGame.LineupUrl.IndexOf(".com/") + 5);
+
+      var competitionShortName = lurl.Split('/')[0] + "/" + lurl.Split('/')[1];
 
       frmCompetitionMapping frm = new frmCompetitionMapping();
       frm.CachedCompetitions = this._cachedCompetitions;
@@ -1918,7 +1946,7 @@ namespace TMS
       if (dr == System.Windows.Forms.DialogResult.OK)
       {
         Competition mappedCompetition = frm.MappedComeptition;
-        mappedCompetition.AlternativeName = competitionShortName;
+        mappedCompetition.AlternativeName.Add(competitionShortName);
         UpdateCompetitionAlternativeName(mappedCompetition);
       }
     }
