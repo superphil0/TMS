@@ -42,8 +42,7 @@ namespace TMS
     private Team _selectedTeam;
     private Competition _selectedCompetition;
     private Country _selectedCountry;
-
-    //private Task _geTask;
+    
     #endregion Attributes
 
     #region Init
@@ -394,8 +393,6 @@ namespace TMS
       }
     }
 
-  
-
     private async void lbCompetition_Click(object sender, EventArgs e)
     {
       if (lbCompetition.SelectedItem != null)
@@ -520,7 +517,6 @@ namespace TMS
       this.cbTeams.Select(this.cbTeams.Text.Length, 0);
     }
 
-
     private void lbTeams_SelectedIndexChanged(object sender, EventArgs e)
     {
       if (_generatingInProgress == false && _playerLoadingInProgress == false && _scheduleUpdateInProgress == false && _competitionUpdateInProgress == false)
@@ -569,7 +565,6 @@ namespace TMS
       }
     }
 
-
     private void UpdateCompetitionAlternativeName(Competition c)
     {
       try
@@ -610,8 +605,6 @@ namespace TMS
         MessageBox.Show(ex.Message);
       }
     }
-
-
 
     private void UpdateCountryTop(Country c)
     {
@@ -1362,8 +1355,6 @@ namespace TMS
       await StartLivescoreFeedAsync();
     }
 
-
-
     private async void lbMatches_CellClick(object sender, DataGridViewCellEventArgs e)
     {
       var senderGrid = (DataGridView)sender;
@@ -1690,7 +1681,6 @@ namespace TMS
       }
       return matchedPlayers;
     }
-
 
     #endregion Livescore
 

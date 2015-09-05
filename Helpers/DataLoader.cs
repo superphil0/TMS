@@ -498,6 +498,9 @@ namespace TMS
       List<Player> result = new List<Player>();
       try
       {
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+
         HttpClient httpClient = new HttpClient();
         HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://www.transfermarkt.com/jumplist/startseite/verein/" + teamid);
         requestMessage.Headers.Add("User-Agent", "Mozilla/5.0");
@@ -506,6 +509,17 @@ namespace TMS
         HtmlDocument htmlDocument = new HtmlDocument();
         string ss = await response.Content.ReadAsStringAsync();
         htmlDocument.LoadHtml(ss);
+
+        stopWatch.Stop();
+        // Get the elapsed time as a TimeSpan value.
+        TimeSpan ts = stopWatch.Elapsed;
+
+        // Format and display the TimeSpan value. 
+        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+        Console.WriteLine("RunTime " + elapsedTime);
+
 
 
         var playersTableNodes = htmlDocument.DocumentNode.SelectNodes("//table[@class='items']");
