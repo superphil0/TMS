@@ -499,16 +499,34 @@ namespace TMS
       return teamList;
     }
 
-    private void lbTeams_KeyDown(object sender, KeyEventArgs e)
+    private async void lbTeams_KeyDown(object sender, KeyEventArgs e)
     {
       if (e.KeyCode == Keys.Return && lbTeams.SelectedItem != null)
+      {
+        _selectedTeam = (Team)this.lbTeams.SelectedItem;
+        if (_selectedTeam.Schedule == null || _selectedTeam.Schedule.Count == 0)
+        {
+          List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, _selectedTeam, cbCurrentSeason.SelectedItem.ToString());
+          _selectedTeam.Schedule = schedule;
+        }
+
         this.LoadPlayers();
+      }
     }
 
-    private void lbTeams_Click(object sender, EventArgs e)
+    private async void lbTeams_Click(object sender, EventArgs e)
     {
       if (_generatingInProgress == false && lbTeams.SelectedItem != null)
+      {
+        _selectedTeam = (Team)this.lbTeams.SelectedItem;
+        if (_selectedTeam.Schedule == null || _selectedTeam.Schedule.Count == 0)
+        {
+          List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, _selectedTeam, cbCurrentSeason.SelectedItem.ToString());
+          _selectedTeam.Schedule = schedule;
+        }
+
         this.LoadPlayers();
+      }
     }
 
     private void cbTeams_TextUpdate(object sender, EventArgs e)
@@ -714,10 +732,11 @@ namespace TMS
         this.dgvPlayers.DataSource = null;
         this.tbStatus.Clear();
         this._selectedTeam = (Team)this.lbTeams.SelectedItem;
-        this.btnGenerateExcel.Enabled = false;
+       // this.btnGenerateExcel.Enabled = false;
         this.pbLoadingPlayers.Visible = true;
 
-        this._selectedTeam.Players = await DataLoader.LoadPlayersAsync(this._selectedTeam.TeamId);
+        if (_selectedTeam.Players == null)
+          this._selectedTeam.Players = await DataLoader.LoadPlayersAsync(this._selectedTeam.TeamId);
 
         _cachedStats = LoadCachedData(_selectedTeam.TeamId);
 
@@ -752,8 +771,10 @@ namespace TMS
         }
         else
         {
+          DetermineLineupStatus(_selectedTeam);
           lbUnamapped.Visible = false;
           lblUnmapped.Visible = false;
+
         }
 
         lbTeams.Enabled = true;
@@ -761,7 +782,7 @@ namespace TMS
         lbMatches.Enabled = true;
 
         this.pbLoadingPlayers.Visible = false;
-        this.btnGenerateExcel.Enabled = true;
+        //this.btnGenerateExcel.Enabled = true;
         dgvPlayers.AutoGenerateColumns = false;
         dgvPlayers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
         dgvPlayers.Columns.Clear();
@@ -789,7 +810,7 @@ namespace TMS
 
         c = new DataGridViewTextBoxColumn();
         c.DataPropertyName = "MU";
-        c.Width = 30;
+        c.Width = 40;
         dgvPlayers.Columns.Add(c);
 
         c = new DataGridViewTextBoxColumn();
@@ -832,7 +853,7 @@ namespace TMS
             dgvr.Cells[0].Style.BackColor = Color.LightGreen;
             dgvr.Cells[1].Style.BackColor = Color.LightGreen;
           }
-          else if (player.Lineup == Player.LineUpStatus.MAYBE)
+          else if (player.Lineup == Player.LineUpStatus.UNKNOWN)
           {
             dgvr.Cells[0].Style.BackColor = Color.Orange;
             dgvr.Cells[1].Style.BackColor = Color.Orange;
@@ -920,17 +941,20 @@ namespace TMS
                 select cs).ToList<Player>();
               if (list.Count > 0)
               {
-                List<Statistics> list2 = (
-                  from ss in list.First<Player>().Statistics
-                  where ss.Year.Equals(year)
-                  select ss).ToList<Statistics>();
-                if (list2.Count > 0)
+                if (list.First().Statistics != null)
                 {
-                  flag3 = true;
-                  statistics2 = list2.ElementAt(0);
-                  p.Statistics.Add(statistics2);
-                  p.SecondaryPositions = list.First<Player>().SecondaryPositions.ToList<string>();
-                  p.PrefferedFoot = list.First<Player>().PrefferedFoot;
+                  List<Statistics> list2 = (
+                    from ss in list.First<Player>().Statistics
+                    where ss.Year.Equals(year)
+                    select ss).ToList<Statistics>();
+                  if (list2.Count > 0)
+                  {
+                    flag3 = true;
+                    statistics2 = list2.ElementAt(0);
+                    p.Statistics.Add(statistics2);
+                    p.SecondaryPositions = list.First<Player>().SecondaryPositions.ToList<string>();
+                    p.PrefferedFoot = list.First<Player>().PrefferedFoot;
+                  }
                 }
               }
             }
@@ -1484,6 +1508,103 @@ namespace TMS
       }
     }
 
+    private void DetermineLineupStatus(Team t)
+    {
+      try
+      {
+        foreach (var p in t.Players)
+        {
+          var comment = p.Injury;
+          p.Lineup = Player.LineUpStatus.YES;
+
+          #region position
+          //NO POSITION SET
+          var position = p.MainPosition;
+          if (position == "")
+            p.Lineup = Player.LineUpStatus.UNKNOWN;
+          #endregion positions
+
+          if (comment != null && position != "GK")
+          {
+            string dateS;
+            DateTime date;
+            bool status;
+
+            #region suspension
+            if (comment.ToLower().Contains("suspension") || comment.ToLower().Contains("leave"))
+            {
+              string[] parts = Regex.Split(comment, " - ");
+              var suspensionUntil = parts[1];
+              var competitionName = parts[2];
+              var nextGame = t.Schedule.Where(s => s.Date > DateTime.Now).FirstOrDefault();
+
+              if (suspensionUntil != "")
+              {
+                suspensionUntil = comment.Substring(comment.ToLower().IndexOf(" until ") + 7);
+                dateS = suspensionUntil.Substring(0, suspensionUntil.IndexOf(" - ")).Trim();
+                status = DateTime.TryParseExact(dateS, "MMM d, yyyy", null, DateTimeStyles.None, out date);
+                if (status == true)
+                {
+                  if (nextGame != null)
+                  {
+                    if (nextGame.Date.HasValue && nextGame.Date < date && (t.CompetitionName == competitionName || competitionName == "cross"))
+                      p.Lineup = Player.LineUpStatus.NO;
+                  }
+                  else
+                    p.Lineup = Player.LineUpStatus.UNKNOWN;
+                }
+                else
+                  p.Lineup = Player.LineUpStatus.UNKNOWN;
+
+              }
+              else
+              {
+                if (t.CompetitionName == competitionName || competitionName == "cross-competition")
+                  p.Lineup = Player.LineUpStatus.NO;
+              }
+            }
+            #endregion suspension
+
+            #region injury
+            //INJURY
+            if (comment.ToLower().Contains("return unknown"))
+            {
+              p.Lineup = Player.LineUpStatus.NO;
+            }
+            else if (comment.ToLower().Contains("return"))
+            {
+              if (comment.ToLower().IndexOf(" on ") != -1)
+              {
+                dateS = comment.Substring(comment.ToLower().IndexOf(" on ") + 4);
+                status = DateTime.TryParseExact(dateS, "MMM d, yyyy", null, DateTimeStyles.None, out date);
+                if (status == true)
+                {
+                  var nextGame = t.Schedule.Where(s => s.Date > DateTime.Now).FirstOrDefault();
+                  if (nextGame != null)
+                  {
+                    if (nextGame.Date.HasValue && nextGame.Date < date)
+                      p.Lineup = Player.LineUpStatus.NO;
+                  }
+                  else
+                    p.Lineup = Player.LineUpStatus.UNKNOWN;
+                }
+                else
+                  p.Lineup = Player.LineUpStatus.UNKNOWN;
+              }
+              else
+                p.Lineup = Player.LineUpStatus.UNKNOWN;
+            }
+          }
+          #endregion injury
+        }
+      }
+      catch (Exception ex)
+      {
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
+      }
+    }
+
     private List<string> SetLineupStatus()
     {
       List<string> matchedPlayers = new List<string>();
@@ -1552,7 +1673,7 @@ namespace TMS
                       p.Lineup = Player.LineUpStatus.YES;
                     }
                     else
-                      p.Lineup = Player.LineUpStatus.MAYBE;
+                      p.Lineup = Player.LineUpStatus.UNKNOWN;
                   }
                 }
               }
@@ -1590,7 +1711,7 @@ namespace TMS
                       p.Lineup = Player.LineUpStatus.YES;
                     }
                     else
-                      p.Lineup = Player.LineUpStatus.MAYBE;
+                      p.Lineup = Player.LineUpStatus.UNKNOWN;
                   }
                 }
               }
@@ -1772,6 +1893,22 @@ namespace TMS
     {
       try
       {
+        var archiveFileName = Application.StartupPath + Helper.GetCompetitionArchiveFileName(c);
+        if (File.Exists(archiveFileName) && Helper.IsFileLocked(new FileInfo(archiveFileName)))
+        {
+          MessageBox.Show("Arhiva '" + archiveFileName + "' je otvorena. Zatvori je pa pokusaj opet.");
+          return;
+        }
+
+        if (File.Exists(archiveFileName) == true)
+        {
+          DialogResult dr =
+          MessageBox.Show(
+            "Arhiva '" + archiveFileName + "' vec postoji! Da li treba nabraviti novu i obrisati postojecu ?",
+            "Pitanje", MessageBoxButtons.YesNo);
+          if (dr == DialogResult.No)
+            return;
+        }
         foreach (Team t in c.Teams)
         {
           List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, t, cbCurrentSeason.SelectedItem.ToString());
@@ -1780,7 +1917,7 @@ namespace TMS
           cbCurrentSeason.SelectedItem = season;
           t.Schedule = schedule;
         }
-        var archiveFileName = Application.StartupPath + Helper.GetCompetitionArchiveFileName(c);
+
         DocumentBuilder.CreateCompetitionArchive(archiveFileName, c);
         if (File.Exists(archiveFileName))
         {
@@ -1963,20 +2100,31 @@ namespace TMS
 
     private void cbCurrentSeason_SelectedIndexChanged(object sender, EventArgs e)
     {
-      if (lbTeams.SelectedItem != null)
+      try
       {
-        var selectedTeam = (Team)lbTeams.SelectedItem;
-        if (cbCurrentSeason.SelectedIndex == 1)
+        if (lbTeams.SelectedItem != null)
         {
-          this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
-          var pcd = _cachedStats.FirstOrDefault();
-          if (pcd != null)
+          var selectedTeam = (Team)lbTeams.SelectedItem;
+          if (cbCurrentSeason.SelectedIndex == 1)
           {
-            int maxYear = int.Parse(pcd.Statistics.Max(s => s.Year));
-            if (maxYear == (int)cbCurrentSeason.SelectedItem)
-              File.Delete(Application.StartupPath + Helper.GetTeamDataFileName(selectedTeam));
+            this._cachedStats = this.LoadCachedData(this._selectedTeam.TeamId);
+            var pcd = _cachedStats.FirstOrDefault();
+            if (pcd != null && pcd.Statistics!=null)
+            {
+              int maxYear = int.Parse(pcd.Statistics.Max(s => s.Year));
+              if (maxYear == (int)cbCurrentSeason.SelectedItem)
+              {
+                File.Delete(Application.StartupPath + Helper.GetTeamDataFileName(selectedTeam));
+                File.Delete(Application.StartupPath + Helper.GetTeamTempDataFileName(selectedTeam));
+              }
+            }
           }
         }
+      }
+      catch(Exception ex)
+      {
+        MessageBox.Show(ex.Message);
+        Logger.Exception(ex);
       }
     }
 
@@ -1993,6 +2141,7 @@ namespace TMS
       lbCountries.Enabled = allow;
       btnDeleteFile.Enabled = allow;
       cbCurrentSeason.Enabled = allow;
+      btnStop.Visible = !allow;
     }
 
     private async void btnAzurirajLigu_Click(object sender, EventArgs e)
@@ -2012,6 +2161,7 @@ namespace TMS
         {
           lbTeams.SelectedIndex = i;
           await LoadPlayers();
+
           if (_competitionUpdateInProgress == false)
             break;
           _generatingInProgress = true;

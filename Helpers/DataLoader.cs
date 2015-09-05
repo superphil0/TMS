@@ -350,6 +350,7 @@ namespace TMS
       List<Team> result;
       try
       {
+          
         List<Team> list = new List<Team>();
 
         HttpClient httpClient = new HttpClient();
@@ -395,6 +396,8 @@ namespace TMS
       List<Team> result;
       try
       {
+        
+
         List<Team> list = new List<Team>();
 
         HttpClient httpClient = new HttpClient();
@@ -559,18 +562,19 @@ namespace TMS
                 }
               }
 
+              var mainPosition = Helper.PositionShortName(position);
               //ADD PLAYER TO LISTs
               result.Add(new Player
               {
                 Name = WebUtility.HtmlDecode(name),
                 PlayerId = int.Parse(playerId),
-                MainPosition = Helper.PositionShortName(position),
+                MainPosition = mainPosition,
                 TmUrl = tmurl,
                 PlayerNr = playernr,
                 Age = age,
                 MarketValue = marketValue,
                 Injury = injury,
-                Lineup = Player.LineUpStatus.YES
+                Lineup = Player.LineUpStatus.UNKNOWN
               });
             }
           }
@@ -672,7 +676,7 @@ namespace TMS
           {
             if (htmlNodeCollection3.Count > 5)
               text = htmlNodeCollection3.ElementAt(5).InnerText;
-            else
+            else if (htmlNodeCollection3.Count > 4)
               text = htmlNodeCollection3.ElementAt(4).InnerText;
 
             text = text.Replace("\r\n", "").Replace("\t", "");

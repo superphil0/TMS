@@ -47,8 +47,8 @@ namespace TMS
         private void InitializeComponent()
         {
       this.components = new System.ComponentModel.Container();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.btnGenerateExcel = new System.Windows.Forms.Button();
       this.lbCompetition = new System.Windows.Forms.ListBox();
       this.lbTeams = new System.Windows.Forms.ListBox();
@@ -111,7 +111,6 @@ namespace TMS
       // 
       // btnGenerateExcel
       // 
-      this.btnGenerateExcel.Enabled = false;
       this.btnGenerateExcel.Location = new System.Drawing.Point(587, 509);
       this.btnGenerateExcel.Margin = new System.Windows.Forms.Padding(4);
       this.btnGenerateExcel.Name = "btnGenerateExcel";
@@ -441,8 +440,8 @@ namespace TMS
       this.lbMatches.Name = "lbMatches";
       this.lbMatches.ReadOnly = true;
       this.lbMatches.RowHeadersVisible = false;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle2;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle1;
       this.lbMatches.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
       this.lbMatches.Size = new System.Drawing.Size(370, 546);
       this.lbMatches.TabIndex = 40;
@@ -493,8 +492,8 @@ namespace TMS
       this.dgvPlayers.Name = "dgvPlayers";
       this.dgvPlayers.ReadOnly = true;
       this.dgvPlayers.RowHeadersWidth = 30;
-      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle3;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.dgvPlayers.RowsDefaultCellStyle = dataGridViewCellStyle2;
       this.dgvPlayers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
       this.dgvPlayers.Size = new System.Drawing.Size(255, 684);
       this.dgvPlayers.TabIndex = 32;
