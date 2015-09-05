@@ -27,7 +27,7 @@ namespace TMS
 				MessageBox.Show("Ne postoji konfiguracioni fajl!");
 			}
 		}
-		private async void button1_Click(object sender, EventArgs e)
+		private void button1_Click(object sender, EventArgs e)
 		{
 		
 			if (this.username == null || this.password == null)

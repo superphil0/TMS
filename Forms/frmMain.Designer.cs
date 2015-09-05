@@ -131,7 +131,7 @@ namespace TMS
       this.lbCompetition.Size = new System.Drawing.Size(194, 180);
       this.lbCompetition.TabIndex = 7;
       this.lbCompetition.Click += new System.EventHandler(this.lbCompetition_Click);
-      this.lbCompetition.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbCompetition_KeyDown);
+      //this.lbCompetition.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbCompetition_KeyDown);
       // 
       // lbTeams
       // 
@@ -223,7 +223,7 @@ namespace TMS
       this.cbCountries.Size = new System.Drawing.Size(194, 24);
       this.cbCountries.TabIndex = 22;
       this.cbCountries.TextUpdate += new System.EventHandler(this.cbCountries_TextUpdate);
-      this.cbCountries.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbCountries_KeyDown);
+      //this.cbCountries.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbCountries_KeyDown);
       // 
       // cbTeams
       // 
@@ -233,7 +233,7 @@ namespace TMS
       this.cbTeams.Size = new System.Drawing.Size(276, 24);
       this.cbTeams.TabIndex = 25;
       this.cbTeams.TextUpdate += new System.EventHandler(this.cbTeams_TextUpdate);
-      this.cbTeams.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbTeams_KeyDown);
+      //this.cbTeams.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbTeams_KeyDown);
       // 
       // lbLatest
       // 

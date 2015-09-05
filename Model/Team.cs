@@ -6,7 +6,7 @@ namespace TMS
     {
         public Team()
         {
-            Schedule = new List<Match>();
+            //Schedule = new List<Match>();
         }
         public int TeamId
         {

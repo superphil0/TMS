@@ -606,6 +606,9 @@ namespace TMS
       {
         new List<Team>();
 
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+
         HttpClient httpClient = new HttpClient();
         HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://www.transfermarkt.com/" + playerStatsUrl);
         requestMessage.Headers.Add("User-Agent", "Mozilla/5.0");
@@ -614,6 +617,18 @@ namespace TMS
         HtmlDocument htmlDocument = new HtmlDocument();
         string ss = await response.Content.ReadAsStringAsync();
         htmlDocument.LoadHtml(ss);
+
+
+        stopWatch.Stop();
+        // Get the elapsed time as a TimeSpan value.
+        TimeSpan ts = stopWatch.Elapsed;
+
+        // Format and display the TimeSpan value. 
+        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+        Console.WriteLine("RunTime " + elapsedTime);
+
 
 
         HtmlNodeCollection htmlNodeCollection = htmlDocument.DocumentNode.SelectNodes("//table[@class='items']/tfoot/tr/td");
@@ -815,14 +830,8 @@ namespace TMS
       catch (Exception ex)
       {
         Logger.Exception(ex);
-        //MessageBox.Show(ex.Message);
       }
       return adp;
-    }
-
-    public async static Task<List<Match>> UpdateSchedule(Competition c)
-    {
-      return null;
     }
 
     public async static Task<List<Match>> LoadSchedule(List<Team> cachedTeams, Team team, string year)
@@ -1012,7 +1021,7 @@ namespace TMS
       try
       {
         HttpClient httpClient = new HttpClient();
-        HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://www.realstreamunited.com/search.php?option=com_search&tmpl=raw&type=json&ordering=&searchphrase=all&Itemid=207&areas[]=event&searchword=" + home + "&sef=1&limitstart=0");
+        HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://www.realstreamunited.com/search.php?option=com_search&tmpl=raw&type=json&ordering=&searchphrase=all&Itemid=207&areas[]=event&searchword=" + home+" "+away + "&sef=1&limitstart=0");
         requestMessage.Headers.Add("User-Agent", "Mozilla/5.0");
 
         HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
