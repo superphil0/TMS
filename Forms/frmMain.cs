@@ -499,33 +499,38 @@ namespace TMS
       return teamList;
     }
 
-    private async void lbTeams_KeyDown(object sender, KeyEventArgs e)
-    {
-      if (e.KeyCode == Keys.Return && lbTeams.SelectedItem != null)
-      {
-        _selectedTeam = (Team)this.lbTeams.SelectedItem;
-        if (_selectedTeam.Schedule == null || _selectedTeam.Schedule.Count == 0)
-        {
-          List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, _selectedTeam, cbCurrentSeason.SelectedItem.ToString());
-          _selectedTeam.Schedule = schedule;
-        }
+    //private async void lbTeams_KeyDown(object sender, KeyEventArgs e)
+    //{
+    //  if (e.KeyCode == Keys.Return && lbTeams.SelectedItem != null)
+    //  {
+    //    _selectedTeam = (Team)this.lbTeams.SelectedItem;
+    //    if (_selectedTeam.Schedule == null || _selectedTeam.Schedule.Count == 0)
+    //    {
+    //      List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, _selectedTeam, cbCurrentSeason.SelectedItem.ToString());
+    //      _selectedTeam.Schedule = schedule;
+    //    }
 
-        this.LoadPlayers();
-      }
-    }
+    //    this.LoadPlayers();
+    //  }
+    //}
 
     private async void lbTeams_Click(object sender, EventArgs e)
     {
       if (_generatingInProgress == false && lbTeams.SelectedItem != null)
       {
+        AllowControls(false);
         _selectedTeam = (Team)this.lbTeams.SelectedItem;
         if (_selectedTeam.Schedule == null || _selectedTeam.Schedule.Count == 0)
         {
+          _scheduleUpdateInProgress = true;
+    
           List<Match> schedule = await DataLoader.LoadSchedule(_cachedTeams, _selectedTeam, cbCurrentSeason.SelectedItem.ToString());
           _selectedTeam.Schedule = schedule;
+      
+          _scheduleUpdateInProgress = false;
         }
-
-        this.LoadPlayers();
+        await LoadPlayers();
+        AllowControls(true);
       }
     }
 
@@ -724,9 +729,9 @@ namespace TMS
       try
       {
         _playerLoadingInProgress = true;
-        lbTeams.Enabled = false;
-        cbTeams.Enabled = false;
-        lbMatches.Enabled = false;
+        //lbTeams.Enabled = false;
+        //cbTeams.Enabled = false;
+        //lbMatches.Enabled = false;
         lbUnamapped.Visible = false;
         lblUnmapped.Visible = false;
         this.dgvPlayers.DataSource = null;
@@ -777,9 +782,9 @@ namespace TMS
 
         }
 
-        lbTeams.Enabled = true;
-        cbTeams.Enabled = true;
-        lbMatches.Enabled = true;
+        //lbTeams.Enabled = true;
+        //cbTeams.Enabled = true;
+        //lbMatches.Enabled = true;
 
         this.pbLoadingPlayers.Visible = false;
         //this.btnGenerateExcel.Enabled = true;
@@ -834,12 +839,16 @@ namespace TMS
 
         dgvPlayers.DataSource = this._selectedTeam.Players;
         foreach (DataGridViewRow dgvr in dgvPlayers.Rows)
-        {
+        {         
           dgvr.Cells[7].Style = new DataGridViewCellStyle()
           {
             Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Italic)
           };
           Player player = (Player)dgvr.DataBoundItem;
+
+          if(player.Injury!=null)
+            for(int i=0;i<dgvr.Cells.Count;i++)
+              dgvr.Cells[i].ToolTipText = player.Injury;
 
           if (player.CurrentSeasonStatistics != null)
           {
@@ -1834,7 +1843,7 @@ namespace TMS
       {
         Player player = (Player)dgvr.DataBoundItem;
 
-        if (player.Statistics != null && player.PlayerId == playerId)
+        if (player.Statistics != null && player.Statistics.Count>0 && player.PlayerId == playerId)
         {
           dgvr.Cells[3].Value = player.Statistics[0].GamesPlayed;
           dgvr.Cells[4].Value = player.Statistics[0].MinutesPlayed;

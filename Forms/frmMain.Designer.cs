@@ -146,7 +146,7 @@ namespace TMS
       this.lbTeams.TabIndex = 8;
       this.lbTeams.Click += new System.EventHandler(this.lbTeams_Click);
       this.lbTeams.SelectedIndexChanged += new System.EventHandler(this.lbTeams_SelectedIndexChanged);
-      this.lbTeams.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbTeams_KeyDown);
+      //this.lbTeams.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbTeams_KeyDown);
       // 
       // cmsMapTeam
       // 
