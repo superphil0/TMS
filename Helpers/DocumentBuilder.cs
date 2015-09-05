@@ -423,7 +423,7 @@ namespace TMS
         {
           iXLWorksheet = xLWorkbook.Worksheets.Add("Schedule");
           iXLWorksheet.Position = 2;
-          iXLWorksheet.ColumnWidth = 3.57 * 0.7;
+          iXLWorksheet.ColumnWidth = 2.57;
           iXLWorksheet.Columns(1, 1).Width = 5.14 * 0.7;
 
           iXLWorksheet.Style.Font.Bold = true;
@@ -475,7 +475,7 @@ namespace TMS
               mdatecell.Style.Font.Bold = true;
               mdatecell.Style.Font.SetFontSize(8);
               mdatecell.Style.Font.Italic = true;
-              mdatecell.WorksheetColumn().Width = 8;
+              mdatecell.WorksheetColumn().Width = 8.71;
               mdatecell.Value = mdate;
               mdatecell.Hyperlink = new XLHyperlink(teamSchedule[m].MatchReportUrl);
 
@@ -487,7 +487,7 @@ namespace TMS
               mtimecell.Style.Font.SetFontSize(8);
               mtimecell.Style.Font.Italic = true;
               mtimecell.Style.Fill.SetBackgroundColor(XLColor.LightGray);
-              mtimecell.WorksheetColumn().Width = 8;
+              mtimecell.WorksheetColumn().Width = 8.71;
               mtimecell.Value = mtime;
               mtimecell.Hyperlink = new XLHyperlink(teamSchedule[m].MatchReportUrl);
             }
