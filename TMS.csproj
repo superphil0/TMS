@@ -113,6 +113,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\frmCompetitionSelection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmCompetitionSelection.Designer.cs">
+      <DependentUpon>frmCompetitionSelection.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmCompetitionMapping.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -155,6 +161,9 @@
     <Compile Include="Model\Team.cs" />
     <EmbeddedResource Include="Forms\dlgLogin.resx">
       <DependentUpon>dlgLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmCompetitionSelection.resx">
+      <DependentUpon>frmCompetitionSelection.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>

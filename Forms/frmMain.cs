@@ -42,7 +42,7 @@ namespace TMS
     private Team _selectedTeam;
     private Competition _selectedCompetition;
     private Country _selectedCountry;
-    
+
     #endregion Attributes
 
     #region Init
@@ -174,6 +174,15 @@ namespace TMS
               var anames = array[4].Split(',');
               foreach (var an in anames)
                 c.AlternativeName.Add(an);
+
+              string top = array[4];
+              c.Top = top == "True" ? true : false;
+            }
+
+            if (array.Length > 5)
+            {
+              string top = array[5];
+              c.Top = top == "True" ? true : false;
             }
 
             var country = _cachedCountries.Where(cc => cc.CountryId == c.CompetitionCountryId).FirstOrDefault();
@@ -291,7 +300,7 @@ namespace TMS
       this.cbCountries.Select(this.cbCountries.Text.Length, 0);
     }
 
-   
+
     #endregion Countries
 
     #region Competitions
@@ -624,6 +633,38 @@ namespace TMS
         sr.Close();
 
         StreamWriter sw = new StreamWriter(Application.StartupPath + Helper.GetCountryListFileName());
+        foreach (string s in lines)
+          sw.WriteLine(s);
+        sw.Close();
+      }
+      catch (Exception ex)
+      {
+        Logger.Exception(ex);
+        MessageBox.Show(ex.Message);
+      }
+    }
+
+    private void UpdateCompetitionTop(Competition c)
+    {
+      try
+      {
+        StreamReader sr = new StreamReader(Application.StartupPath + Helper.GetCompetitionListFileName());
+        List<string> lines = new List<string>();
+        while (sr.EndOfStream == false)
+        {
+          string line = sr.ReadLine();
+          if (line.Contains(c.CompetitionId + "|" + c.CompetitionName))
+          {
+            if (line.Contains("|True") || line.Contains("|False"))
+              line = line.Substring(0, line.LastIndexOf("|")) + "|" + c.Top;
+            else
+              line += "|" + c.Top;
+          }
+          lines.Add(line);
+        }
+        sr.Close();
+
+        StreamWriter sw = new StreamWriter(Application.StartupPath + Helper.GetCompetitionListFileName());
         foreach (string s in lines)
           sw.WriteLine(s);
         sw.Close();
@@ -1331,7 +1372,7 @@ namespace TMS
 
     private async void btnRefresh_Click(object sender, EventArgs e)
     {
-     await StartLivescoreFeedAsync();
+      await StartLivescoreFeedAsync();
     }
 
     private async void rbSlijedi_Click(object sender, EventArgs e)
@@ -1916,12 +1957,12 @@ namespace TMS
     {
       _scheduleUpdateInProgress = true;
       AllowControls(false);
-      await AzurirajArhivu(_selectedTeam);
+      await AzurirajArhivu(_selectedTeam.CompetitionId);
       _scheduleUpdateInProgress = false;
       AllowControls(true);
     }
 
-    private async Task<bool> AzurirajArhivu(Team team)
+    private async Task<bool> AzurirajArhivu(string competitionId)
     {
       try
       {
@@ -1932,7 +1973,7 @@ namespace TMS
           return false;
         }
 
-        Competition competition = _cachedCompetitions.Where(cc => cc.CompetitionId == team.CompetitionId).FirstOrDefault();
+        Competition competition = _cachedCompetitions.Where(cc => cc.CompetitionId == competitionId).FirstOrDefault();
 
         if (competition == null)
           return false;
@@ -2116,11 +2157,16 @@ namespace TMS
 
     private async void btnAzurirajLigu_Click(object sender, EventArgs e)
     {
+      await AzurirajLigu();
+    }
+
+    private async Task AzurirajLigu()
+    {
       var existingTeams = (List<Team>)lbTeams.DataSource;
 
       _competitionUpdateInProgress = true;
       AllowControls(false);
-      bool status = await AzurirajArhivu(_selectedTeam);
+      bool status = await AzurirajArhivu(_selectedTeam.CompetitionId);
 
       if (status == true)
       {
@@ -2171,6 +2217,45 @@ namespace TMS
           Process.Start(url);
         else
           MessageBox.Show("Nije pronadjen link!");
+      }
+    }
+
+    private void cmsTopCompetition_Opening(object sender, CancelEventArgs e)
+    {
+      var c = lbCompetition.SelectedItem;
+      if (c != null)
+      {
+        var competition = (Competition)c;
+        topToolStripMenuItem1.Checked = competition.Top;
+      }
+    }
+
+    private void topToolStripMenuItem1_Click(object sender, EventArgs e)
+    {
+      //if (((Country)lbCountries.SelectedItem).CountryId != -1)
+      //{
+      var c = lbCompetition.SelectedItem;
+      if (c != null)
+      {
+        var competition = (Competition)c;
+        competition.Top = !competition.Top;
+        UpdateCompetitionTop(competition);
+      }
+      //}
+    }
+
+    private async void btnAzurirajTopLige_Click(object sender, EventArgs e)
+    {
+      frmCompetitionSelection frm = new frmCompetitionSelection();
+      frm.Competitions = _cachedCompetitions.Where(cc => cc.Top == true).ToList();
+      DialogResult dr = frm.ShowDialog();
+      if (dr == DialogResult.OK)
+      {
+        foreach (var competition in frm.SelectedCompetitions)
+        {
+          lbTeams.DataSource = _cachedTeams.Where(ct => ct.CompetitionId == competition.CompetitionId).ToList();
+          await AzurirajLigu();
+        }
       }
     }
   }

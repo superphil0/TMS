@@ -71,11 +71,6 @@ namespace TMS
       this.lbUnamapped = new System.Windows.Forms.ListBox();
       this.lblUnmapped = new System.Windows.Forms.Label();
       this.tbStatus = new System.Windows.Forms.TextBox();
-      this.pbLivescore = new System.Windows.Forms.PictureBox();
-      this.pbLoadingPlayers = new System.Windows.Forms.PictureBox();
-      this.pbLoadingCountries = new System.Windows.Forms.PictureBox();
-      this.pbLoadingCompetitions = new System.Windows.Forms.PictureBox();
-      this.pbLoadingTeams = new System.Windows.Forms.PictureBox();
       this.rbLive = new System.Windows.Forms.RadioButton();
       this.rbSlijedi = new System.Windows.Forms.RadioButton();
       this.rbCompleted = new System.Windows.Forms.RadioButton();
@@ -95,18 +90,27 @@ namespace TMS
       this.rbSve = new System.Windows.Forms.RadioButton();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
       this.btnAzurirajLigu = new System.Windows.Forms.Button();
+      this.cmsTopCompetition = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.topToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+      this.pbLivescore = new System.Windows.Forms.PictureBox();
+      this.pbLoadingTeams = new System.Windows.Forms.PictureBox();
+      this.pbLoadingPlayers = new System.Windows.Forms.PictureBox();
+      this.pbLoadingCountries = new System.Windows.Forms.PictureBox();
+      this.pbLoadingCompetitions = new System.Windows.Forms.PictureBox();
+      this.btnAzurirajTopLige = new System.Windows.Forms.Button();
       this.cmsMapTeam.SuspendLayout();
       this.cmsTop.SuspendLayout();
       this.cmLineupstatus.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLivescore)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingPlayers)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingCountries)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingCompetitions)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingTeams)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.lbMatches)).BeginInit();
       this.cmMapCompetition.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.dgvPlayers)).BeginInit();
       this.groupBox1.SuspendLayout();
+      this.cmsTopCompetition.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLivescore)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingTeams)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingPlayers)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingCountries)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingCompetitions)).BeginInit();
       this.SuspendLayout();
       // 
       // btnGenerateExcel
@@ -122,6 +126,7 @@ namespace TMS
       // 
       // lbCompetition
       // 
+      this.lbCompetition.ContextMenuStrip = this.cmsTopCompetition;
       this.lbCompetition.FormattingEnabled = true;
       this.lbCompetition.ItemHeight = 16;
       this.lbCompetition.Location = new System.Drawing.Point(9, 389);
@@ -131,7 +136,6 @@ namespace TMS
       this.lbCompetition.Size = new System.Drawing.Size(194, 180);
       this.lbCompetition.TabIndex = 7;
       this.lbCompetition.Click += new System.EventHandler(this.lbCompetition_Click);
-      //this.lbCompetition.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbCompetition_KeyDown);
       // 
       // lbTeams
       // 
@@ -146,7 +150,6 @@ namespace TMS
       this.lbTeams.TabIndex = 8;
       this.lbTeams.Click += new System.EventHandler(this.lbTeams_Click);
       this.lbTeams.SelectedIndexChanged += new System.EventHandler(this.lbTeams_SelectedIndexChanged);
-      //this.lbTeams.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbTeams_KeyDown);
       // 
       // cmsMapTeam
       // 
@@ -223,7 +226,6 @@ namespace TMS
       this.cbCountries.Size = new System.Drawing.Size(194, 24);
       this.cbCountries.TabIndex = 22;
       this.cbCountries.TextUpdate += new System.EventHandler(this.cbCountries_TextUpdate);
-      //this.cbCountries.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbCountries_KeyDown);
       // 
       // cbTeams
       // 
@@ -233,7 +235,6 @@ namespace TMS
       this.cbTeams.Size = new System.Drawing.Size(276, 24);
       this.cbTeams.TabIndex = 25;
       this.cbTeams.TextUpdate += new System.EventHandler(this.cbTeams_TextUpdate);
-      //this.cbTeams.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbTeams_KeyDown);
       // 
       // lbLatest
       // 
@@ -328,72 +329,6 @@ namespace TMS
       this.tbStatus.TabIndex = 5;
       this.tbStatus.Visible = false;
       // 
-      // pbLivescore
-      // 
-      this.pbLivescore.BackColor = System.Drawing.Color.White;
-      this.pbLivescore.Image = global::TMS.Properties.Resources.loading4;
-      this.pbLivescore.Location = new System.Drawing.Point(344, 222);
-      this.pbLivescore.Margin = new System.Windows.Forms.Padding(4);
-      this.pbLivescore.Name = "pbLivescore";
-      this.pbLivescore.Size = new System.Drawing.Size(90, 110);
-      this.pbLivescore.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-      this.pbLivescore.TabIndex = 36;
-      this.pbLivescore.TabStop = false;
-      this.pbLivescore.Visible = false;
-      // 
-      // pbLoadingPlayers
-      // 
-      this.pbLoadingPlayers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-      this.pbLoadingPlayers.BackColor = System.Drawing.Color.White;
-      this.pbLoadingPlayers.Image = global::TMS.Properties.Resources.loading4;
-      this.pbLoadingPlayers.Location = new System.Drawing.Point(951, 322);
-      this.pbLoadingPlayers.Margin = new System.Windows.Forms.Padding(4);
-      this.pbLoadingPlayers.Name = "pbLoadingPlayers";
-      this.pbLoadingPlayers.Size = new System.Drawing.Size(90, 110);
-      this.pbLoadingPlayers.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-      this.pbLoadingPlayers.TabIndex = 19;
-      this.pbLoadingPlayers.TabStop = false;
-      this.pbLoadingPlayers.Visible = false;
-      // 
-      // pbLoadingCountries
-      // 
-      this.pbLoadingCountries.BackColor = System.Drawing.Color.White;
-      this.pbLoadingCountries.Image = global::TMS.Properties.Resources.loading4;
-      this.pbLoadingCountries.Location = new System.Drawing.Point(59, 145);
-      this.pbLoadingCountries.Margin = new System.Windows.Forms.Padding(4);
-      this.pbLoadingCountries.Name = "pbLoadingCountries";
-      this.pbLoadingCountries.Size = new System.Drawing.Size(90, 110);
-      this.pbLoadingCountries.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-      this.pbLoadingCountries.TabIndex = 24;
-      this.pbLoadingCountries.TabStop = false;
-      this.pbLoadingCountries.Visible = false;
-      // 
-      // pbLoadingCompetitions
-      // 
-      this.pbLoadingCompetitions.BackColor = System.Drawing.Color.White;
-      this.pbLoadingCompetitions.Image = global::TMS.Properties.Resources.loading4;
-      this.pbLoadingCompetitions.Location = new System.Drawing.Point(59, 428);
-      this.pbLoadingCompetitions.Margin = new System.Windows.Forms.Padding(4);
-      this.pbLoadingCompetitions.Name = "pbLoadingCompetitions";
-      this.pbLoadingCompetitions.Size = new System.Drawing.Size(90, 110);
-      this.pbLoadingCompetitions.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-      this.pbLoadingCompetitions.TabIndex = 23;
-      this.pbLoadingCompetitions.TabStop = false;
-      this.pbLoadingCompetitions.Visible = false;
-      // 
-      // pbLoadingTeams
-      // 
-      this.pbLoadingTeams.BackColor = System.Drawing.Color.White;
-      this.pbLoadingTeams.Image = global::TMS.Properties.Resources.loading4;
-      this.pbLoadingTeams.Location = new System.Drawing.Point(680, 237);
-      this.pbLoadingTeams.Margin = new System.Windows.Forms.Padding(4);
-      this.pbLoadingTeams.Name = "pbLoadingTeams";
-      this.pbLoadingTeams.Size = new System.Drawing.Size(90, 118);
-      this.pbLoadingTeams.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-      this.pbLoadingTeams.TabIndex = 18;
-      this.pbLoadingTeams.TabStop = false;
-      this.pbLoadingTeams.Visible = false;
-      // 
       // rbLive
       // 
       this.rbLive.AutoSize = true;
@@ -443,7 +378,7 @@ namespace TMS
       dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lbMatches.RowsDefaultCellStyle = dataGridViewCellStyle1;
       this.lbMatches.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.lbMatches.Size = new System.Drawing.Size(370, 546);
+      this.lbMatches.Size = new System.Drawing.Size(370, 507);
       this.lbMatches.TabIndex = 40;
       this.lbMatches.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.lbMatches_CellClick);
       // 
@@ -609,12 +544,106 @@ namespace TMS
       this.btnAzurirajLigu.UseVisualStyleBackColor = true;
       this.btnAzurirajLigu.Click += new System.EventHandler(this.btnAzurirajLigu_Click);
       // 
+      // cmsTopCompetition
+      // 
+      this.cmsTopCompetition.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.topToolStripMenuItem1});
+      this.cmsTopCompetition.Name = "cmsTopCompetition";
+      this.cmsTopCompetition.Size = new System.Drawing.Size(95, 26);
+      this.cmsTopCompetition.Opening += new System.ComponentModel.CancelEventHandler(this.cmsTopCompetition_Opening);
+      // 
+      // topToolStripMenuItem1
+      // 
+      this.topToolStripMenuItem1.Checked = true;
+      this.topToolStripMenuItem1.CheckState = System.Windows.Forms.CheckState.Checked;
+      this.topToolStripMenuItem1.Name = "topToolStripMenuItem1";
+      this.topToolStripMenuItem1.Size = new System.Drawing.Size(94, 22);
+      this.topToolStripMenuItem1.Text = "Top";
+      this.topToolStripMenuItem1.Click += new System.EventHandler(this.topToolStripMenuItem1_Click);
+      // 
+      // pbLivescore
+      // 
+      this.pbLivescore.BackColor = System.Drawing.Color.White;
+      this.pbLivescore.Image = global::TMS.Properties.Resources.loading4;
+      this.pbLivescore.Location = new System.Drawing.Point(344, 222);
+      this.pbLivescore.Margin = new System.Windows.Forms.Padding(4);
+      this.pbLivescore.Name = "pbLivescore";
+      this.pbLivescore.Size = new System.Drawing.Size(90, 110);
+      this.pbLivescore.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+      this.pbLivescore.TabIndex = 36;
+      this.pbLivescore.TabStop = false;
+      this.pbLivescore.Visible = false;
+      // 
+      // pbLoadingTeams
+      // 
+      this.pbLoadingTeams.BackColor = System.Drawing.Color.White;
+      this.pbLoadingTeams.Image = global::TMS.Properties.Resources.loading4;
+      this.pbLoadingTeams.Location = new System.Drawing.Point(680, 237);
+      this.pbLoadingTeams.Margin = new System.Windows.Forms.Padding(4);
+      this.pbLoadingTeams.Name = "pbLoadingTeams";
+      this.pbLoadingTeams.Size = new System.Drawing.Size(90, 118);
+      this.pbLoadingTeams.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+      this.pbLoadingTeams.TabIndex = 18;
+      this.pbLoadingTeams.TabStop = false;
+      this.pbLoadingTeams.Visible = false;
+      // 
+      // pbLoadingPlayers
+      // 
+      this.pbLoadingPlayers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+      this.pbLoadingPlayers.BackColor = System.Drawing.Color.White;
+      this.pbLoadingPlayers.Image = global::TMS.Properties.Resources.loading4;
+      this.pbLoadingPlayers.Location = new System.Drawing.Point(951, 322);
+      this.pbLoadingPlayers.Margin = new System.Windows.Forms.Padding(4);
+      this.pbLoadingPlayers.Name = "pbLoadingPlayers";
+      this.pbLoadingPlayers.Size = new System.Drawing.Size(90, 110);
+      this.pbLoadingPlayers.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+      this.pbLoadingPlayers.TabIndex = 19;
+      this.pbLoadingPlayers.TabStop = false;
+      this.pbLoadingPlayers.Visible = false;
+      // 
+      // pbLoadingCountries
+      // 
+      this.pbLoadingCountries.BackColor = System.Drawing.Color.White;
+      this.pbLoadingCountries.Image = global::TMS.Properties.Resources.loading4;
+      this.pbLoadingCountries.Location = new System.Drawing.Point(59, 145);
+      this.pbLoadingCountries.Margin = new System.Windows.Forms.Padding(4);
+      this.pbLoadingCountries.Name = "pbLoadingCountries";
+      this.pbLoadingCountries.Size = new System.Drawing.Size(90, 110);
+      this.pbLoadingCountries.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+      this.pbLoadingCountries.TabIndex = 24;
+      this.pbLoadingCountries.TabStop = false;
+      this.pbLoadingCountries.Visible = false;
+      // 
+      // pbLoadingCompetitions
+      // 
+      this.pbLoadingCompetitions.BackColor = System.Drawing.Color.White;
+      this.pbLoadingCompetitions.Image = global::TMS.Properties.Resources.loading4;
+      this.pbLoadingCompetitions.Location = new System.Drawing.Point(59, 428);
+      this.pbLoadingCompetitions.Margin = new System.Windows.Forms.Padding(4);
+      this.pbLoadingCompetitions.Name = "pbLoadingCompetitions";
+      this.pbLoadingCompetitions.Size = new System.Drawing.Size(90, 110);
+      this.pbLoadingCompetitions.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+      this.pbLoadingCompetitions.TabIndex = 23;
+      this.pbLoadingCompetitions.TabStop = false;
+      this.pbLoadingCompetitions.Visible = false;
+      // 
+      // btnAzurirajTopLige
+      // 
+      this.btnAzurirajTopLige.Location = new System.Drawing.Point(212, 576);
+      this.btnAzurirajTopLige.Name = "btnAzurirajTopLige";
+      this.btnAzurirajTopLige.Size = new System.Drawing.Size(369, 38);
+      this.btnAzurirajTopLige.TabIndex = 52;
+      this.btnAzurirajTopLige.Text = "Ažuriraj top lige ";
+      this.btnAzurirajTopLige.UseVisualStyleBackColor = true;
+      this.btnAzurirajTopLige.Click += new System.EventHandler(this.btnAzurirajTopLige_Click);
+      // 
       // frmMain
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.LightSteelBlue;
       this.ClientSize = new System.Drawing.Size(1123, 702);
+      this.Controls.Add(this.btnAzurirajTopLige);
       this.Controls.Add(this.btnAzurirajLigu);
       this.Controls.Add(this.groupBox1);
       this.Controls.Add(this.btnAzurirajArhivu);
@@ -658,16 +687,17 @@ namespace TMS
       this.cmsMapTeam.ResumeLayout(false);
       this.cmsTop.ResumeLayout(false);
       this.cmLineupstatus.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.pbLivescore)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingPlayers)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingCountries)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingCompetitions)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingTeams)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.lbMatches)).EndInit();
       this.cmMapCompetition.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.dgvPlayers)).EndInit();
       this.groupBox1.ResumeLayout(false);
       this.groupBox1.PerformLayout();
+      this.cmsTopCompetition.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.pbLivescore)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingTeams)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingPlayers)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingCountries)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.pbLoadingCompetitions)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -688,6 +718,9 @@ namespace TMS
     private Button btnAzurirajLigu;
     private ToolStripMenuItem gledajToolStripMenuItem;
     private ToolStripMenuItem pogledajGoloveToolStripMenuItem;
+    private ContextMenuStrip cmsTopCompetition;
+    private ToolStripMenuItem topToolStripMenuItem1;
+    private Button btnAzurirajTopLige;
   }
 }
 

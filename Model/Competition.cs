@@ -61,5 +61,7 @@ namespace TMS
       get { return this.CompetitionCountry + " (" + this.CompetitionName + ")"; }
 
     }
+
+    public bool Top { get; set; }
   }
 }
