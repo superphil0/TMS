@@ -699,7 +699,12 @@ namespace TMS
         {
           string text = "";
           string text2 = "";
-          HtmlNode htmlNode = htmlDocument.DocumentNode.SelectNodes("//table[@class='profilheader']").ElementAt(0);
+          var items  = htmlDocument.DocumentNode.SelectNodes("//table[@class='profilheader']");
+          if (items == null)
+          {
+            return statistics;
+          }
+          HtmlNode htmlNode = items.ElementAt(0);
           HtmlNodeCollection htmlNodeCollection3 = htmlNode.SelectNodes("tr/td");
           if (htmlNodeCollection3 != null)
           {

@@ -1006,7 +1006,8 @@ namespace TMS
               p.Statistics.Add(statistics);
               if (currentSeason && statistics != null)
               {
-                p.Matches = statistics.Matches.OrderByDescending(m => m.Date).Take(4).ToList();
+                if(statistics.Matches!=null)
+                  p.Matches = statistics.Matches.OrderByDescending(m => m.Date).Take(4).ToList();
                 currentSeason = false;
 
                 currentSeasonData.WriteLine(playerData);
@@ -1957,12 +1958,12 @@ namespace TMS
     {
       _scheduleUpdateInProgress = true;
       AllowControls(false);
-      await AzurirajArhivu(_selectedTeam.CompetitionId);
+      await AzurirajArhivu(_selectedTeam.CompetitionId,false);
       _scheduleUpdateInProgress = false;
       AllowControls(true);
     }
 
-    private async Task<bool> AzurirajArhivu(string competitionId)
+    private async Task<bool> AzurirajArhivu(string competitionId, bool bundleMode)
     {
       try
       {
@@ -1982,11 +1983,19 @@ namespace TMS
 
         if (File.Exists(archiveFileName) == false)
         {
-          DialogResult dr =
-          MessageBox.Show(
-            "Ne postoji arhiva " + archiveFileName + "! Da li je treba napraviti ?",
-            "Pitanje", MessageBoxButtons.YesNo);
-          if (dr == DialogResult.Yes)
+          if (bundleMode == false)
+          {
+            DialogResult dr =
+            MessageBox.Show(
+              "Ne postoji arhiva " + archiveFileName + "! Da li je treba napraviti ?",
+              "Pitanje", MessageBoxButtons.YesNo);
+            if (dr == DialogResult.Yes)
+            {
+              await LoadTeamsAsync(false);
+              await KreirajArhivu(competition);
+            }
+          }
+          else
           {
             await LoadTeamsAsync(false);
             await KreirajArhivu(competition);
@@ -2157,16 +2166,16 @@ namespace TMS
 
     private async void btnAzurirajLigu_Click(object sender, EventArgs e)
     {
-      await AzurirajLigu();
+      await AzurirajLigu(false);
     }
 
-    private async Task AzurirajLigu()
+    private async Task AzurirajLigu(bool bundleMode)
     {
       var existingTeams = (List<Team>)lbTeams.DataSource;
 
       _competitionUpdateInProgress = true;
       AllowControls(false);
-      bool status = await AzurirajArhivu(_selectedTeam.CompetitionId);
+      bool status = await AzurirajArhivu(_selectedTeam.CompetitionId,bundleMode);
 
       if (status == true)
       {
@@ -2254,7 +2263,7 @@ namespace TMS
         foreach (var competition in frm.SelectedCompetitions)
         {
           lbTeams.DataSource = _cachedTeams.Where(ct => ct.CompetitionId == competition.CompetitionId).ToList();
-          await AzurirajLigu();
+          await AzurirajLigu(true);
         }
       }
     }
